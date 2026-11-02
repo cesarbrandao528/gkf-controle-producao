@@ -1,0 +1,6 @@
+{
+  "name": "Controle de Produção • GKF",
+  "description": "Sistema integrado de controle de produção, trechos de obras (OSE), medições CASAN (BM), cadastro de contratos, fluxo financeiro e dashboards executivos da GKF Engenharia.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,43 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with role-based access control for production control",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": {
+          "type": "string",
+          "enum": ["gestor", "editor", "leitor", "pendente"]
+        },
+        "createdAt": { "type": "string" },
+        "approvedBy": { "type": "string" }
+      },
+      "required": ["id", "email", "role"]
+    },
+    "ProductionData": {
+      "title": "ProductionData",
+      "description": "Central production and contracts configuration",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "updatedBy": { "type": "string" },
+        "payload": { "type": "string" }
+      },
+      "required": ["id", "updatedAt", "payload"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile records with role assignments"
+    },
+    "/production/{docId}": {
+      "schema": "ProductionData",
+      "description": "Shared production state storage"
+    }
+  }
+}
