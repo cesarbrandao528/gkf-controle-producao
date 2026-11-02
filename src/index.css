@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+:root {
+  --cy: #3d9bff;
+  --cyr: 61, 155, 255;
+  --vi: #a9b6c8;
+  --vir: 169, 182, 200;
+  --am: #fbbf24;
+  --amr: 251, 191, 36;
+  --rd: #ff5d6c;
+  --rdr: 255, 93, 108;
+  --rd2: #ff8a95;
+  --tx: #e8eefb;
+  --tx2: #c3cde2;
+  --mu: #93a3bd;
+  --w: 255, 255, 255;
+  --ln: rgba(255, 255, 255, 0.1);
+  --grid: rgba(255, 255, 255, 0.08);
+  --bg0: #030813;
+  --opt: #0b1630;
+  --shd: rgba(0, 0, 0, 0.4);
+  --bgA: #0b2a55;
+  --bgB: #071530;
+  --bgC: #030813;
+  --card1: rgba(255, 255, 255, 0.07);
+  --card2: rgba(255, 255, 255, 0.025);
+  --tipbg: rgba(8, 16, 36, 0.95);
+  --c3: #7cc4ff;
+  --c4: #5b6f8a;
+  --c5: #2563b0;
+  --c6: #c7d2e0;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --cy: #00467d;
+  --cyr: 0, 70, 125;
+  --vi: #6d6e72;
+  --vir: 109, 110, 114;
+  --am: #c48100;
+  --amr: 196, 129, 0;
+  --rd: #c43c3c;
+  --rdr: 196, 60, 60;
+  --rd2: #c43c3c;
+  --tx: #1b2733;
+  --tx2: #3a4a5b;
+  --mu: #5f7083;
+  --w: 0, 54, 95;
+  --ln: rgba(0, 54, 95, 0.15);
+  --grid: rgba(0, 54, 95, 0.1);
+  --bg0: #ffffff;
+  --opt: #ffffff;
+  --shd: rgba(0, 54, 95, 0.12);
+  --bgA: #dfeaf5;
+  --bgB: #f0f5fa;
+  --bgC: #f8fafc;
+  --card1: rgba(255, 255, 255, 0.95);
+  --card2: rgba(255, 255, 255, 0.75);
+  --tipbg: rgba(255, 255, 255, 0.97);
+  --c3: #4a90c9;
+  --c4: #9aa7b8;
+  --c5: #0b7bc4;
+  --c6: #b9c4d2;
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--tx);
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+  font-size: 14px;
+  background:
+    radial-gradient(900px 500px at 12% -5%, rgba(var(--cyr), 0.13), transparent 60%),
+    radial-gradient(800px 500px at 95% 5%, rgba(var(--vir), 0.15), transparent 60%),
+    linear-gradient(165deg, var(--bgA) 0%, var(--bgB) 50%, var(--bgC) 100%);
+  background-attachment: fixed;
+}
+
+/* Custom modern scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(var(--w), 0.04);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--w), 0.18);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cy);
+}
+
+.gkf-card {
+  background: linear-gradient(180deg, var(--card1), var(--card2));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--ln);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: inset 0 1px 0 rgba(var(--w), 0.12), 0 20px 50px var(--shd);
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.gkf-card:hover {
+  border-color: rgba(var(--cyr), 0.35);
+}
+
+.gkf-table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.gkf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gkf-table th,
+.gkf-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(var(--w), 0.06);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.gkf-table th {
+  color: var(--mu);
+  font-size: 12px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--ln);
+}
+
+.gkf-table tbody tr:hover td {
+  background: rgba(var(--cyr), 0.06);
+}
+
+.gkf-table td input,
+.gkf-table td select {
+  width: 100%;
+  min-width: 80px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 5px 8px;
+  color: inherit;
+  font: inherit;
+}
+
+.gkf-table td input:hover,
+.gkf-table td select:hover {
+  border-color: var(--ln);
+}
+
+.gkf-table td input:focus,
+.gkf-table td select:focus {
+  background: rgba(var(--w), 0.08);
+  border-color: var(--cy);
+  outline: none;
+}
+
+.gkf-kpi {
+  background: linear-gradient(180deg, var(--card1), var(--card2));
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--ln);
+  border-radius: 18px;
+  padding: 18px 20px;
+  font-size: 13px;
+  color: var(--mu);
+  box-shadow: inset 0 1px 0 rgba(var(--w), 0.12), 0 15px 35px var(--shd);
+}
+
+.gkf-kpi b {
+  display: block;
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-top: 6px;
+  background: linear-gradient(100deg, var(--cy), var(--vi));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  white-space: nowrap;
+}

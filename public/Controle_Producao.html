@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="pt-BR"><head><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet"><script src="dados/jszip.min.js"></script><script>try{var t=localStorage.getItem("cp-tema");document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark")}catch(e){}</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Controle de Produção • GKF</title>
+<style>
+:root{--cy:#3d9bff;--cyr:61,155,255;--vi:#a9b6c8;--vir:169,182,200;--am:#fbbf24;--amr:251,191,36;--rd:#ff5d6c;--rdr:255,93,108;--rd2:#ff8a95;--tx:#e8eefb;--tx2:#c3cde2;--mu:#93a3bd;--w:255,255,255;--ln:rgba(255,255,255,.1);--grid:rgba(255,255,255,.08);--bg0:#030813;--opt:#0b1630;--shd:rgba(0,0,0,.4);--bgA:#0b2a55;--bgB:#071530;--bgC:#030813;--card1:rgba(255,255,255,.07);--card2:rgba(255,255,255,.025);--tipbg:rgba(8,16,36,.95);--c3:#7cc4ff;--c4:#5b6f8a;--c5:#2563b0;--c6:#c7d2e0;color-scheme:dark}
+:root[data-theme=light]{--cy:#00467D;--cyr:0,70,125;--vi:#6D6E72;--vir:109,110,114;--am:#c48100;--amr:196,129,0;--rd:#c43c3c;--rdr:196,60,60;--rd2:#c43c3c;--tx:#1b2733;--tx2:#3a4a5b;--mu:#5f7083;--w:0,54,95;--ln:rgba(0,54,95,.15);--grid:rgba(0,54,95,.1);--bg0:#fff;--opt:#fff;--shd:rgba(0,54,95,.12);--bgA:#dfeaf5;--bgB:#f0f5fa;--bgC:#f8fafc;--card1:rgba(255,255,255,.95);--card2:rgba(255,255,255,.75);--tipbg:rgba(255,255,255,.97);--c3:#4a90c9;--c4:#9aa7b8;--c5:#0b7bc4;--c6:#b9c4d2;color-scheme:light}
+:root{--ac:var(--cy);--cd:rgba(var(--w),.05);--cd2:rgba(var(--w),.08)}
+*{box-sizing:border-box}html{background:var(--bg0)}
+body{margin:0;min-height:100vh;color:var(--tx);font-family:Manrope,"Segoe UI",system-ui,sans-serif;letter-spacing:.01em;line-height:1.5;font-size:14px;background:radial-gradient(900px 500px at 12% -5%,rgba(var(--cyr),.13),transparent 60%),radial-gradient(800px 500px at 95% 5%,rgba(var(--vir),.15),transparent 60%),linear-gradient(165deg,var(--bgA) 0%,var(--bgB) 50%,var(--bgC) 100%);background-attachment:fixed}
+header{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:14px 26px;align-items:center;justify-content:space-between;padding:14px 26px;background:linear-gradient(180deg,rgba(var(--w),.07),rgba(var(--w),.03));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--ln)}
+.brand{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.logo{height:46px;background:#fff;border-radius:12px;padding:6px 12px;box-shadow:0 8px 24px var(--shd)}
+h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.1}.brand small{display:block;margin-top:4px;color:var(--mu);font-size:12.5px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}.tools{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+main{max-width:1500px;margin:auto;padding:26px 26px 60px}
+button{font:inherit;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(100deg,var(--cy),#1e6fd0);border:1px solid transparent;border-radius:12px;padding:10px 16px;cursor:pointer;transition:filter .2s,border-color .2s,transform .2s}
+button:hover{filter:brightness(1.1)}button:active{transform:translateY(1px)}button:disabled{opacity:.45;cursor:not-allowed}
+button.g,button.t{color:var(--tx);background:rgba(var(--w),.07);border:1px solid var(--ln)}button.g:hover,button.t:hover{border-color:var(--cy);filter:none}
+button.t.on{color:#fff;background:linear-gradient(100deg,var(--cy),#1e6fd0);border-color:transparent}
+input,select{font:inherit;font-size:13px;color:var(--tx);background:rgba(var(--w),.06);border:1px solid var(--ln);border-radius:12px;padding:9px 12px;backdrop-filter:blur(10px)}
+select option{background:var(--opt)}input:hover,select:hover{border-color:rgba(var(--cyr),.5)}
+input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+.card{background:linear-gradient(180deg,var(--card1),var(--card2));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--ln);border-radius:20px;padding:22px;margin-bottom:18px;box-shadow:inset 0 1px 0 rgba(var(--w),.12),0 20px 50px var(--shd);min-width:0;transition:border-color .25s,box-shadow .25s}
+.card:hover{border-color:rgba(var(--cyr),.35)}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mu);font-weight:500}label .row{text-transform:none}
+.tw{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:10px 12px;border-bottom:1px solid rgba(var(--w),.06);text-align:left;white-space:nowrap}
+th{color:var(--mu);font-size:12px;font-weight:700;border-bottom:1px solid var(--ln)}td.r,th.r{text-align:right}
+tbody tr:hover td{background:rgba(var(--cyr),.06)}td input,td select{width:100%;min-width:90px;background:transparent;border-color:transparent;padding:7px 9px}td input:hover,td select:hover{border-color:var(--ln)}td input:focus,td select:focus{background:rgba(var(--w),.06);border-color:var(--cy)}
+input.r{text-align:right}tr.o td{opacity:.4}tfoot td{font-weight:800;border-top:2px solid var(--ln);border-bottom:0}
+.card.k{display:flex;flex-wrap:wrap;gap:16px;background:none;border:0;box-shadow:none;padding:0;backdrop-filter:none}
+.k div{flex:1;min-width:220px;background:linear-gradient(180deg,var(--card1),var(--card2));backdrop-filter:blur(20px);border:1px solid var(--ln);border-radius:20px;padding:20px 22px;font-size:13px;color:var(--mu);box-shadow:inset 0 1px 0 rgba(var(--w),.12),0 20px 50px var(--shd)}
+.k b{display:block;font-size:clamp(22px,2.3vw,30px);font-weight:800;letter-spacing:-.02em;margin-top:8px;background:linear-gradient(100deg,var(--cy),var(--vi));-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+.neg{color:var(--rd2)}.mu{color:var(--mu)}h3{font-size:17px;font-weight:700;margin:0 0 6px}
+details.eqd summary{cursor:pointer;list-style:none;padding:7px 10px;border:1px solid transparent;border-radius:10px;min-width:150px}details.eqd summary:hover{border-color:var(--ln)}details.eqd[open] summary{background:rgba(var(--w),.06);border-color:var(--cy)}
+.eqm{display:grid;gap:6px;margin:6px 0 4px;padding:8px}.ck{flex-direction:row;align-items:center;gap:8px;font-size:13px;color:var(--tx)}.ck input{width:auto;min-width:0}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--tipbg);border:1px solid var(--cy);border-radius:12px;padding:12px 18px;font-size:13px;opacity:0;pointer-events:none;transition:.3s;z-index:50;max-width:90vw}#toast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:760px){header{padding:12px 14px}main{padding:16px 14px}}
+</style></head><body>
+<header>
+<div class="brand"><img class="logo" alt="GKF Engenharia de Obras" src="data:image/png;base64,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"><div><h1>Controle de Produção</h1><small>Trechos · Medições CASAN · Contratos</small></div></div>
+<nav class="tabs"><button class="t on" data-t="t">Trechos (OSE)</button><button class="t" data-t="m">Medição (BM CASAN)</button><button class="t" data-t="c">Cadastro de contratos</button><button class="t" data-t="p">Painel de Controle</button><button class="t" data-t="d">Dashboard</button><button class="t" data-t="f">Fluxo e Resultado</button></nav>
+<div class="tools"><label class="pctl"><span id="plab">Período da frente</span><span class="row" style="gap:6px"><input type="date" id="pi" data-a="per" data-k="ini"><input type="date" id="pf" data-a="per" data-k="fim"></span></label><button id="open" data-a="open">Abrir pasta de dados</button><button class="g" id="tema" type="button" aria-label="Alternar tema claro/escuro">Tema claro</button></div>
+</header>
+<main id="app"></main><iframe id="dash" title="Dashboard de contratos" style="display:none;width:100%;border:0;height:calc(100vh - 88px)"></iframe><iframe id="fluxo" title="Gestão de Obras - Fluxo e Resultado" style="display:none;width:100%;border:0;height:calc(100vh - 88px)"></iframe><div id="toast" role="status"></div>
+<script>
+const Motor=(()=>{
+const colN=s=>{let n=0;for(const ch of s)n=n*26+ch.charCodeAt(0)-64;return n},colL=n=>{let s='';while(n){s=String.fromCharCode(65+(n-1)%26)+s;n=Math.floor((n-1)/26)}return s};
+class Er{constructor(c){this.c=c}}
+const TK=/\s*(?:(\d+\.?\d*(?:[eE][+-]?\d+)?)|"((?:[^"]|"")*)"|([A-Z][A-Z0-9.]*)(?=\()|(\$?[A-Z]{1,3}\$?\d+(?::\$?[A-Z]{1,3}\$?\d+)?)|(<>|<=|>=|[-+*\/^&=<>(),%])|(TRUE|FALSE))/gy;
+function parse(src){
+ const t=[];TK.lastIndex=0;let m;
+ while(TK.lastIndex<src.length&&(m=TK.exec(src))){
+  if(m[1]!==undefined)t.push(['n',+m[1]]);else if(m[2]!==undefined)t.push(['s',m[2].replace(/""/g,'"')]);
+  else if(m[3]!==undefined)t.push(['f',m[3]]);else if(m[4]!==undefined)t.push(['r',m[4]]);
+  else if(m[5]!==undefined)t.push(['o',m[5]]);else t.push(['b',m[6]==='TRUE'])}
+ if(TK.lastIndex<src.trim().length)throw new Error('fórmula não suportada: '+src);
+ let p=0;const pk=()=>t[p],nx=()=>t[p++],isO=o=>t[p]&&t[p][0]==='o'&&t[p][1]===o;
+ const ref=s=>{const q=s.replace(/\$/g,'').split(':'),a=/([A-Z]+)(\d+)/.exec(q[0]),b=q[1]?/([A-Z]+)(\d+)/.exec(q[1]):a;
+  return q[1]?['g',colN(a[1]),+a[2],colN(b[1]),+b[2]]:['c',colN(a[1]),+a[2]]};
+ function cmp(){let l=cat();while(t[p]&&t[p][0]==='o'&&['=','<>','<','>','<=','>='].includes(t[p][1])){const o=nx()[1];l=['B',o,l,cat()]}return l}
+ function cat(){let l=add();while(isO('&')){nx();l=['B','&',l,add()]}return l}
+ function add(){let l=mul();while(isO('+')||isO('-')){const o=nx()[1];l=['B',o,l,mul()]}return l}
+ function mul(){let l=pow();while(isO('*')||isO('/')){const o=nx()[1];l=['B',o,l,pow()]}return l}
+ function pow(){let l=un();while(isO('^')){nx();l=['B','^',l,un()]}return l}
+ function un(){if(isO('-')){nx();return['u',un()]}if(isO('+')){nx();return un()}return pc()}
+ function pc(){let x=pr();while(isO('%')){nx();x=['B','/',x,['n',100]]}return x}
+ function pr(){const k=nx();if(!k)throw new Error('fim inesperado');
+  if(k[0]==='n'||k[0]==='s'||k[0]==='b')return k;if(k[0]==='r')return ref(k[1]);
+  if(k[0]==='f'){nx();const a=[];if(!isO(')')){do{a.push(cmp())}while(isO(',')&&nx())}nx();return['F',k[1],a]}
+  if(k[0]==='o'&&k[1]==='('){const e=cmp();nx();return e}throw new Error('token inesperado')}
+ return cmp()}
+const NA=new Er('#N/A');
+function build(cells){const C={};for(const k in cells){const v=cells[k];C[k]=typeof v==='string'&&v[0]==='='?{f:parse(v.slice(1))}:{v}}return C}
+function run(C,inp){
+ const X=Object.assign({},C),memo={},busy={};for(const k in inp)X[k]={v:inp[k]};
+ const num=v=>{if(v instanceof Er)return v;if(v==null||v==='')return 0;if(typeof v==='number')return v;if(typeof v==='boolean')return v?1:0;const n=+String(v).replace(',','.');return isNaN(n)?new Er('#VALUE!'):n};
+ const isn=v=>typeof v==='number';
+ const cell=(c,r)=>get(colL(c)+r);
+ function get(k){if(k in memo)return memo[k];const x=X[k];if(!x)return null;if(!x.f)return x.v===undefined?null:x.v;if(busy[k])return new Er('#REF!');busy[k]=1;let v=ev(x.f);if(v==null)v=0;busy[k]=0;return memo[k]=v}
+ const rng=n=>{const o=[];for(let r=n[2];r<=n[4];r++)for(let c=n[1];c<=n[3];c++)o.push(cell(c,r));return o};
+ const tru=v=>{if(v instanceof Er)return v;if(typeof v==='string')return v.toUpperCase()==='TRUE'?true:new Er('#VALUE!');return !!num(v)};
+ const eq=(a,b)=>{if(a==null)a=typeof b==='string'?'':0;if(b==null)b=typeof a==='string'?'':0;if(typeof a==='string'&&typeof b==='string')return a.toLowerCase()===b.toLowerCase();return a===b};
+ const cmpv=(o,a,b)=>{if(a instanceof Er)return a;if(b instanceof Er)return b;
+  if(o==='='||o==='<>'){const r=eq(a,b);return o==='='?r:!r}
+  if(a==null)a=typeof b==='string'?'':0;if(b==null)b=typeof a==='string'?'':0;
+  const ra=typeof a==='string'?1:0,rb=typeof b==='string'?1:0;let d=ra!==rb?ra-rb:(ra?(a.toLowerCase()<b.toLowerCase()?-1:a.toLowerCase()>b.toLowerCase()?1:0):a-b);
+  return o==='<'?d<0:o==='>'?d>0:o==='<='?d<=0:d>=0};
+ const crit=(cr)=>{let o='=',v=cr;if(typeof cr==='string'){const m=/^(<>|<=|>=|=|<|>)(.*)$/.exec(cr);if(m){o=m[1];v=m[2]}const n=v!==''&&!isNaN(+v)?+v:v;v=n}
+  return x=>{if(x instanceof Er)return false;if(typeof v==='number'){const n=typeof x==='number'?x:(typeof x==='string'&&x!==''&&!isNaN(+x)?+x:null);if(n==null)return o==='<>';return o==='='?n===v:o==='<>'?n!==v:o==='<'?n<v:o==='>'?n>v:o==='<='?n<=v:n>=v}
+   const s=x==null?'':String(x).toLowerCase(),w=String(v).toLowerCase();return o==='<>'?s!==w:s===w}};
+ function ev(n){
+  switch(n[0]){
+   case'n':case's':case'b':return n[1];
+   case'c':return cell(n[1],n[2]);
+   case'g':return new Er('#VALUE!');
+   case'u':{const v=num(ev(n[1]));return v instanceof Er?v:-v}
+   case'B':{const o=n[1];let a=ev(n[2]),b=ev(n[3]);
+    if(['=','<>','<','>','<=','>='].includes(o))return cmpv(o,a,b);
+    if(o==='&')return a instanceof Er?a:b instanceof Er?b:String(a==null?'':a)+String(b==null?'':b);
+    a=num(a);b=num(b);if(a instanceof Er)return a;if(b instanceof Er)return b;
+    if(o==='+')return a+b;if(o==='-')return a-b;if(o==='*')return a*b;
+    if(o==='/')return b===0?new Er('#DIV/0!'):a/b;return Math.pow(a,b)}
+   case'F':return fn(n[1],n[2])}}
+ function fn(f,a){
+  const flat=(skipText)=>{const o=[];for(const x of a){if(x[0]==='g')o.push(...rng(x));else if(skipText===2&&x[0]==='c')o.push(ev(x));else o.push(ev(x))}return o};
+  switch(f){
+   case'IF':{const c=tru(ev(a[0]));if(c instanceof Er)return c;return c?ev(a[1]):(a.length>2?ev(a[2]):false)}
+   case'IFERROR':{const v=ev(a[0]);return v instanceof Er?ev(a[1]):v}
+   case'SUM':case'AVERAGE':case'MAX':case'MIN':{let s=0,k=0,mx=-Infinity,mn=Infinity;for(const x of a){const direct=x[0]!=='g'&&x[0]!=='c';const vs=x[0]==='g'?rng(x):[ev(x)];
+     for(const v of vs){if(v instanceof Er)return v;let q=null;if(isn(v))q=v;else if(direct&&v!=null&&v!==''){q=num(v);if(q instanceof Er)return q}else if(typeof v==='boolean'&&direct)q=v?1:0;if(q!=null){s+=q;k++;mx=Math.max(mx,q);mn=Math.min(mn,q)}}}
+    return f==='SUM'?s:f==='AVERAGE'?(k?s/k:new Er('#DIV/0!')):f==='MAX'?(k?mx:0):(k?mn:0)}
+   case'SUMIF':{const g=a[0],t=crit(ev(a[1])),s=a[2]||a[0],R=rng(g),S=rng(['g',s[1],s[2],s[1]+(g[3]-g[1]),s[2]+(g[4]-g[2])]);let tot=0;R.forEach((v,i)=>{if(t(v)&&isn(S[i]))tot+=S[i]});return tot}
+   case'OR':case'AND':{let r=f==='AND';for(const v of flat()){if(v==null||v==='')continue;const b=tru(v);if(b instanceof Er)return b;if(f==='OR'&&b)return true;if(f==='AND'&&!b)return false}return r?true:false}
+   case'ROUND':{const v=num(ev(a[0])),d=num(ev(a[1]));if(v instanceof Er)return v;const p=Math.pow(10,d);return Math.sign(v)*Math.round(Math.abs(v)*p+1e-9)/p}
+   case'TODAY':return Math.floor((Date.now()-Date.UTC(1899,11,30))/864e5);
+   default:return new Er('#NAME?')}}
+ return{get,ev:k=>{const v=get(k);return v instanceof Er?v.c:v}}}
+return{parse,build,run,colN,colL,Er}})();
+
+
+const $=s=>document.querySelector(s),fmt=n=>(+n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}),
+pn=s=>{const t=String(s).replace(/[^\d,.-]/g,'');return t.includes(',')?+t.replace(/\./g,'').replace(',','.')||0:+t.replace(/\./g,'')||0},
+pf=s=>{s=String(s==null?'':s).trim();return s.includes(',')?pn(s):(parseFloat(s)||0)},
+esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
+dbr=d=>d.split('-').reverse().join('/');
+let DIR=null,CFG=null,LN={},LM={},TAB='t',FR=null,PRm={},tm,TPL={},TPLC={},OS=null,MEMO={},BMAP=null,FILT={q:'',s:''},DASHT='',DASHLAST='',FLUXT='',FLUXLAST='',FLUXD=null;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tm);tm=setTimeout(()=>t.classList.remove('on'),3500)}
+function setTema(t){document.documentElement.dataset.theme=t;try{localStorage.setItem('cp-tema',t)}catch(e){}$('#tema').textContent=t==='dark'?'Tema claro':'Tema escuro'}
+setTema(document.documentElement.dataset.theme==='light'?'light':'dark');
+document.addEventListener('click',e=>{if(e.target.closest('#tema'))setTema(document.documentElement.dataset.theme==='dark'?'light':'dark')});
+/* ---- pasta compartilhada (File System Access API) ---- */
+const idb=()=>new Promise(r=>{const q=indexedDB.open('cp',1);q.onupgradeneeded=()=>q.result.createObjectStore('k');q.onsuccess=()=>r(q.result)});
+const kget=async k=>{const d=await idb();return new Promise(r=>{const q=d.transaction('k').objectStore('k').get(k);q.onsuccess=()=>r(q.result)})};
+const kset=async(k,v)=>{const d=await idb();d.transaction('k','readwrite').objectStore('k').put(v,k)};
+async function openDir(){
+ if(!window.showDirectoryPicker){toast('Use o Google Chrome ou o Microsoft Edge neste computador.');return}
+ try{const h=await kget('h');if(h&&await h.requestPermission({mode:'readwrite'})==='granted')DIR=h}catch(e){}
+ try{if(!DIR){DIR=await showDirectoryPicker({mode:'readwrite'});await kset('h',DIR)}await loadAll()}
+ catch(e){DIR=null;if(e.name!=='AbortError')toast('Não foi possível abrir a pasta: '+e.message)}}
+async function rd(n){try{const f=await(await DIR.getFileHandle(n)).getFile();return{o:JSON.parse(await f.text()),m:f.lastModified}}catch(e){return null}}
+async function wr(n,o){
+ const fh=await DIR.getFileHandle(n,{create:true}),f=await fh.getFile();
+ if(LM[n]&&f.lastModified>LM[n]){toast('Outra pessoa alterou "'+n+'". Dados recarregados: refaça sua última alteração.');await loadAll();return false}
+ const w=await fh.createWritable();await w.write(JSON.stringify(o));await w.close();LM[n]=(await fh.getFile()).lastModified;toast('Salvo ✓');return true}
+async function loadAll(){
+ const c=await rd('config.json');if(!c){toast('config.json não encontrado. Selecione a pasta "dados".');DIR=null;return}
+ CFG=c.o;LM['config.json']=c.m;PRm=Object.fromEntries(CFG.precos.map(p=>[p.c,p]));LN={};MEMO={};{const tp=await rd('templates.json');TPL=tp?tp.o:{};TPLC={};const bmm=await rd('bm_map.json');BMAP=bmm?bmm.o:null;try{DASHT=await(await(await DIR.getFileHandle('dashboard_modelo.html')).getFile()).text()}catch(e){DASHT=''}try{FLUXT=await(await(await DIR.getFileHandle('fluxo_obras.html')).getFile()).text()}catch(e){FLUXT=''}{const fd=await rd('fluxo_dados.json');FLUXD=fd&&fd.o&&fluxoOk(fd.o.d)?fd.o.d:null;if(fd)LM['fluxo_dados.json']=fd.m}}
+ for(const f of CFG.frentes){const l=await rd('lanc_'+f.id+'.json');LN[f.id]=l?l.o:{itens:[]};if(l)LM['lanc_'+f.id+'.json']=l.m}
+ if(!CFG.frentes.some(f=>f.id===FR))FR=CFG.frentes[0].id;render()}
+/* ---- cálculos (mesmas fórmulas do PAINEL DE CONTROLE) ---- */
+const per=id=>{const f=CFG.frentes.find(x=>x.id===id);return(f&&f.periodo)||CFG.periodo};
+const inP=(d,id)=>{const p=per(id);return d>=p.ini&&d<=p.fim};
+const bm=id=>LN[id].itens.filter(x=>inP(x.d,id)).reduce((t,x)=>t+x.q*((PRm[x.c]||{}).p||0),0)+(LN[id].oses||[]).reduce((t,o)=>t+calcOSE(o,id).total,0);
+const exe=id=>bm(id)*(1+CFG.k);
+const fechTot=x=>valorQ(somaCols(x.cols))*(1+CFG.k);
+const fechCt=c=>CFG.frentes.filter(f=>f.contrato===c.id).flatMap(f=>(LN[f.id]&&LN[f.id].fech)||[]);
+const remL=()=>CFG.rem||[];
+const remDe=c=>remL().filter(r=>r.de===c.id).reduce((t,r)=>t+r.valor,0);
+const remO=c=>remL().filter(r=>r.para===c.id&&r.st!=='med').reduce((t,r)=>t+r.valor,0);
+const remP=c=>remL().filter(r=>r.para===c.id&&r.st==='med').reduce((t,r)=>t+r.valor,0);
+const remTem=c=>remL().some(r=>r.de===c.id||r.para===c.id);
+function calc(c){
+ const N=CFG.frentes.filter(f=>f.contrato===c.id).reduce((t,f)=>t+exe(f.id),0)+(c.nl||0),L=c.L||0,fc=fechCt(c),O=(c.O||0)+remO(c)+fc.filter(x=>x.st!=='med').reduce((t,x)=>t+fechTot(x),0),P=(c.P||0)+remP(c)+fc.filter(x=>x.st==='med').reduce((t,x)=>t+fechTot(x),0);
+ const T=L-P>0?L-P:0,M=T>0?(T-N-O<0?T:N+O):0,Q='qo' in c?c.qo:(L-P>0?0:P-L),R=T>0?Math.max(L-N-P-O,0):0,
+ S='so' in c?c.so:((L-N-O-P)>0?0:L-N-O-P),U=M===0?(N>0?1:0):N/M;
+ return{N,M,Q,R,S,T,U,O,P}}
+/* ---- telas ---- */
+function render(){MEMO={};const ae=document.activeElement,fid=ae&&ae.id,fpos=ae&&ae.selectionStart;
+ $('#open').hidden=!!CFG;
+ if(!CFG){$('#app').innerHTML='<div class="card">Clique em <b>Abrir pasta de dados</b> e selecione a pasta <code>dados</code> (a que contém o arquivo config.json).</div>';return}
+ {const pp=per(FR),fn=(CFG.frentes.find(x=>x.id===FR)||{}).nome||'';$('#pi').value=pp.ini;$('#pf').value=pp.fim;$('#plab').textContent='Período da frente '+fn;document.querySelector('.pctl').style.display=(TAB==='t'||TAB==='m')?'':'none'}
+ document.querySelectorAll('.t').forEach(b=>b.classList.toggle('on',b.dataset.t===TAB));
+ const isD=TAB==='d',isF=TAB==='f';$('#app').style.display=(isD||isF)?'none':'';$('#dash').style.display=isD?'block':'none';$('#fluxo').style.display=isF?'block':'none';
+ if(isD){const h=DASHT?embedHtml(buildDash(DASHT)):'';if(!h){$('#app').style.display='';$('#dash').style.display='none';$('#app').innerHTML='<div class="card">Dashboard indisponível: o arquivo dashboard_modelo.html não está na pasta dados.</div>'}else if(h!==DASHLAST){$('#dash').srcdoc=h;DASHLAST=h}}
+ else if(isF){const fh=embedHtml(fluxoHtml());if(!fh){$('#app').style.display='';$('#fluxo').style.display='none';$('#app').innerHTML='<div class="card">Fluxo e Resultado indisponível: o arquivo fluxo_obras.html não está na pasta dados.</div>'}else if(fh!==FLUXLAST){$('#fluxo').srcdoc=fh;FLUXLAST=fh}}
+ else $('#app').innerHTML=TAB==='t'?vT():TAB==='m'?vM():TAB==='c'?vC():vP();
+ if(fid==='flt-q'){const e=document.getElementById(fid);if(e){e.focus();try{e.setSelectionRange(fpos,fpos)}catch(x){}}}}
+function vAv(oid){
+ const f=CFG.frentes.find(x=>x.id===FR),LL=LN[FR],oses=LL.oses||[],todos=oid===undefined,L=todos?LL.itens:LL.itens.filter(x=>x.oid===oid),b=bm(FR);
+ const nomeO=x=>{const o=oses.find(y=>y.id===x.oid);return o?o.nome:(x.os||'— avulso geral —')};
+ const rows=[...L].sort((a,c)=>a.d.localeCompare(c.d)).map(x=>{const p=PRm[x.c]||{};
+  return `<tr class="${inP(x.d,FR)?'':'o'}"><td>${dbr(x.d)}</td><td>${esc(nomeO(x))}</td><td>${esc(x.c)}</td><td>${esc(p.d)}</td><td>${esc(p.u)}</td><td><input class="r" data-a="q" data-i="${x.i}" value="${fmt(x.q)}"></td><td class="r">${fmt(p.p)}</td><td class="r">${fmt(x.q*(p.p||0))}</td><td><button class="g" data-a="del" data-i="${x.i}" aria-label="Excluir">✕</button></td></tr>`}).join('');
+ const tot=L.filter(x=>inP(x.d,FR)).reduce((t,x)=>t+x.q*((PRm[x.c]||{}).p||0),0);
+ return `<div class="card">${todos?'':'<h3>Serviços avulsos desta OSE</h3><p class="mu">Lance aqui serviços que não saem dos trechos. Eles entram no BM em uma coluna própria desta OSE.</p>'}<div class="row"><label>Data<input type="date" id="fd" value="${new Date().toISOString().slice(0,10)}"></label>
+${todos?`<label>OSE<select id="fo"><option value="">— avulso geral (sem OSE) —</option>${oses.map(o=>`<option value="${o.id}">${esc(o.nome)} (${esc(o.tipo)})</option>`).join('')}</select></label>`:''}
+<label>Serviço (código ou descrição)<input id="fc" list="dl-c" placeholder="digite para buscar" style="min-width:360px"></label>
+<label>Quantidade<input id="fq" class="r" placeholder="0,00" style="width:110px"></label><button data-a="add" data-oid="${todos?'':oid}">Adicionar</button></div>
+<datalist id="dl-c">${CFG.precos.map(p=>`<option value="${esc(p.c)} — ${esc(p.d)}">`).join('')}</datalist></div>
+${todos?`<div class="k card"><div>Medição do período da frente (BM)<b>R$ ${fmt(b)}</b></div><div>Canteiro / adm. local (proporcional)<b>R$ ${fmt(b*CFG.k)}</b></div><div>Executado no período<b>R$ ${fmt(b*(1+CFG.k))}</b></div></div>`:''}
+<div class="card tw"><table><thead><tr><th>Data</th><th>OSE</th><th>Código</th><th>Serviço</th><th>Und.</th><th class="r">Quantidade</th><th class="r">Unitário R$</th><th class="r">Valor R$</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="9" class="mu">Nenhum serviço avulso lançado.</td></tr>'}</tbody>${todos?'':`<tfoot><tr><td colspan="7">Total dos avulsos desta OSE no período</td><td class="r">${fmt(tot)}</td><td></td></tr></tfoot>`}</table>
+<p class="mu">Linhas esmaecidas estão fora do período de medição e não entram no executado.</p></div>`}
+function vP(){
+ const T={L:0,M:0,N:0,nl:0,O:0,P:0,Q:0,R:0,S:0,T:0};
+ const rows=filtC(ordC(CFG.contratos)).map(c=>{const r=calc(c);['L','nl'].forEach(k=>T[k]+=c[k]||0);['M','N','Q','R','S','T','O','P'].forEach(k=>T[k]+=r[k]);
+  const i=(k,v)=>`<td><input class="r" data-a="cf" data-id="${c.id}" data-k="${k}" value="${fmt(v)}"></td>`,t=(k,v,w)=>`<td><input data-a="cf" data-id="${c.id}" data-k="${k}" value="${esc(v)}" style="min-width:${w}px"></td>`,
+  fx=(k,v)=>`<td class="r ${v<0?'neg':''}" ${k in c?'title="Valor fixado manualmente na planilha original"':''}>${fmt(v)}${k in c?' ✎':''}</td>`;
+  return `<tr>${t('n',c.n,110)}${t('obra',c.obra,170)}${i('L',c.L)}<td class="r">${fmt(r.M)}</td><td class="r">${fmt(r.N)}</td>${i('nl',c.nl)}<td class="r"${remTem(c)?' title="Inclui valor remanejado de saldo retido de outro contrato"':''}>${fmt(r.O)}</td><td class="r"${remTem(c)?' title="Inclui valor remanejado de saldo retido de outro contrato"':''}>${fmt(r.P)}${remTem(c)?' ⇄':''}</td>${fx('qo',r.Q)}<td class="r">${fmt(r.R)}</td>${fx('so',r.S)}<td class="r">${fmt(r.T)}</td></tr>`}).join('');
+ const U=T.M===0?(T.N>0?1:0):T.N/T.M;
+ return `${filtBar()}<div class="k card"><div>Medido no período<b>R$ ${fmt(T.N)}</b></div><div>Possível medir<b>R$ ${fmt(T.M)}</b></div><div>Saldo geral<b>R$ ${fmt(T.R)}</b></div><div>Valor total para recebimento<b>R$ ${fmt(T.M-T.S)}</b></div></div>
+<div class="card tw"><table><thead><tr><th>Contrato</th><th>Obra</th><th class="r">Contratado</th><th class="r">Previsto faturamento</th><th class="r">Exec. período (app)</th><th class="r">Exec. legado*</th><th class="r">Pendente de medição</th><th class="r">Acumulado medido</th><th class="r">Saldo retido</th><th class="r">Saldo incluso exec.</th><th class="r">Exec. sem saldo</th><th class="r">Saldo de contratos</th></tr></thead><tbody>${rows}</tbody>
+<tfoot><tr><td colspan="2">${FILT.q||FILT.s?'SUBTOTAL (FILTRADO)':'SUBTOTAL OBRAS'}</td><td class="r">${fmt(T.L)}</td><td class="r">${fmt(T.M)}</td><td class="r">${fmt(T.N)}</td><td class="r">${fmt(T.nl)}</td><td class="r">${fmt(T.O)}</td><td class="r">${fmt(T.P)}</td><td class="r">${fmt(T.Q)}</td><td class="r">${fmt(T.R)}</td><td class="r ${T.S<0?'neg':''}">${fmt(T.S)}</td><td class="r">${fmt(T.T)}</td></tr></tfoot></table>
+<p class="mu">*Exec. legado: executado de obras cuja produção ainda não foi migrada para o aplicativo (valor da planilha de origem). O "Pendente de medição" soma o valor anterior (cadastro) e as medições fechadas ainda não marcadas como medidas; o "Acumulado medido" soma o valor anterior e as medições marcadas como medidas. O "Exec. período (app)" já inclui os lançamentos das frentes vinculadas ao contrato e o legado.</p></div>`}
+const BMGen=(()=>{
+const cn=a=>{let n=0;for(const ch of a)n=n*26+ch.charCodeAt(0)-64;return n},cl=n=>{let s='';while(n){s=String.fromCharCode(65+(n-1)%26)+s;n=Math.floor((n-1)/26)}return s};
+const ex=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const styleOf=(x,ref)=>{const i=x.indexOf('<c r="'+ref+'"');if(i<0)return'';const m=/ s="(\d+)"/.exec(x.slice(i,x.indexOf('>',i)+1));return m?m[1]:''};
+function setCell(x,ref,val,st,isF){
+ const m=/^([A-Z]+)(\d+)$/.exec(ref),col=cn(m[1]),row=+m[2];
+ const mk=s=>{const a=s?` s="${s}"`:'';return isF?`<c r="${ref}"${a}><f>${ex(val)}</f></c>`:val==null||val===''?`<c r="${ref}"${a}/>`:typeof val==='number'?`<c r="${ref}"${a}><v>${val}</v></c>`:`<c r="${ref}"${a} t="inlineStr"><is><t xml:space="preserve">${ex(val)}</t></is></c>`};
+ const i=x.indexOf('<c r="'+ref+'"');
+ if(i>=0){const te=x.indexOf('>',i),open=x.slice(i,te+1),sm=/ s="(\d+)"/.exec(open),end=open.endsWith('/>')?te+1:x.indexOf('</c>',te)+4;return x.slice(0,i)+mk(sm?sm[1]:st||'')+x.slice(end)}
+ const ri=x.indexOf('<row r="'+row+'"');
+ if(ri<0){const re=/<row r="(\d+)"/g;let q,pos=-1;while((q=re.exec(x))){if(+q[1]>row){pos=q.index;break}}if(pos<0)pos=x.indexOf('</sheetData>');return x.slice(0,pos)+`<row r="${row}">${mk(st)}</row>`+x.slice(pos)}
+ const rte=x.indexOf('>',ri);let open=x.slice(ri,rte+1);
+ open=open.replace(/spans="(\d+):(\d+)"/,(a,b,c)=>`spans="${Math.min(+b,col)}:${Math.max(+c,col)}"`);
+ if(open.endsWith('/>'))return x.slice(0,ri)+open.slice(0,-2)+'>'+mk(st)+'</row>'+x.slice(rte+1);
+ const rend=x.indexOf('</row>',rte),body=x.slice(rte+1,rend),re2=/<c r="([A-Z]+)\d+"/g;let q2,at=body.length;
+ while((q2=re2.exec(body))){if(cn(q2[1])>col){at=q2.index;break}}
+ return x.slice(0,ri)+open+body.slice(0,at)+mk(st)+body.slice(at)+x.slice(rend)}
+const shiftF=(f,dr,dc)=>f.replace(/(?<![A-Za-z0-9_.])(\$?)([A-Z]{1,3})(\$?)(\d+)(?![\d(A-Za-z])/g,(m,a,c,b2,r)=>a+(a?c:cl(cn(c)+dc))+b2+(b2?r:(+r+dr)));
+function unshare(x){const M={};
+ x=x.replace(/<c r="([A-Z]+)(\d+)"([^>]*)>(\s*)<f t="shared" ref="[^"]*" si="(\d+)"([^>]*)>([^<]*)<\/f>/g,(m,c,r,at,ws,si,fa,t)=>{M[si]={c:cn(c),r:+r,t};return `<c r="${c}${r}"${at}><f>${t}</f>`});
+ return x.replace(/<c r="([A-Z]+)(\d+)"([^>]*)><f t="shared" si="(\d+)"\/>/g,(m,c,r,at,si)=>{const g=M[si];return g?`<c r="${c}${r}"${at}><f>${shiftF(g.t,+r-g.r,cn(c)-g.c)}</f>`:m})}
+const strip=x=>x.replace(/(<c [^>]*>)(<f[^>]*?(?:\/>|>[\s\S]*?<\/f>))<v>[\s\S]*?<\/v>/g,(m,o,f)=>o.replace(/ t="[^"]*"/,'')+f);
+const serial=d=>d?Math.round((Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10))-Date.UTC(1899,11,30))/864e5):null;
+const br=d=>d?d.split('-').reverse().join('/'):'';
+const nomeAba=(n,usados)=>{let b=String(n).replace(/[\\\/\?\*\[\]:]/g,'').trim().slice(0,31)||'OSE',u=b,k=2;while(usados.has(u.toLowerCase())){const suf=' ('+k+++')';u=b.slice(0,31-suf.length)+suf}usados.add(u.toLowerCase());return u};
+async function montarOSE(z,tp,os,nome,d,pf,svc){
+ let x=await z.file('xl/worksheets/sheet'+tp.sheetNum+'.xml').async('string');
+ x=unshare(x.replace(/ tabSelected="1"/,'').replace(/(<pageSetup[^>]*?) r:id="[^"]*"/,'$1'));
+ for(const e of tp.entradas)for(let r=tp.r0;r<=tp.r1;r++)x=setCell(x,e.k+r,null);
+ for(const ref of tp.limpar||[])x=setCell(x,ref,null);
+ for(const k in tp.cells){const m=/^([A-Z]+)(\d+)$/.exec(k),r=+m[2],v=tp.cells[k];
+  if(r>=tp.r0&&r<=tp.r1&&typeof v==='string'&&v[0]==='=')x=setCell(x,k,v.slice(1),styleOf(x,m[1]+(tp.r0+1)),true)}
+ os.rows.forEach((r,i)=>{const row=tp.r0+i;if(row>tp.r1)return;
+  tp.entradas.forEach(e=>{const v=r.v[e.k];
+   if(e.t==='d'){if(r.d)x=setCell(x,e.k+row,serial(r.d));return}
+   if(v===''||v==null){if(e.k==='A'&&r.d)x=setCell(x,'A'+row,br(r.d));return}
+   x=setCell(x,e.k+row,e.t==='n'?pf(v):e.k==='A'&&r.d?br(r.d)+' - '+v:String(v))});
+  if(!r.v.A&&r.d&&tp.entradas.some(e=>e.k==='A'))x=setCell(x,'A'+row,br(r.d))});
+ for(const c in os.aj||{})if(svc[c])x=setCell(x,svc[c],os.aj[c]);
+ if(tp.sheetNum===11){x=setCell(x,'D2',os.nome);x=setCell(x,'F3',d.n);x=setCell(x,'D4',d.mun)}else x=setCell(x,'B2',os.nome);
+ return strip(x)}
+/* d: {n,ini,fim,mun,ct,di,df,cols:[{nome,q,os?:{tipo,rows,aj}}],ant,antCan}  map: bm_map.json  pf: parser numérico  TPL: templates.json */
+async function gerar(JSZip,buf,map,d,pf,TPL){
+ const z=await JSZip.loadAsync(buf),P=n=>'xl/worksheets/sheet'+n+'.xml',rd=n=>z.file(P(n)).async('string');
+ const MUN=d.mun.toUpperCase();
+ let capa=await rd(1);capa=setCell(capa,'A24',d.n+'ª MEDIÇÃO');capa=setCell(capa,'A29','PERÍODO: '+br(d.ini)+' e '+br(d.fim));capa=setCell(capa,'A36','MUNICÍPIO: '+MUN+'/SC');if(d.ct)capa=setCell(capa,'H52',d.ct);
+ capa=capa.replace(/<sheetView /,m=>m+(/tabSelected/.test(capa)?'':'tabSelected="1" '));
+ let res=await rd(2);res=setCell(res,'A4','Cidade: '+d.mun+'/SC');if(d.di)res=setCell(res,'B5','Início: '+br(d.di));if(d.df)res=setCell(res,'C5','Término: '+br(d.df));
+ let can=await rd(3);can=setCell(can,'A2','Cidade: '+d.mun+'/SC');if(d.di)can=setCell(can,'F3',serial(d.di));if(d.df)can=setCell(can,'F4',serial(d.df));can=setCell(can,'K6',d.n);can=setCell(can,'K12',d.antCan||0);can=setCell(can,'K13',d.antCan||0);
+ let bm=await rd(5);for(const c in map.bm)bm=setCell(bm,'J'+map.bm[c],Math.round((d.ant[c]||0)*1e6)/1e6);
+ let q=await rd(8),cols=d.cols.slice();
+ if(cols.length>14){const rest=cols.slice(13),m={};rest.forEach(c=>{for(const k in c.q)m[k]=(m[k]||0)+c.q[k]});cols=cols.slice(0,13).concat([{nome:'DEMAIS OSE',q:m}])}
+ const n=Math.max(cols.length,3),st3=styleOf(q,'K3');
+ const wbx=await z.file('xl/workbook.xml').async('string'),usados=new Set([...wbx.matchAll(/<sheet name="([^"]*)"/g)].map(m=>m[1].toLowerCase()));
+ let sid=Math.max(...[...wbx.matchAll(/sheetId="(\d+)"/g)].map(m=>+m[1])),nx=13,newSheets=[],ct=await z.file('[Content_Types].xml').async('string'),rels=await z.file('xl/_rels/workbook.xml.rels').async('string');
+ const linkCol=[];
+ for(let k=0;k<cols.length;k++){const c=cols[k];
+  if(c.os&&TPL&&TPL[c.os.tipo]&&k<13+(cols.length>14?0:1)){
+   const tp=TPL[c.os.tipo],svc={};tp.servicos.forEach(s=>svc[s.c]=s.ref);
+   const cap=tp.r1-tp.r0+1,rows=c.os.rows||[],pages=[],nomes=[];
+   for(let i=0;i<Math.max(rows.length,1);i+=cap)pages.push(rows.slice(i,i+cap));
+   for(let pg=0;pg<pages.length;pg++){
+    const suf=pg?' ('+(pg+1)+')':'',lim=String(c.nome).replace(/[\\\/\?\*\[\]:]/g,'').trim().slice(0,31-suf.length)+suf,nome=nomeAba(lim,usados),tit=c.nome+suf;
+    const aj=pg===0?(c.os.aj||{}):Object.fromEntries(Object.keys(c.os.aj||{}).map(x=>[x,0]));
+    z.file(P(nx),await montarOSE(z,tp,{...c.os,rows:pages[pg],aj,nome:tit},nome,d,pf,svc));
+    ct=ct.replace('</Types>',`<Override PartName="/xl/worksheets/sheet${nx}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>`);
+    rels=rels.replace('</Relationships>',`<Relationship Id="rId${900+nx}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${nx}.xml"/></Relationships>`);
+    newSheets.push(`<sheet name="${ex(nome)}" sheetId="${++sid}" r:id="rId${900+nx}"/>`);nomes.push(nome);nx++}
+   linkCol[k]={nomes,svc}}}
+ for(let k=0;k<n;k++){const L=cl(9+k);q=setCell(q,L+'3',cols[k]?cols[k].nome:(k===0?'—':''),styleOf(q,L+'3')||st3)}
+ for(const r of map.resRows){const code=map.rowCode[r],stl=styleOf(q,'K'+r);
+  for(let k=0;k<n;k++){const ref=cl(9+k)+r,lk=linkCol[k];
+   if(lk){q=lk.svc[code]&&code?setCell(q,ref,lk.nomes.map(n=>"'"+n.replace(/'/g,"''")+"'!"+lk.svc[code]).join('+'),stl,true):setCell(q,ref,null,stl)}
+   else{const v=code&&cols[k]&&cols[k].q[code]?Math.round(cols[k].q[code]*1e6)/1e6:null;q=setCell(q,ref,v,stl)}}}
+ z.file(P(1),strip(capa));z.file(P(2),strip(res));z.file(P(3),strip(can));z.file(P(5),strip(bm));z.file(P(8),strip(q));
+ z.file(P(12),(await rd(12)).replace(/ tabSelected="1"/,''));
+ let wb=wbx;
+ for(const s of ['ESCAVADO','REPOSIÇÃO','MND'])wb=wb.replace('<sheet name="'+s+'" ','<sheet name="'+s+'" state="hidden" ');
+ wb=wb.replace('</sheets>',newSheets.join('')+'</sheets>').replace(/<calcPr[^>]*\/>/,'<calcPr calcId="191029" fullCalcOnLoad="1"/>').replace(/firstSheet="\d+"/,'firstSheet="0"').replace(/activeTab="\d+"/,'activeTab="0"');
+ z.file('xl/workbook.xml',wb);z.remove('xl/calcChain.xml');
+ z.file('xl/_rels/workbook.xml.rels',rels.replace(/<Relationship [^>]*calcChain[^>]*\/>/,''));
+ z.file('[Content_Types].xml',ct.replace(/<Override [^>]*calcChain[^>]*\/>/,''));
+ return z.generateAsync({type:'uint8array',compression:'DEFLATE'})}
+return{gerar,setCell}})();
+
+
+/* ---- Medição (BM CASAN) ---- */
+const addD=(d,n)=>{const x=new Date(d+'T00:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10)};
+const addM=(d,n)=>{const x=new Date(d+'T00:00:00Z'),dd=x.getUTCDate();x.setUTCDate(1);x.setUTCMonth(x.getUTCMonth()+n);const u=new Date(Date.UTC(x.getUTCFullYear(),x.getUTCMonth()+1,0)).getUTCDate();x.setUTCDate(Math.min(dd,u));return x.toISOString().slice(0,10)};
+const BASEBM=()=>(BMAP&&BMAP.base)||92072173.55;
+function colsFrente(id){const L=LN[id],cols=[];
+ (L.oses||[]).forEach(o=>{const q={};calcOSE(o,id).itens.forEach(x=>{if(x.qf)q[x.c]=x.qf});if(Object.keys(q).length)cols.push({nome:o.nome,q,os:{tipo:o.tipo,rows:o.rows.filter(r=>!r.d||inP(r.d,id)).map(r=>({d:r.d||null,v:{...r.v}})),aj:{...(o.aj||{})}}})});
+ const avO={},avG={nome:'SERVIÇOS AVULSOS',q:{}};L.itens.filter(x=>inP(x.d,id)).forEach(x=>{const o=(L.oses||[]).find(y=>y.id===x.oid),T=o?(avO[o.id]=avO[o.id]||{nome:o.nome+' - AVULSOS',q:{}}):avG;T.q[x.c]=(T.q[x.c]||0)+x.q});
+ cols.push(...Object.values(avO));if(Object.keys(avG.q).length)cols.push(avG);return cols}
+const somaCols=cs=>{const q={};cs.forEach(c=>{for(const k in c.q)q[k]=(q[k]||0)+c.q[k]});return q};
+const valorQ=q=>Object.entries(q).reduce((t,[c,v])=>t+v*((PRm[c]||{}).p||0),0);
+const fechs=id=>(LN[id].fech=LN[id].fech||[]).sort((a,b)=>a.n-b.n);
+function snapAtual(id){const f=CFG.frentes.find(x=>x.id===id),c=CFG.contratos.find(x=>x.id===f.contrato)||{};
+ return{n:fechs(id).length+1,ini:per(id).ini,fim:per(id).fim,mun:f.nome,ct:c.n||'',di:c.di||null,df:c.df||null,cols:colsFrente(id)}}
+async function baixarBM(id,sn){
+ if(!window.JSZip){toast('jszip.min.js não encontrado ao lado do aplicativo (pasta dados).');return}
+ if(!BMAP){toast('bm_map.json não encontrado na pasta dados.');return}
+ let buf;try{buf=await(await(await DIR.getFileHandle('BM_modelo.xlsx')).getFile()).arrayBuffer()}catch(e){toast('BM_modelo.xlsx não encontrado na pasta dados.');return}
+ const ant=somaCols(fechs(id).filter(x=>x.n<sn.n).flatMap(x=>x.cols)),ign=[...new Set(sn.cols.flatMap(c=>Object.keys(c.q)).filter(k=>!(k in BMAP.bm)))];
+ const out=await BMGen.gerar(JSZip,buf,BMAP,{...sn,ant,antCan:valorQ(ant)/BASEBM()},pf,TPL);
+ const dir=await DIR.getDirectoryHandle('BM',{create:true}),nome='BM '+String(sn.n).padStart(2,'0')+' - '+sn.mun+' - '+sn.ini+'.xlsx',fh=await dir.getFileHandle(nome,{create:true}),w=await fh.createWritable();
+ await w.write(out);await w.close();toast('BM gerado em dados/BM: '+nome+(ign.length?' · códigos sem linha no modelo: '+ign.join(', '):''))}
+function vM(){
+ const f=CFG.frentes.find(x=>x.id===FR),F=fechs(FR),sn=snapAtual(FR),q=somaCols(sn.cols),ant=somaCols(F.flatMap(x=>x.cols)),vp=valorQ(q),va=valorQ(ant),k=CFG.k;
+ const codes=[...new Set([...Object.keys(q),...Object.keys(ant)])].sort();
+ const rows=codes.map(c=>{const p=PRm[c]||{},a=ant[c]||0,x=q[c]||0;return `<tr><td>${esc(c)}</td><td>${esc(p.d)}</td><td>${esc(p.u)}</td><td class="r">${fmt(a)}</td><td class="r">${fmt(x)}</td><td class="r">${fmt(a+x)}</td><td class="r">${fmt(x*(p.p||0))}</td></tr>`}).join('');
+ const hist=F.map((x,i)=>`<tr><td>${x.n}ª</td><td>${dbr(x.ini)} a ${dbr(x.fim)}</td><td>${esc(x.ct)}</td><td class="r">${fmt(fechTot(x))}</td><td>${x.st==='med'?'Medido em '+dbr(x.aprov||x.em.slice(0,10)):'<span class="neg">Pendente de medição</span>'}</td><td><button class="g" data-a="bmh" data-n="${x.n}">Baixar BM</button> <button class="g" data-a="bms" data-n="${x.n}">${x.st==='med'?'Voltar para pendente':'Marcar como medido'}</button>${i===F.length-1?` <button class="g" data-a="bmr">Reabrir</button>`:''}</td></tr>`).join('');
+ return `<div class="card row"><label>Frente (município)<select data-a="fr">${CFG.frentes.map(x=>`<option value="${x.id}"${x.id===FR?' selected':''}>${esc(x.nome)}</option>`).join('')}</select></label>
+<label>Contrato<span style="padding:10px 0">${esc(sn.ct)||'— sem contrato (vincule na aba Cadastro)'}</span></label><label>Período<span style="padding:10px 0">${dbr(sn.ini)} a ${dbr(sn.fim)}</span></label>
+<button data-a="bmg">Baixar BM nº ${sn.n} (prévia)</button><button class="g" data-a="bmf">Fechar medição nº ${sn.n}</button></div>
+<div class="k card"><div>Serviços do período<b>R$ ${fmt(vp)}</b></div><div>Canteiro / adm. local<b>R$ ${fmt(vp*k)}</b></div><div>Total do período (${sn.n}ª medição)<b>R$ ${fmt(vp*(1+k))}</b></div><div>Acumulado após esta medição<b>R$ ${fmt((vp+va)*(1+k))}</b></div></div>
+<div class="card tw"><h3>Quantidades do boletim</h3><table><thead><tr><th>Código</th><th>Serviço</th><th>Und.</th><th class="r">Anterior</th><th class="r">Período</th><th class="r">Acumulado</th><th class="r">Valor do período R$</th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="mu">Sem produção no período para esta frente.</td></tr>'}</tbody></table>
+<p class="mu">O BM usa o modelo da CASAN (CAPA, Resumo $, Canteiro, BM e Resumo de quantidades). Cada OSE vira uma folha de memória de cálculo (com os trechos e as fórmulas do modelo) ligada a uma coluna do Resumo de quantidades, e os serviços avulsos de cada OSE (ou os avulsos gerais) entram em colunas próprias. O "anterior" vem das medições já fechadas. Os arquivos ficam na pasta dados/BM.</p></div>
+${vRem()}<div class="card tw"><h3>Medições fechadas</h3><table><thead><tr><th>Nº</th><th>Período</th><th>Contrato</th><th class="r">Total R$</th><th>Situação</th><th></th></tr></thead><tbody>${hist||'<tr><td colspan="6" class="mu">Nenhuma medição fechada nesta frente.</td></tr>'}</tbody></table></div>`}
+/* ---- remanejamento de saldo retido entre contratos ---- */
+const ctNome=c=>c?(c.n+(c.obra?' · '+c.obra:'')):'(excluído)';
+function vRem(){
+ const cs=ordC(CFG.contratos),ret=c=>Math.max(0,calc(c).Q-remDe(c)),comRet=cs.filter(c=>ret(c)>0.005);
+ const optO=cs.map(c=>`<option value="${c.id}">${esc(ctNome(c))}${ret(c)>0.005?' — saldo retido R$ '+fmt(ret(c)):''}</option>`).join(''),optD=cs.map(c=>`<option value="${c.id}">${esc(ctNome(c))}</option>`).join('');
+ const rows=remL().map(r=>{const de=CFG.contratos.find(c=>c.id===r.de),pa=CFG.contratos.find(c=>c.id===r.para),med=r.st==='med';
+  return `<tr><td>${dbr(r.data)}</td><td>${esc(ctNome(de))}</td><td>${esc(ctNome(pa))}</td><td class="r">${fmt(r.valor)}</td><td>${med?'<span class="mu">Medido</span>':'<span class="neg">A medir no contrato destino</span>'}</td><td>${esc(r.obs||'')}</td><td>${med?`<button class="g" data-a="rmb" data-id="${r.id}">Voltar para pendente</button>`:`<button data-a="rmn" data-id="${r.id}">Marcar como medido</button>`} <button class="g" data-a="rmx" data-id="${r.id}" aria-label="Excluir">✕</button></td></tr>`}).join('');
+ return `<div class="card"><h3>Medir o saldo retido de um contrato em outro</h3><p class="mu">O saldo retido é o que já foi medido acima do valor do contrato (acumulado menos valor) e não pode ser pago no contrato de origem. Ele continua registrado no contrato de origem; aqui você apenas acrescenta o valor solicitado ao contrato de destino, como pendente de medição e depois como medido.${comRet.length?' Contratos com saldo retido ainda disponível: '+comRet.map(c=>esc(c.n)+' ('+esc(c.obra||'')+') R$ '+fmt(ret(c))).join('; ')+'.':' Nenhum contrato tem saldo retido no momento.'}</p>
+<div class="row"><label>Contrato de origem<select id="rmd">${optO}</select></label><label>Contrato de destino<select id="rmp">${optD}</select></label><label>Valor (R$) — em branco usa todo o saldo retido disponível<input id="rmv" class="r" placeholder="saldo retido" style="width:170px"></label><label>Observação<input id="rmo" placeholder="opcional" style="min-width:240px"></label><button data-a="rma">Remanejar</button></div></div>
+<div class="card tw"><table><thead><tr><th>Data</th><th>Origem</th><th>Destino</th><th class="r">Valor R$</th><th>Situação</th><th>Observação</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="mu">Nenhum remanejamento registrado.</td></tr>'}</tbody></table></div>`}
+/* ---- Fluxo e Resultado: dados da planilha ficam salvos na pasta ---- */
+const fluxoOk=d=>!!(d&&Array.isArray(d.obras)&&d.obras.some(o=>(o.m||[]).some(v=>v)||(o.e||[]).some(v=>v)));
+const embedHtml=h=>h?h.replace('</style>','header .brand{display:none!important}header{justify-content:flex-start!important}header .side{flex-direction:row!important;flex-wrap:wrap!important;align-items:flex-end!important;justify-content:flex-start!important;margin:0!important;gap:12px 20px!important}header .acts,header .filters{justify-content:flex-start!important}</style>'):h;
+function fluxoHtml(){if(!FLUXT)return'';if(!FLUXD||!Array.isArray(FLUXD.obras))return FLUXT;
+ const i=FLUXT.indexOf('let D=');if(i<0)return FLUXT;let d=0,k=i+6,ins=false,esc=false;
+ for(;k<FLUXT.length;k++){const c=FLUXT[k];if(ins){if(esc)esc=false;else if(c==='\\')esc=true;else if(c==='"')ins=false}else if(c==='"')ins=true;else if(c==='{')d++;else if(c==='}'){d--;if(d===0){k++;break}}}
+ return FLUXT.slice(0,i+6)+JSON.stringify(FLUXD).replace(/<\//g,'<\\/')+FLUXT.slice(k)}
+async function onFluxoMsg(e){const f=$('#fluxo');if(!f||e.source!==f.contentWindow||!e.data||!e.data.fluxoD||!fluxoOk(e.data.fluxoD))return;
+ FLUXD=e.data.fluxoD;FLUXLAST=embedHtml(fluxoHtml());
+ try{if(!DIR)throw new Error('pasta de dados não aberta');
+  if(await wr('fluxo_dados.json',{d:FLUXD,nome:e.data.nome||'',em:new Date().toISOString()}))toast('Fluxo e Resultado atualizado com '+(e.data.nome||'a planilha')+' e salvo na pasta para toda a equipe ✓')}
+ catch(x){toast('Planilha lida, mas não foi possível salvar na pasta ('+((x&&x.message)||'erro')+'). Os dados valem só nesta sessão.')}}
+addEventListener('message',onFluxoMsg);
+/* ---- ordenação e filtro de contratos ---- */
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const RX=/^(\d+)\/(\d{4})$/,isAg=c=>!RX.test((c.n||'').trim());
+const ordC=l=>[...l].sort((a,b)=>{const A=isAg(a),B=isAg(b);if(A!==B)return A?1:-1;
+ if(!A){const x=RX.exec(a.n.trim()),y=RX.exec(b.n.trim());const d=(+x[2]-+y[2])||(+x[1]-+y[1]);if(d)return d}
+ return norm(a.obra).localeCompare(norm(b.obra))});
+const stC=c=>{if(isAg(c))return'ag';if(c.bx)return'fin';if(!c.df)return'sd';const d=Math.floor((new Date(c.df+'T00:00:00')-new Date(hoje()+'T00:00:00'))/864e5);return d<0?'venc':d<90?'renov':'vig'};
+const filtC=l=>l.filter(c=>{const q=norm(FILT.q);if(q){const fs=CFG.frentes.filter(f=>f.contrato===c.id).map(f=>f.nome).join(' ');if(!norm([c.n,c.obra,c.p,fs].join(' ')).includes(q))return false}return !FILT.s||stC(c)===FILT.s});
+const filtBar=()=>`<div class="card row"><label>Buscar contrato<input id="flt-q" data-a="fq" value="${esc(FILT.q)}" placeholder="número, obra, polo ou frente" style="min-width:270px"></label><label>Situação<select data-a="fs">${[['','Todas'],['vig','Vigentes'],['renov','A renovar (menos de 90 dias)'],['venc','Vencidos'],['fin','Finalizados'],['ag','Aguardando'],['sd','Sem data final']].map(([v,l])=>`<option value="${v}"${FILT.s===v?' selected':''}>${l}</option>`).join('')}</select></label><button class="g" data-a="fl">Limpar filtros</button><span class="mu">${filtC(CFG.contratos).length} de ${CFG.contratos.length} contratos · ordem numérica, "Aguardando" por último</span></div>`;
+/* ---- cadastro de contratos + dashboard ---- */
+function sit(c){if(c.bx)return'<span class="mu">Finalizado em '+dbr(c.bx)+'</span>';if(!c.df)return'<span class="mu">sem data final</span>';
+ const d=Math.floor((new Date(c.df+'T00:00:00')-new Date(hoje()+'T00:00:00'))/864e5);
+ return d<0?`<span class="neg">Vencido há ${-d} dias</span>`:d<60?`<span class="neg">${d} dias · alta prioridade</span>`:d<90?`<span>${d} dias · renovar</span>`:`<span class="mu">${d} dias · vigente</span>`}
+function vC(){
+ const rows=filtC(ordC(CFG.contratos)).map(c=>{const fs=CFG.frentes.filter(f=>f.contrato===c.id),f=fs[0];
+  const inp=(k,v,w,ty)=>`<td><input${ty?` type="${ty}"`:''} data-a="cf" data-id="${c.id}" data-k="${k}" value="${esc(v==null?'':v)}" style="min-width:${w}px"></td>`;
+  return `<tr>${inp('n',c.n,110)}<td>${fs.map(x=>`<span class="mu">${esc(x.nome)} <button class="g" data-a="uf" data-f="${x.id}" aria-label="Remover frente" style="padding:0 6px">✕</button></span>`).join(' ')||(c.obra?`<span class="mu">${esc(c.obra)} (sem frente)</span>`:'')} <select data-a="af" data-id="${c.id}"><option value="">+ frente…</option>${CFG.frentes.filter(x=>x.contrato!==c.id).map(x=>`<option value="${x.id}">${esc(x.nome)}${x.contrato?' (em outro contrato)':''}</option>`).join('')}<option value="__nova">➕ Nova frente…</option></select></td>${inp('p',c.p,100)}${inp('resp',c.resp,120)}${inp('di',c.di,130,'date')}${inp('df',c.df,130,'date')}<td><input class="r" data-a="cf" data-id="${c.id}" data-k="L" value="${fmt(c.L)}"></td><td><input class="r" data-a="cf" data-id="${c.id}" data-k="P" value="${fmt(c.P)}"></td><td>${sit(c)}</td><td style="text-align:center"><input type="checkbox" data-a="cb" data-id="${c.id}"${c.bx?' checked':''} aria-label="Finalizado" style="min-width:0;width:auto"></td><td><button class="g" data-a="dc" data-id="${c.id}" aria-label="Excluir contrato">✕</button></td></tr>`}).join('');
+ return `<div class="card"><h3 style="margin:0 0 10px">Novo contrato</h3><div class="row"><label>Número<input id="cn" placeholder="4350/2026" style="width:120px"></label><label>Obra / Frente (município)<input id="cf" list="dl-f" placeholder="digite ou escolha" style="width:210px"></label><label>Polo<input id="cp" value="Rio do Sul" style="width:120px"></label><label>Data início<input type="date" id="cdi"></label><label>Data final<input type="date" id="cdf"></label><label>Valor (R$)<input id="cv" class="r" placeholder="0,00" style="width:130px"></label><button data-a="ncc">Criar contrato</button></div><datalist id="dl-f">${CFG.frentes.map(x=>`<option value="${esc(x.nome)}">`).join('')}</datalist><p class="mu">Se a frente (município) ainda não existe, ela é criada junto com o contrato.</p></div>
+${filtBar()}<div class="card tw"><table><thead><tr><th>Número</th><th>Obra / Frente (município)</th><th>Polo</th><th>Responsável</th><th>Data início</th><th>Data final</th><th class="r">Valor (R$)</th><th class="r">Acum. anterior (R$)</th><th>Situação</th><th>Finalizado</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+<p class="row"><button class="g" data-a="gd">Salvar cópia do dashboard (arquivo)</button></p>
+<p class="mu">O dashboard fica na aba Dashboard e se atualiza sozinho com estes contratos. O botão acima salva uma cópia em arquivo (Dashboard_Contratos.html) na pasta de dados para compartilhar e o executado calculado a partir dos lançamentos. Contratos finalizados saem dos alertas de renovação. Um contrato pode ter mais de uma frente: use "+ frente…" na linha do contrato.</p></div>`}
+function dashRows(){return ordC(CFG.contratos).map(c=>{const r=calc(c),f=CFG.frentes.find(x=>x.contrato===c.id);
+ return{c:(c.n||'').trim(),o:(f?f.nome:c.obra||'').replace(/\s*-\s*[A-Z]{2}$/,''),di:c.di||null,df:c.df||null,p:c.p||'',v:c.L||0,pf:r.M,ex:r.N,ac:r.P,si:r.R,es:r.S,sc:r.T,bx:c.bx||null}})}
+function buildDash(t){const j=JSON.stringify({rows:dashRows(),atualizado:hoje()}).replace(/<\//g,'<\\/');return t.replace(/(<script id="dados" type="application\/json">)[\s\S]*?(<\/script>)/,(m,a,b)=>a+j+b)}
+async function gerarDash(){
+ let t;try{t=await(await(await DIR.getFileHandle('dashboard_modelo.html')).getFile()).text()}catch(e){toast('dashboard_modelo.html não encontrado na pasta de dados.');return}
+ const fh=await DIR.getFileHandle('Dashboard_Contratos.html',{create:true}),w=await fh.createWritable();await w.write(buildDash(t));await w.close();toast('Dashboard_Contratos.html gerado na pasta de dados ✓')}
+/* ---- trechos (OSE): fórmulas das planilhas-modelo executadas pelo motor ---- */
+const PAV={ESC:['S.Pav','Paver','Lajota','Asfalto','Asf + Par','Paral','Cimem','Ladri'],MND:['S.Pav','Paver','Lajota','Asfalto','Asf + Par','Paral','Cimem','Ladri'],REP:['Meio Fio','Paver','Lajota','Asfalto','Placa','Paral','Cimen','Grama','Sarjeta','Ladrilho']};
+const byD=(a,b)=>(a.d||'9999-99-99').localeCompare(b.d||'9999-99-99');
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5),hoje=()=>new Date().toISOString().slice(0,10);
+function calcOSE(o,fid){
+ if(MEMO[o.id])return MEMO[o.id];const tp=TPL[o.tipo];if(!tp)return{itens:[],total:0};
+ const C=TPLC[o.tipo]||(TPLC[o.tipo]=Motor.build(tp.cells)),act=o.rows.filter(r=>!r.d||inP(r.d,fid)),cap=tp.r1-tp.r0+1,map={};
+ for(let pg=0;pg===0||pg<act.length;pg+=cap){const inp={};
+  act.slice(pg,pg+cap).forEach((r,i)=>{const row=tp.r0+i;tp.entradas.forEach(e=>{const v=r.v[e.k];if(v===''||v==null||e.t==='d')return;inp[e.k+row]=e.t==='n'?pf(v):v})});
+  const run=Motor.run(C,inp);tp.servicos.forEach(s=>{const v=run.get(s.ref);if(typeof v==='number'&&Math.abs(v)>1e-9)map[s.c]=(map[s.c]||0)+v})}
+ const aj=o.aj||{},itens=[...new Set([...Object.keys(map),...Object.keys(aj)])].sort().map(c=>{const p=PRm[c]||{},q=map[c]||0,qf=c in aj?aj[c]:q;return{c,d:p.d,u:p.u,p:p.p||0,q,aj:c in aj,qf,v:qf*(p.p||0)}});
+ return MEMO[o.id]={itens,total:itens.reduce((t,x)=>t+x.v,0)}}
+const eqNomes=r=>(r.eq||[]).map(id=>(CFG.equipes||[]).find(q=>q.id===id)).filter(Boolean).map(q=>q.nome);
+const eqCell=(r,i)=>{const EQ=CFG.equipes||[];return `<details class="eqd"><summary>${esc(eqNomes(r).join(', ')||'— equipes —')}</summary><div class="eqm">${EQ.map(q=>`<label class="ck"><input type="checkbox" data-a="eq" data-i="${i}" data-q="${q.id}"${(r.eq||[]).includes(q.id)?' checked':''}> ${esc(q.nome)}</label>`).join('')||'<span class="mu">Nenhuma equipe cadastrada.</span>'}<button class="g" data-a="neq" type="button">+ Nova equipe</button></div></details>`};
+function vT(){
+ const f=CFG.frentes.find(x=>x.id===FR),LL=LN[FR];LL.oses=LL.oses||[];
+ let o=LL.oses.find(x=>x.id===OS);if(!o&&OS!=='__av')o=LL.oses[0];OS=o?o.id:'__av';const ct=CFG.contratos.find(c=>c.id===f.contrato);
+ const head=`<div class="card row"><label>Frente (município)<select data-a="fr">${CFG.frentes.map(x=>`<option value="${x.id}"${x.id===FR?' selected':''}>${esc(x.nome)}</option>`).join('')}</select></label>
+<label>Contrato<span style="padding:8px 0">${ct?esc(ct.n):'— sem contrato (vincule na aba Cadastro)'}</span></label>
+<label>OSE / tipo de lançamento<select data-a="os">${LL.oses.map(x=>`<option value="${x.id}"${o&&x.id===o.id?' selected':''}>${esc(x.nome)} (${esc(x.tipo)})</option>`).join('')}<option value="__av"${OS==='__av'?' selected':''}>Serviços avulsos (por código)</option></select></label>
+<label>Nova OSE<span class="row"><input id="no" placeholder="ex.: OSE 01 Rua X" style="width:200px"><select id="nt">${Object.keys(TPL).map(k=>`<option value="${k}">${esc(TPL[k].nome)}</option>`).join('')}</select><button data-a="no">Criar</button></span></label>${o?'<button class="g" data-a="dos">Excluir OSE</button>':''}</div>`;
+ if(!o)return head+(LL.oses.length?'':'<div class="card mu">Para lançar por trecho, crie uma OSE (Escavado, MND ou Reposição). Abaixo, o lançamento avulso por serviço.</div>')+vAv();
+ o.rows.sort(byD);const tp=TPL[o.tipo],max=tp.r1-tp.r0+1,res=calcOSE(o,FR),pav=PAV[o.tipo]||[],avT=LL.itens.filter(x=>x.oid===o.id&&inP(x.d,FR)).reduce((t,x)=>t+x.q*((PRm[x.c]||{}).p||0),0);
+ const cell=(e,r,i)=>e.t==='p'?`<select data-a="ri" data-i="${i}" data-k="${e.k}"><option value=""></option>${pav.map(x=>`<option${r.v[e.k]===x?' selected':''}>${x}</option>`).join('')}</select>`:`<input data-a="ri" data-i="${i}" data-k="${e.k}" value="${esc(r.v[e.k]==null?'':r.v[e.k])}" ${e.t==='n'?'class="r" style="width:96px"':'style="width:130px"'}>`;
+ const ent=tp.entradas.filter(e=>e.t!=='d'),rows=o.rows.map((r,i)=>`<tr class="${!r.d||inP(r.d,FR)?'':'o'}"><td><input type="date" data-a="ri" data-i="${i}" data-k="d" value="${r.d||''}"></td><td>${eqCell(r,i)}</td>${ent.map(e=>`<td>${cell(e,r,i)}</td>`).join('')}<td><button class="g" data-a="dr" data-i="${i}" aria-label="Excluir linha">✕</button></td></tr>`).join('');
+ const sv=res.itens.map(x=>`<tr><td>${esc(x.c)}</td><td>${esc(x.d)}</td><td>${esc(x.u)}</td><td class="r">${fmt(x.q)}</td><td><input class="r" data-a="aj" data-c="${esc(x.c)}" value="${x.aj?fmt(x.qf):''}" placeholder="${fmt(x.q)}"></td><td class="r">${fmt(x.p)}</td><td class="r">${fmt(x.v)}</td></tr>`).join('');
+ return head+`<div class="card tw"><table><thead><tr><th>Data</th><th>Equipes</th>${ent.map(e=>`<th>${esc(e.l)}</th>`).join('')}<th></th></tr></thead><tbody>${rows||'<tr><td colspan="12" class="mu">Nenhum trecho lançado.</td></tr>'}</tbody></table>
+<p><button data-a="ar">+ Linha</button> <span class="mu">${o.rows.length} linhas${o.rows.length>max?' · no BM esta OSE será dividida em '+Math.ceil(o.rows.length/max)+' folhas de cálculo (cada folha do modelo comporta '+max+' linhas)':''}. Linhas esmaecidas estão fora do período.</span></p></div>
+<div class="k card"><div>Medição desta OSE (trechos + avulsos)<b>R$ ${fmt(res.total+avT)}</b></div><div>Com canteiro (proporcional)<b>R$ ${fmt((res.total+avT)*(1+CFG.k))}</b></div><div>Executado da frente no período<b>R$ ${fmt(exe(FR))}</b></div></div>
+<div class="card tw"><h3 style="margin:0 0 8px">Serviços calculados</h3><table><thead><tr><th>Código</th><th>Serviço</th><th>Und.</th><th class="r">Qtd. calculada</th><th class="r">Qtd. ajustada (medição)</th><th class="r">Unitário R$</th><th class="r">Valor R$</th></tr></thead><tbody>${sv||'<tr><td colspan="7" class="mu">Preencha os trechos para calcular.</td></tr>'}</tbody></table>
+<p class="mu">Para ajustar a medição, digite a quantidade na coluna "ajustada"; apague o campo para voltar ao valor calculado. Nos campos numéricos use vírgula nos decimais (ex.: 1,25); o ponto também é aceito quando não houver vírgula.</p></div>${vAv(o.id)}`}
+/* ---- eventos ---- */
+document.addEventListener('click',async e=>{
+ const tb=e.target.closest('[data-t]');if(tb){TAB=tb.dataset.t;if(CFG)render();return}
+ const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a;
+ if(a==='open'){await openDir();return}if(!CFG)return;
+ if(a==='add'){const d=$('#fd').value,oid=b.dataset.oid||(($('#fo')||{}).value||''),c=$('#fc').value.split(' ')[0],q=pn($('#fq').value),L=LN[FR],o=(L.oses||[]).find(x=>x.id===oid);
+  if(!d||!PRm[c]||!q){toast('Informe data, serviço válido da lista e quantidade.');return}
+  L.itens.push({i:Date.now().toString(36)+Math.random().toString(36).slice(2,5),d,os:o?o.nome:'',oid:o?o.id:undefined,c,q});if(await wr('lanc_'+FR+'.json',L))render()}
+ else if(a==='del'){if(!confirm('Excluir este lançamento?'))return;const L=LN[FR];L.itens=L.itens.filter(x=>x.i!==b.dataset.i);if(await wr('lanc_'+FR+'.json',L))render()}
+ else if(a==='nf'){const n=prompt('Nome da nova frente (município):');if(!n)return;
+  const id=n.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')||String(Date.now());
+  if(CFG.frentes.some(f=>f.id===id)){toast('Já existe uma frente com esse nome.');return}
+  CFG.frentes.push({id,nome:n,contrato:'',oses:[]});LN[id]={itens:[]};FR=id;await wr('config.json',CFG);await wr('lanc_'+id+'.json',LN[id]);render()}
+ else if(a==='nc'){CFG.contratos.push({id:'c'+Date.now().toString(36),n:'',obra:'',L:0,O:0,P:0,nl:0});if(await wr('config.json',CFG))render()}});
+document.addEventListener('change',async e=>{
+ const t=e.target,a=t.dataset.a;if(!CFG||!a)return;
+ if(a==='fr'){FR=t.value;OS=null;render()}
+ else if(a==='lk'){CFG.frentes.find(f=>f.id===FR).contrato=t.value;if(await wr('config.json',CFG))render()}
+ else if(a==='q'){const x=LN[FR].itens.find(i=>i.i===t.dataset.i);x.q=pn(t.value);if(await wr('lanc_'+FR+'.json',LN[FR]))render()}
+ else if(a==='cf'){const c=CFG.contratos.find(c=>c.id===t.dataset.id),k=t.dataset.k;c[k]=['n','obra','p','resp','di','df'].includes(k)?(t.value||(k==='di'||k==='df'?null:'')):pn(t.value);if(await wr('config.json',CFG))render()}
+ else if(a==='per'){const f=CFG.frentes.find(x=>x.id===FR);if(!f)return;f.periodo={...per(FR),[t.dataset.k]:t.value};if(await wr('config.json',CFG))render()}});
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('[data-a]');if(!b||!CFG)return;const a=b.dataset.a,LL=LN[FR],o=LL&&(LL.oses||[]).find(x=>x.id===OS),sv=()=>wr('lanc_'+FR+'.json',LL);
+ if(a==='no'){const n=$('#no').value.trim();if(!n){toast('Dê um nome à OSE.');return}LL.oses=LL.oses||[];const x={id:uid(),nome:n,tipo:$('#nt').value,rows:[],aj:{}};LL.oses.push(x);OS=x.id;if(await sv())render()}
+ else if(a==='dos'&&o){if(!confirm('Excluir a OSE "'+o.nome+'" e seus trechos?'))return;LL.oses=LL.oses.filter(x=>x!==o);OS=null;if(await sv())render()}
+ else if(a==='ar'&&o){const l=o.rows[o.rows.length-1];o.rows.push({d:l?l.d:hoje(),v:{},eq:l?[...(l.eq||[])]:[]});if(await sv())render()}
+ else if(a==='dr'&&o){o.rows.splice(+b.dataset.i,1);if(await sv())render()}
+ else if(a==='neq'){const n=(prompt('Nome da equipe:')||'').trim();if(!n)return;CFG.equipes=CFG.equipes||[];const id=slug(n);if(!CFG.equipes.some(q=>q.id===id))CFG.equipes.push({id,nome:n});if(await wr('config.json',CFG))render()}});
+document.addEventListener('change',async e=>{
+ const t=e.target,a=t.dataset.a;if(!CFG||!a)return;const LL=LN[FR],o=LL&&(LL.oses||[]).find(x=>x.id===OS),sv=()=>wr('lanc_'+FR+'.json',LL);
+ if(a==='os'){OS=t.value;render()}
+ else if(a==='ri'&&o){const r=o.rows[+t.dataset.i],k=t.dataset.k;if(k==='d'){r.d=t.value;o.rows.sort(byD)}else r.v[k]=t.value;if(await sv())render()}
+ else if(a==='eq'&&o){const r=o.rows[+t.dataset.i],q=t.dataset.q;r.eq=r.eq||[];if(t.checked){if(!r.eq.includes(q))r.eq.push(q)}else r.eq=r.eq.filter(x=>x!==q);
+  if(await sv()){const sm=t.closest('details').querySelector('summary');sm.textContent=eqNomes(r).join(', ')||'— equipes —'}}
+ else if(a==='aj'&&o){o.aj=o.aj||{};const c=t.dataset.c;if(t.value.trim()==='')delete o.aj[c];else o.aj[c]=pf(t.value);if(await sv())render()}});
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b||!CFG)return;
+ if(b.dataset.a==='gd')await gerarDash();
+ else if(b.dataset.a==='dc'){const c=CFG.contratos.find(x=>x.id===b.dataset.id);if(!confirm('Excluir o contrato '+(c.n||'(sem número)')+'? As frentes vinculadas ficarão sem contrato.'))return;
+  CFG.frentes.forEach(f=>{if(f.contrato===c.id)f.contrato=''});CFG.contratos=CFG.contratos.filter(x=>x!==c);if(await wr('config.json',CFG))render()}});
+document.addEventListener('change',async e=>{const t=e.target,a=t.dataset.a;if(!CFG||!a)return;
+ if(a==='cb'){const c=CFG.contratos.find(x=>x.id===t.dataset.id);c.bx=t.checked?hoje():null;if(await wr('config.json',CFG))render()}
+ else if(a==='cfr'){const id=t.dataset.id,old=CFG.frentes.find(f=>f.contrato===id);if(old)old.contrato='';
+  if(t.value){const f=CFG.frentes.find(x=>x.id===t.value);f.contrato=id;const c=CFG.contratos.find(x=>x.id===id);c.obra=f.nome}
+  if(await wr('config.json',CFG))render()}});
+const slug=n=>n.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')||String(Date.now());
+async function garantirFrente(nome){const id=slug(nome);let f=CFG.frentes.find(x=>x.id===id);if(!f){f={id,nome,contrato:'',oses:[]};CFG.frentes.push(f);LN[id]={itens:[]};await wr('lanc_'+id+'.json',LN[id])}return f}
+const nomeObra=c=>{const f=CFG.frentes.find(x=>x.contrato===c.id);if(f)c.obra=f.nome};
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b||!CFG)return;const a=b.dataset.a;
+ if(a==='uf'){const f=CFG.frentes.find(x=>x.id===b.dataset.f),c=CFG.contratos.find(x=>x.id===f.contrato);f.contrato='';if(c)nomeObra(c);if(await wr('config.json',CFG))render()}
+ else if(a==='ncc'){const n=$('#cn').value.trim();if(!n){toast('Informe o número do contrato.');return}
+  const fn=$('#cf').value.trim();let f=null;
+  if(fn){const ex=CFG.frentes.find(x=>x.id===slug(fn));if(ex&&ex.contrato&&!confirm('A frente "'+ex.nome+'" já pertence ao contrato '+((CFG.contratos.find(c=>c.id===ex.contrato)||{}).n||'(excluído)')+'. Mover para este novo contrato?'))return;f=await garantirFrente(fn)}
+  const c={id:'c'+uid(),n,obra:f?f.nome:'',p:$('#cp').value.trim(),di:$('#cdi').value||null,df:$('#cdf').value||null,L:pn($('#cv').value),O:0,P:0,nl:0};
+  if(f)f.contrato=c.id;CFG.contratos.push(c);if(await wr('config.json',CFG)){toast('Contrato criado ✓');render()}}});
+document.addEventListener('change',async e=>{const t=e.target;if(!CFG||t.dataset.a!=='af')return;
+ const c=CFG.contratos.find(x=>x.id===t.dataset.id);let f;
+ if(t.value==='__nova'){const n=(prompt('Nome da frente (município):')||'').trim();if(!n){render();return}f=await garantirFrente(n)}
+ else if(t.value)f=CFG.frentes.find(x=>x.id===t.value);else return;
+ f.contrato=c.id;nomeObra(c);if(await wr('config.json',CFG))render()});
+document.addEventListener('input',e=>{if(CFG&&e.target.dataset&&e.target.dataset.a==='fq'){FILT.q=e.target.value;render()}});
+document.addEventListener('change',e=>{if(CFG&&e.target.dataset&&e.target.dataset.a==='fs'){FILT.s=e.target.value;render()}});
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b||!CFG)return;const a=b.dataset.a;
+ if(a==='fl'){FILT={q:'',s:''};render()}
+ else if(a==='bmg')await baixarBM(FR,snapAtual(FR));
+ else if(a==='bmh'){const x=fechs(FR).find(y=>y.n===+b.dataset.n);if(x)await baixarBM(FR,x)}
+ else if(a==='bmf'){const F=fechs(FR),sn=snapAtual(FR);
+  if(!sn.cols.length){toast('Não há produção no período para fechar.');return}
+  if(F.some(x=>x.ini===sn.ini&&x.fim===sn.fim)){toast('Já existe uma medição fechada para este período.');return}
+  if(!confirm('Fechar a medição nº '+sn.n+' de '+sn.mun+' ('+dbr(sn.ini)+' a '+dbr(sn.fim)+')?\nOs ajustes de quantidade das OSE serão zerados para o próximo período.'))return;
+  F.push({...sn,em:new Date().toISOString(),st:'pend'});(LN[FR].oses||[]).forEach(o=>{o.aj={}});
+  const f=CFG.frentes.find(x=>x.id===FR),ni=addD(sn.fim,1);f.periodo={ini:ni,fim:addD(addM(ni,1),-1)};
+  if(await wr('lanc_'+FR+'.json',LN[FR])){await wr('config.json',CFG);await baixarBM(FR,F[F.length-1]);toast('Medição fechada. Novo período da frente: '+dbr(f.periodo.ini)+' a '+dbr(f.periodo.fim)+'.');render()}}
+ else if(a==='bms'){const x=fechs(FR).find(y=>y.n===+b.dataset.n);if(!x)return;x.st=x.st==='med'?'pend':'med';x.aprov=x.st==='med'?hoje():null;if(await wr('lanc_'+FR+'.json',LN[FR]))render()}
+ else if(a==='bmr'){const F=fechs(FR),x=F[F.length-1];if(!x)return;if(!confirm('Reabrir a medição nº '+x.n+'? Ela volta a ser produção do período '+dbr(x.ini)+' a '+dbr(x.fim)+' e deixa de contar como medição fechada.'))return;
+  F.pop();(LN[FR].oses||[]).forEach(o=>{const c=x.cols.find(y=>y.nome===o.nome&&y.os);if(c)o.aj={...c.os.aj}});CFG.frentes.find(f=>f.id===FR).periodo={ini:x.ini,fim:x.fim};
+  if(await wr('lanc_'+FR+'.json',LN[FR])){await wr('config.json',CFG);render()}}});
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b||!CFG)return;const a=b.dataset.a,r=remL().find(x=>x.id===b.dataset.id),sv=()=>wr('config.json',CFG);
+ if(a==='rma'){const de=$('#rmd').value,pa=$('#rmp').value,co=CFG.contratos.find(c=>c.id===de);
+  if(!de||!pa||de===pa){toast('Escolha contratos de origem e destino diferentes.');return}
+  const Q=Math.max(0,calc(co).Q-remDe(co));if(!(Q>0.005)){toast('O contrato de origem não tem saldo retido disponível para remanejar.');return}
+  let v=pn($('#rmv').value);if(!(v>0))v=Q;if(v>Q+0.005){toast('O valor excede o saldo retido disponível do contrato de origem (R$ '+fmt(Q)+').');return}
+  CFG.rem=CFG.rem||[];CFG.rem.push({id:'rem'+uid(),de,para:pa,valor:Math.round(v*100)/100,data:hoje(),st:'pend',obs:$('#rmo').value.trim()});if(await sv()){toast('Saldo retido remanejado ✓');render()}}
+ else if(a==='rmn'&&r){r.st='med';r.dmed=hoje();if(await sv())render()}
+ else if(a==='rmb'&&r){r.st='pend';if(await sv())render()}
+ else if(a==='rmx'&&r){if(!confirm('Excluir este remanejamento? O valor deixa de ser acrescentado ao contrato de destino.'))return;CFG.rem=CFG.rem.filter(x=>x!==r);if(await sv())render()}});
+setInterval(()=>{if(DIR&&CFG&&!document.activeElement.matches('input,select'))loadAll()},30000);
+render();window.__t={onFluxoMsg,fluxoHtml,setFluxoD:d=>{FLUXD=d},render,setDash:t=>{DASHT=t},setFluxo:t=>{FLUXT=t},setTab:t=>{TAB=t},per,fechTot,addD,addM,vM,colsFrente,baixarBM,setDir:d=>{DIR=d},ordC,filtC,setFilt:f=>{FILT=f},vAv,buildDash,dashRows,calc,exe,vP,vT,calcOSE,set:(c,l,t,m)=>{CFG=c;LN=l;TPL=t||{};TPLC={};MEMO={};if(m)BMAP=m;PRm=Object.fromEntries(c.precos.map(p=>[p.c,p]))}};
+</script></body></html>
