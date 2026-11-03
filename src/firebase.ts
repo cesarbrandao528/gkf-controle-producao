@@ -15,6 +15,7 @@ import {
   collection,
   getDocs,
   getDocFromServer,
+  deleteDoc,
 } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
@@ -326,7 +327,18 @@ export async function setRole(
   }
 }
 
-// Central production data sync
+// Gestor deletes access
+export async function deleteUserDoc(userId: string): Promise<boolean> {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await deleteDoc(userRef);
+    return true;
+  } catch (e) {
+    console.error('Erro ao excluir usuário:', e);
+    return false;
+  }
+}
+
 export async function saveCentralProduction(
   dataPackage: any,
   email: string

@@ -38,26 +38,29 @@ export const FluxoObrasTab: React.FC = () => {
     return () => window.removeEventListener('message', handleMessage);
   }, [setFluxD, toast]);
 
-  const srcDocContent = useMemo(() => {
-    if (!fluxt) return '';
-    let html = fluxt;
-
-    // Calculate Previsto Faturamento (Column M) from Painel de Controle
-    let totalPrevistoFaturamento = 0;
-    const previstoFaturamentoPorObra: Record<string, number> = {};
+  // Calculate Previsto Faturamento (Column M) from Painel de Controle
+  const { totalPrevistoFaturamento, previstoFaturamentoPorObra } = useMemo(() => {
+    let total = 0;
+    const porObra: Record<string, number> = {};
     if (cfg?.contratos) {
       cfg.contratos.forEach((c: any) => {
         const r = calc(c, cfg, ln, prm, tpl);
-        totalPrevistoFaturamento += r.M || 0;
-        if (c.id) previstoFaturamentoPorObra[c.id] = (previstoFaturamentoPorObra[c.id] || 0) + (r.M || 0);
+        total += r.M || 0;
+        if (c.id) porObra[c.id] = (porObra[c.id] || 0) + (r.M || 0);
         if (c.o) {
           const norm = c.o.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-          previstoFaturamentoPorObra[norm] = (previstoFaturamentoPorObra[norm] || 0) + (r.M || 0);
+          porObra[norm] = (porObra[norm] || 0) + (r.M || 0);
           const cleanCity = norm.split(' - ')[0].trim();
-          previstoFaturamentoPorObra[cleanCity] = (previstoFaturamentoPorObra[cleanCity] || 0) + (r.M || 0);
+          porObra[cleanCity] = (porObra[cleanCity] || 0) + (r.M || 0);
         }
       });
     }
+    return { totalPrevistoFaturamento: total, previstoFaturamentoPorObra: porObra };
+  }, [cfg, ln, prm, tpl]);
+
+  const srcDocContent = useMemo(() => {
+    if (!fluxt) return '';
+    let html = fluxt;
 
     if (fluxd && Array.isArray(fluxd.obras)) {
       const i = fluxt.indexOf('let D=');
@@ -164,8 +167,62 @@ export const FluxoObrasTab: React.FC = () => {
   };
 
   const handleDownloadCopy = () => {
-    if (!srcDocContent) return;
-    const blob = new Blob([srcDocContent], { type: 'text/html;charset=utf-8' });
+    if (!fluxt) return;
+    let html = fluxt;
+    if (fluxd) {
+      const i = fluxt.indexOf('var D=');
+      if (i !== -1) {
+        let d = 0, ins = false, esc = false, k = i + 6;
+        for (; k < fluxt.length; k++) {
+          const c = fluxt[k];
+          if (ins) {
+            if (esc) esc = false;
+            else if (c === '\\') esc = true;
+            else if (c === '"') ins = false;
+          } else if (c === '"') ins = true;
+          else if (c === '{') d++;
+          else if (c === '}') {
+            d--;
+            if (d === 0) { k++; break; }
+          }
+        }
+        html = fluxt.slice(0, i + 6) + JSON.stringify(fluxd).replace(/<\//g, '<\\/') + fluxt.slice(k);
+      }
+    }
+
+    const withTheme = html.replace(/<html([^>]*)>/i, `<html$1 data-theme="${theme}">`);
+    const standaloneStyle = `
+      <style>
+        html, body {
+          background: ${theme === 'light' ? '#f0f5fa' : '#030813'} !important;
+          color: ${theme === 'light' ? '#1b2733' : '#e8eefb'} !important;
+          margin: 0 !important;
+          padding: 24px 20px 60px !important;
+          overflow-y: auto !important;
+          overflow-x: auto !important;
+          min-height: 100vh !important;
+          font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        .app {
+          max-width: 1600px !important;
+          margin: 0 auto !important;
+          padding: 0 !important;
+        }
+        .card {
+          border-radius: 18px !important;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
+          margin-bottom: 24px !important;
+        }
+      </style>
+      <script>
+        window.PREVISTO_FATURAMENTO = ${JSON.stringify({
+          total: totalPrevistoFaturamento,
+          porObra: previstoFaturamentoPorObra,
+        })};
+      </script>
+    `;
+    const finalHtml = withTheme.replace('</head>', `${standaloneStyle}</head>`);
+    const blob = new Blob([finalHtml], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -174,7 +231,7 @@ export const FluxoObrasTab: React.FC = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast('Fluxo e Resultado exportado como HTML autônomo ✓');
+    toast('Fluxo e Resultado exportado como HTML autônomo com rolagem completa ✓');
   };
 
   if (!fluxt) {

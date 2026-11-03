@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   fetchAllUsers,
   setRole,
+  deleteUserDoc,
   UserProfile,
   UserRole,
 } from '../firebase';
@@ -15,6 +16,7 @@ import {
   RefreshCw,
   Search,
   UserCheck,
+  Trash2,
 } from 'lucide-react';
 
 interface UserManagementModalProps {
@@ -55,6 +57,27 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({
       setTimeout(() => setFeedback(null), 3000);
     } else {
       setFeedback('Erro ao atualizar permissão. Verifique sua conexão.');
+    }
+    setUpdatingId(null);
+  };
+
+  const handleDeleteUser = async (user: UserProfile) => {
+    if (
+      !confirm(
+        `Tem certeza que deseja excluir o acesso de "${user.displayName || user.email}"? O usuário perderá permissão total ao sistema.`
+      )
+    ) {
+      return;
+    }
+    setUpdatingId(user.id);
+    setFeedback(null);
+    const ok = await deleteUserDoc(user.id);
+    if (ok) {
+      setUsers((prev) => prev.filter((u) => u.id !== user.id));
+      setFeedback(`Acesso de ${user.email} excluído com sucesso! ✓`);
+      setTimeout(() => setFeedback(null), 3000);
+    } else {
+      setFeedback('Erro ao excluir usuário. Tente novamente.');
     }
     setUpdatingId(null);
   };
@@ -248,6 +271,19 @@ export const UserManagementModal: React.FC<UserManagementModalProps> = ({
                                 title="Promover a Gestor"
                               >
                                 + Gestor
+                              </button>
+                            )}
+
+                            {/* Excluir acesso */}
+                            {!isCurrent && (
+                              <button
+                                type="button"
+                                disabled={updatingId === u.id}
+                                onClick={() => handleDeleteUser(u)}
+                                className="p-1.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/20 border border-rose-500/30 transition-all cursor-pointer ml-1"
+                                title="Excluir acesso do usuário"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             )}
                           </div>

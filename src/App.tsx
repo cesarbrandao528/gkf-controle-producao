@@ -13,8 +13,15 @@ import { Loader2, Info } from 'lucide-react';
 import { DEFAULT_DIRECT_PROFILE } from './firebase';
 
 const AppContent: React.FC = () => {
-  const { tab, loading, currentUser, userProfile, authChecked, canEdit, setUserProfile } =
+  const { tab, setTab, loading, currentUser, userProfile, authChecked, canEdit, setUserProfile } =
     useData() as any;
+
+  // Auto-redirect Leitor to Dashboard if on an edit tab
+  React.useEffect(() => {
+    if (userProfile?.role === 'leitor' && tab !== 'd' && tab !== 'f') {
+      setTab('d');
+    }
+  }, [userProfile, tab, setTab]);
 
   if (loading || !authChecked) {
     return (
@@ -27,35 +34,32 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // If user profile is not set, allow login or direct access
+  // If user profile is not set, login is required
   if (!userProfile) {
-    return (
-      <AuthModal
-        onSuccess={(profile) => setUserProfile(profile)}
-        onCancel={() => setUserProfile(DEFAULT_DIRECT_PROFILE)}
-      />
-    );
+    return <AuthModal onSuccess={(profile) => setUserProfile(profile)} />;
   }
+
+  const isLeitor = userProfile.role === 'leitor';
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      {/* Reader mode notice if not editor/gestor */}
-      {!canEdit && (
+      {/* Reader mode banner */}
+      {isLeitor && (
         <div className="bg-blue-950/40 border-b border-blue-500/20 px-4 py-2 text-xs text-blue-200 flex items-center justify-center gap-2">
           <Info className="w-3.5 h-3.5 shrink-0 text-[var(--cy)]" />
           <span>
-            <b>Modo Leitura:</b> Seu perfil ({userProfile.displayName || userProfile.email}) possui permissão para visualizar todas as obras, relatórios e dashboards. Para editar dados, solicite autorização ao Gestor (cesar@gkfengenharia.com.br).
+            <b>Perfil Leitor:</b> Acesso restrito a <b>Dashboard</b> e <b>Fluxo e Resultado</b>. Para permissão de edição de trechos e medições, solicite liberação ao Gestor (cesar@gkfengenharia.com.br).
           </span>
         </div>
       )}
 
       <main className="flex-1 max-w-[1600px] w-full mx-auto p-4 md:p-6 lg:p-7">
-        {tab === 't' && <TrechosTab />}
-        {tab === 'm' && <MedicaoTab />}
-        {tab === 'c' && <CadastroTab />}
-        {tab === 'p' && <PainelControleTab />}
+        {!isLeitor && tab === 't' && <TrechosTab />}
+        {!isLeitor && tab === 'm' && <MedicaoTab />}
+        {!isLeitor && tab === 'c' && <CadastroTab />}
+        {!isLeitor && tab === 'p' && <PainelControleTab />}
         {tab === 'd' && <DashboardTab />}
         {tab === 'f' && <FluxoObrasTab />}
       </main>

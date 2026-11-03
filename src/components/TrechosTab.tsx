@@ -408,16 +408,6 @@ export const TrechosTab: React.FC = () => {
             </button>
           )}
 
-          {/* Save to Cloud button */}
-          <button
-            type="button"
-            onClick={saveAll}
-            className="px-3.5 py-1.5 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
-            title="Salvar alterações e sincronizar com o banco na nuvem (Firestore)"
-          >
-            <Save className="w-3.5 h-3.5" />
-            <span>Salvar na Nuvem</span>
-          </button>
         </div>
       </div>
 

@@ -93,17 +93,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
   const [activeToast, setActiveToast] = useState<string | null>(null);
 
-  // Auth & RBAC State (Acesso Direto por padrão para não exigir login)
+  // Auth & RBAC State (Login obrigatório para todos os usuários)
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(() => getSavedUserProfile() || DEFAULT_DIRECT_PROFILE);
-  const [authChecked, setAuthChecked] = useState<boolean>(true);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(() => getSavedUserProfile());
+  const [authChecked, setAuthChecked] = useState<boolean>(false);
 
   useEffect(() => {
     const saved = getSavedUserProfile();
     if (saved) {
       setUserProfile(saved);
-    } else {
-      setUserProfile(DEFAULT_DIRECT_PROFILE);
     }
     const unsub = onAuthStateChanged(auth, async (u: FirebaseUser | null) => {
       setCurrentUser(u);
@@ -116,7 +114,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } else {
         const local = getSavedUserProfile();
-        setUserProfile(local || DEFAULT_DIRECT_PROFILE);
+        setUserProfile(local);
       }
       setAuthChecked(true);
     });

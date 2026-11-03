@@ -10,6 +10,7 @@ import {
 } from '../engine/calc';
 import { Search } from 'lucide-react';
 import { Contrato } from '../types';
+import { NumericInput } from './NumericInput';
 
 export const PainelControleTab: React.FC = () => {
   const {
@@ -56,7 +57,7 @@ export const PainelControleTab: React.FC = () => {
     return { c, r };
   });
 
-  const handleUpdateField = (cId: string, key: string, val: string) => {
+  const handleUpdateField = (cId: string, key: string, val: any) => {
     updateConfig((prev: any) => ({
       ...prev,
       contratos: prev.contratos.map((c: Contrato) => {
@@ -64,7 +65,7 @@ export const PainelControleTab: React.FC = () => {
           const isNum = ['L', 'nl'].includes(key);
           return {
             ...c,
-            [key]: isNum ? pn(val) : val,
+            [key]: isNum ? (typeof val === 'number' ? val : pn(val)) : val,
           };
         }
         return c;
@@ -199,10 +200,9 @@ export const PainelControleTab: React.FC = () => {
 
                     {/* Contratado (L) */}
                     <td className="text-right py-1 px-1.5">
-                      <input
-                        type="text"
-                        value={fmt(c.L)}
-                        onChange={(e) => handleUpdateField(c.id, 'L', e.target.value)}
+                      <NumericInput
+                        value={c.L}
+                        onChange={(val) => handleUpdateField(c.id, 'L', val)}
                         className="text-right text-xs font-semibold py-0.5 px-1 rounded border border-transparent hover:border-[var(--ln)] focus:border-[var(--cy)] bg-transparent w-24"
                       />
                     </td>
@@ -219,10 +219,9 @@ export const PainelControleTab: React.FC = () => {
 
                     {/* Exec. legado (nl) */}
                     <td className="text-right py-1 px-1.5">
-                      <input
-                        type="text"
-                        value={fmt(c.nl)}
-                        onChange={(e) => handleUpdateField(c.id, 'nl', e.target.value)}
+                      <NumericInput
+                        value={c.nl}
+                        onChange={(val) => handleUpdateField(c.id, 'nl', val)}
                         className="text-right text-xs text-[var(--mu)] py-0.5 px-1 rounded border border-transparent hover:border-[var(--ln)] focus:border-[var(--cy)] bg-transparent w-20"
                       />
                     </td>

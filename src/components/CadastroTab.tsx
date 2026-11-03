@@ -14,6 +14,7 @@ import {
 } from '../engine/calc';
 import { Plus, Trash2, X, Search, FileDown } from 'lucide-react';
 import { Config, Contrato, Frente } from '../types';
+import { NumericInput } from './NumericInput';
 
 export const CadastroTab: React.FC = () => {
   const {
@@ -137,7 +138,11 @@ export const CadastroTab: React.FC = () => {
           const isNum = ['L', 'P', 'O', 'nl'].includes(fieldKey);
           return {
             ...c,
-            [fieldKey]: isNum ? pn(val) : val || (fieldKey === 'di' || fieldKey === 'df' ? null : ''),
+            [fieldKey]: isNum
+              ? typeof val === 'number'
+                ? val
+                : pn(val)
+              : val || (fieldKey === 'di' || fieldKey === 'df' ? null : ''),
           };
         }
         return c;
@@ -490,21 +495,19 @@ export const CadastroTab: React.FC = () => {
 
                     {/* Valor Contratado (L) */}
                     <td className="text-right" style={{ width: '130px' }}>
-                      <input
-                        type="text"
-                        value={fmt(c.L)}
-                        onChange={(e) => handleUpdateContratoField(c.id, 'L', e.target.value)}
-                        className="text-right text-xs font-semibold"
+                      <NumericInput
+                        value={c.L}
+                        onChange={(val) => handleUpdateContratoField(c.id, 'L', val)}
+                        className="text-right text-xs font-semibold w-full bg-transparent px-2 py-1 rounded border border-transparent hover:border-[var(--ln)] focus:border-[var(--cy)]"
                       />
                     </td>
 
                     {/* Acumulado Anterior (P) */}
                     <td className="text-right" style={{ width: '130px' }}>
-                      <input
-                        type="text"
-                        value={fmt(c.P)}
-                        onChange={(e) => handleUpdateContratoField(c.id, 'P', e.target.value)}
-                        className="text-right text-xs font-medium"
+                      <NumericInput
+                        value={c.P}
+                        onChange={(val) => handleUpdateContratoField(c.id, 'P', val)}
+                        className="text-right text-xs font-medium w-full bg-transparent px-2 py-1 rounded border border-transparent hover:border-[var(--ln)] focus:border-[var(--cy)]"
                       />
                     </td>
 

@@ -64,6 +64,68 @@
   color-scheme: light;
 }
 
+/* Select & Options styling for crystal-clear readability in both dark and light modes */
+select {
+  background-color: var(--opt) !important;
+  color: var(--tx) !important;
+}
+
+select option {
+  background-color: #0d1b30 !important;
+  color: #f1f5f9 !important;
+  padding: 8px 12px !important;
+}
+
+:root[data-theme="light"] select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Light theme high-contrast readability adjustments */
+:root[data-theme="light"] {
+  --ln: rgba(0, 54, 95, 0.22);
+  --mu: #475569;
+}
+
+:root[data-theme="light"] .bg-amber-500\/10,
+:root[data-theme="light"] .bg-amber-500\/15,
+:root[data-theme="light"] .bg-amber-500\/20 {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #f59e0b !important;
+}
+
+:root[data-theme="light"] .text-amber-300,
+:root[data-theme="light"] .text-amber-400 {
+  color: #b45309 !important;
+}
+
+:root[data-theme="light"] .text-emerald-300,
+:root[data-theme="light"] .text-emerald-400 {
+  color: #047857 !important;
+}
+
+:root[data-theme="light"] .text-blue-300,
+:root[data-theme="light"] .text-blue-400 {
+  color: #1d4ed8 !important;
+}
+
+:root[data-theme="light"] .bg-blue-500\/10,
+:root[data-theme="light"] .bg-blue-500\/15,
+:root[data-theme="light"] .bg-blue-500\/20 {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  border-color: #93c5fd !important;
+}
+
+:root[data-theme="light"] .bg-slate-500\/15,
+:root[data-theme="light"] .bg-slate-500\/20 {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+
+
 body {
   margin: 0;
   min-height: 100vh;
