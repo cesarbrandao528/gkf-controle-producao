@@ -89,20 +89,15 @@ export const DashboardTab: React.FC = () => {
   }, [dasht, cfg, ln, prm, tpl, theme]);
 
   const handleDownloadCopy = () => {
-    if (!dasht || !cfg) return;
-    const rows = dashRows(cfg, ln, prm, tpl);
-    const htmlWithData = buildDash(dasht, rows, hoje());
-    const withTheme = htmlWithData.replace(
-      /<html([^>]*)>/i,
-      `<html$1 data-theme="${theme}">`
-    );
+    if (!srcDocContent) return;
+
     const standaloneStyle = `
       <style>
         html, body {
           background: ${theme === 'light' ? '#f0f5fa' : '#030813'} !important;
           color: ${theme === 'light' ? '#1b2733' : '#e8eefb'} !important;
           margin: 0 !important;
-          padding: 24px 20px 60px !important;
+          padding: 24px 20px 80px !important;
           overflow-y: auto !important;
           overflow-x: auto !important;
           min-height: 100vh !important;
@@ -111,16 +106,24 @@ export const DashboardTab: React.FC = () => {
         .app {
           max-width: 1600px !important;
           margin: 0 auto !important;
-          padding: 0 !important;
+          padding: 0 0 60px !important;
         }
-        .card {
-          border-radius: 18px !important;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
-          margin-bottom: 24px !important;
-        }
+        header .brand { display: none !important; }
       </style>
     `;
-    const finalHtml = withTheme.replace('</head>', `${standaloneStyle}</head>`);
+
+    let finalHtml = srcDocContent
+      .replace(
+        /overflow-y:\s*hidden\s*!important;/g,
+        'overflow-y: auto !important; min-height: 100vh !important;'
+      )
+      .replace(
+        /background:\s*transparent\s*!important;/g,
+        `background: ${theme === 'light' ? '#f0f5fa' : '#030813'} !important; color: ${theme === 'light' ? '#1b2733' : '#e8eefb'} !important;`
+      );
+
+    finalHtml = finalHtml.replace('</head>', `${standaloneStyle}</head>`);
+
     const blob = new Blob([finalHtml], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -130,7 +133,7 @@ export const DashboardTab: React.FC = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast('Dashboard exportado como HTML autônomo com rolagem completa ✓');
+    toast('Dashboard exportado com dados e design idênticos ao aplicativo ✓');
   };
 
   const handleIframeLoad = () => {

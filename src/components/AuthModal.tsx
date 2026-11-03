@@ -95,36 +95,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccess, onCancel }) => 
           <h2 className="text-xl font-extrabold text-[var(--tx)] tracking-tight">
             Controle de Produção • GKF
           </h2>
-          <p className="text-xs text-[var(--mu)]">
-            Acesso livre para a equipe de obras e medição
+          <p className="text-xs text-[var(--mu)] text-center">
+            Acesso restrito para colaboradores autorizados da GKF Engenharia
           </p>
-        </div>
-
-        {/* Botão de Acesso Direto sem Login */}
-        <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-500/15 to-teal-500/15 border border-emerald-500/30 text-center space-y-2">
-          <p className="text-xs font-semibold text-emerald-300 flex items-center justify-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" />
-            Entrada livre sem necessidade de senha
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              saveUserProfileLocal(DEFAULT_DIRECT_PROFILE);
-              onSuccess(DEFAULT_DIRECT_PROFILE);
-            }}
-            className="w-full py-2.5 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
-          >
-            <span>Acessar Diretamente sem Login</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="relative flex py-1 items-center">
-          <div className="flex-grow border-t border-[var(--ln)]"></div>
-          <span className="flex-shrink mx-3 text-[11px] text-[var(--mu)] uppercase tracking-wider font-semibold">
-            ou acesse com conta pessoal
-          </span>
-          <div className="flex-grow border-t border-[var(--ln)]"></div>
         </div>
 
         {/* Tabs: Entrar / Cadastre-se */}

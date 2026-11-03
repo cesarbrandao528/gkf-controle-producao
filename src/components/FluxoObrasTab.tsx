@@ -167,37 +167,16 @@ export const FluxoObrasTab: React.FC = () => {
   };
 
   const handleDownloadCopy = () => {
-    if (!fluxt) return;
-    let html = fluxt;
-    if (fluxd) {
-      const i = fluxt.indexOf('var D=');
-      if (i !== -1) {
-        let d = 0, ins = false, esc = false, k = i + 6;
-        for (; k < fluxt.length; k++) {
-          const c = fluxt[k];
-          if (ins) {
-            if (esc) esc = false;
-            else if (c === '\\') esc = true;
-            else if (c === '"') ins = false;
-          } else if (c === '"') ins = true;
-          else if (c === '{') d++;
-          else if (c === '}') {
-            d--;
-            if (d === 0) { k++; break; }
-          }
-        }
-        html = fluxt.slice(0, i + 6) + JSON.stringify(fluxd).replace(/<\//g, '<\\/') + fluxt.slice(k);
-      }
-    }
+    if (!srcDocContent) return;
 
-    const withTheme = html.replace(/<html([^>]*)>/i, `<html$1 data-theme="${theme}">`);
+    // Use srcDocContent which contains the exact live fluxd data and PREVISTO_FATURAMENTO from the app
     const standaloneStyle = `
       <style>
         html, body {
           background: ${theme === 'light' ? '#f0f5fa' : '#030813'} !important;
           color: ${theme === 'light' ? '#1b2733' : '#e8eefb'} !important;
           margin: 0 !important;
-          padding: 24px 20px 60px !important;
+          padding: 24px 20px 80px !important;
           overflow-y: auto !important;
           overflow-x: auto !important;
           min-height: 100vh !important;
@@ -206,22 +185,25 @@ export const FluxoObrasTab: React.FC = () => {
         .app {
           max-width: 1600px !important;
           margin: 0 auto !important;
-          padding: 0 !important;
+          padding: 0 0 60px !important;
         }
-        .card {
-          border-radius: 18px !important;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
-          margin-bottom: 24px !important;
-        }
+        header .brand { display: none !important; }
       </style>
-      <script>
-        window.PREVISTO_FATURAMENTO = ${JSON.stringify({
-          total: totalPrevistoFaturamento,
-          porObra: previstoFaturamentoPorObra,
-        })};
-      </script>
     `;
-    const finalHtml = withTheme.replace('</head>', `${standaloneStyle}</head>`);
+
+    // Replace the iframe scroll-lock styles with the full-scroll standalone styling
+    let finalHtml = srcDocContent
+      .replace(
+        /overflow-y:\s*hidden\s*!important;/g,
+        'overflow-y: auto !important; min-height: 100vh !important;'
+      )
+      .replace(
+        /background:\s*transparent\s*!important;/g,
+        `background: ${theme === 'light' ? '#f0f5fa' : '#030813'} !important; color: ${theme === 'light' ? '#1b2733' : '#e8eefb'} !important;`
+      );
+
+    finalHtml = finalHtml.replace('</head>', `${standaloneStyle}</head>`);
+
     const blob = new Blob([finalHtml], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -231,7 +213,7 @@ export const FluxoObrasTab: React.FC = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast('Fluxo e Resultado exportado como HTML autônomo com rolagem completa ✓');
+    toast('Fluxo e Resultado exportado com dados e design idênticos ao aplicativo ✓');
   };
 
   if (!fluxt) {
