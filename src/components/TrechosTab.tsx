@@ -27,6 +27,9 @@ import {
   Wrench,
   CheckCircle2,
   AlertCircle,
+  Users,
+  X,
+  Check,
 } from 'lucide-react';
 import { AvulsoItem, Config, Fechamento, FrenteLancamentos, OSE, OSERow, PrecoItem } from '../types';
 
@@ -48,6 +51,15 @@ export const TrechosTab: React.FC = () => {
   // Selected period: 'current' (default), 'fech_${n}' (closed BM), or 'all'
   const [selectedPeriod, setSelectedPeriod] = useState<string>('current');
   const [showArchivedRows, setShowArchivedRows] = useState<boolean>(false);
+
+  // Filter trechos by team in the OSE view: 'all', team id, or 'none'
+  const [filterEquipeId, setFilterEquipeId] = useState<string>('all');
+
+  // Modal states for equipes
+  const [editingEquipeRowIndex, setEditingEquipeRowIndex] = useState<number | null>(null);
+  const [showEquipesModal, setShowEquipesModal] = useState<boolean>(false);
+  const [quickTeamName, setQuickTeamName] = useState<string>('');
+  const [newTeamModalName, setNewTeamModalName] = useState<string>('');
 
   const [newOseName, setNewOseName] = useState('');
   const [newOseType, setNewOseType] = useState('MND');
@@ -97,7 +109,6 @@ export const TrechosTab: React.FC = () => {
     if (isCurrentPeriod) {
       // If it's a newly created OSE or has active work, keep it
       if (!o.rows || o.rows.length === 0) return true;
-      // Also show if it has any rows or avulsos
       return true;
     }
 
@@ -268,19 +279,31 @@ export const TrechosTab: React.FC = () => {
     });
   };
 
-  const handleCreateEquipe = () => {
-    const nome = prompt('Nome da equipe:')?.trim();
+  const handleAddNewEquipe = (teamName: string) => {
+    const nome = teamName.trim();
     if (!nome) return;
     const id = slug(nome);
     updateConfig((prev: Config) => {
       const equipes = prev.equipes || [];
-      if (equipes.some((q: any) => q.id === id)) return prev;
+      if (equipes.some((q: any) => q.id === id || q.nome.toLowerCase() === nome.toLowerCase())) {
+        toast(`Equipe "${nome}" já está cadastrada.`);
+        return prev;
+      }
       return {
         ...prev,
         equipes: [...equipes, { id, nome }],
       };
     });
-    toast(`Equipe "${nome}" adicionada.`);
+    toast(`Equipe "${nome}" cadastrada com sucesso ✓`);
+  };
+
+  const handleDeleteEquipe = (equipeId: string, equipeNome: string) => {
+    if (!confirm(`Remover a equipe "${equipeNome}" do cadastro do sistema?`)) return;
+    updateConfig((prev: Config) => ({
+      ...prev,
+      equipes: (prev.equipes || []).filter((q: any) => q.id !== equipeId),
+    }));
+    toast(`Equipe "${equipeNome}" removida.`);
   };
 
   const handleUpdateAjuste = (o: OSE, code: string, valStr: string) => {
@@ -454,6 +477,13 @@ export const TrechosTab: React.FC = () => {
   const allRows = currentOse ? currentOse.rows || [] : [];
   const rowsWithIndex = allRows.map((row, index) => ({ row, originalIndex: index }));
   const visibleRowsWithIndex = rowsWithIndex.filter(({ row }) => {
+    // Equipe filtering
+    if (filterEquipeId === 'none') {
+      if ((row.eq || []).length > 0) return false;
+    } else if (filterEquipeId !== 'all') {
+      if (!(row.eq || []).includes(filterEquipeId)) return false;
+    }
+
     if (isCurrentPeriod || isAllPeriods || showArchivedRows) return true;
     if (!periodBounds) return true;
     return !row.d || (row.d >= periodBounds.ini && row.d <= periodBounds.fim);
@@ -572,7 +602,7 @@ export const TrechosTab: React.FC = () => {
               <button
                 type="button"
                 onClick={handleCreateOSE}
-                className="px-3 py-1.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white shadow-sm flex items-center gap-1"
+                className="px-3 py-1.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white shadow-sm flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Criar
@@ -587,7 +617,7 @@ export const TrechosTab: React.FC = () => {
             <button
               type="button"
               onClick={() => handleDeleteOSE(currentOse!)}
-              className="px-3 py-1.5 rounded-xl font-bold text-xs bg-red-950/40 text-red-300 border border-red-500/30 hover:bg-red-900/50 transition-all flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl font-bold text-xs bg-red-950/40 text-red-300 border border-red-500/30 hover:bg-red-900/50 transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <Trash2 className="w-3.5 h-3.5" />
               Excluir OSE
@@ -619,7 +649,7 @@ export const TrechosTab: React.FC = () => {
             <button
               type="button"
               onClick={() => setSelectedPeriod('current')}
-              className="px-3 py-1 rounded-lg bg-[var(--cy)] text-white font-bold text-xs hover:opacity-90 transition-opacity"
+              className="px-3 py-1 rounded-lg bg-[var(--cy)] text-white font-bold text-xs hover:opacity-90 transition-opacity cursor-pointer"
             >
               Voltar ao Período Atual
             </button>
@@ -656,7 +686,7 @@ export const TrechosTab: React.FC = () => {
         <div className="space-y-4">
           {/* Card 1: Trechos Físicos Executados & Serviços da OSE */}
           <div className="gkf-card space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--ln)] pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--ln)] pb-3">
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-base font-bold text-[var(--tx)]">
@@ -672,20 +702,51 @@ export const TrechosTab: React.FC = () => {
                   Modelo: <span className="font-semibold text-[var(--cy)]">{tp.nome}</span> · Os serviços físicos da CASAN são calculados automaticamente por trecho.
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+
+              {/* Toolbar Actions: Team Filter & Buttons */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Filtro de Equipes no Cabeçalho dos Trechos */}
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.05)] border border-[var(--ln)] text-xs text-[var(--mu)]">
+                  <Users className="w-3.5 h-3.5 text-[var(--cy)] shrink-0" />
+                  <span className="font-medium text-[var(--tx)] hidden sm:inline">Equipe:</span>
+                  <select
+                    value={filterEquipeId}
+                    onChange={(e) => setFilterEquipeId(e.target.value)}
+                    className="bg-transparent border-0 text-xs font-bold text-[var(--cy)] cursor-pointer focus:ring-0 focus:outline-none p-0 pr-1"
+                    title="Filtrar tabela para exibir trechos de uma equipe específica"
+                  >
+                    <option value="all" className="bg-[var(--card)] text-[var(--tx)]">
+                      Todas as equipes ({allRows.length})
+                    </option>
+                    {(cfg.equipes || []).map((eq: any) => {
+                      const count = allRows.filter((r: any) => (r.eq || []).includes(eq.id)).length;
+                      return (
+                        <option key={eq.id} value={eq.id} className="bg-[var(--card)] text-[var(--tx)]">
+                          {eq.nome} ({count})
+                        </option>
+                      );
+                    })}
+                    <option value="none" className="bg-[var(--card)] text-[var(--tx)]">
+                      Sem equipe ({allRows.filter((r: any) => !(r.eq || []).length).length})
+                    </option>
+                  </select>
+                </div>
+
                 {!isClosedPeriod && (
                   <>
                     <button
                       type="button"
-                      onClick={handleCreateEquipe}
-                      className="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] hover:border-[var(--cy)]"
+                      onClick={() => setShowEquipesModal(true)}
+                      className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] hover:border-[var(--cy)] flex items-center gap-1.5 cursor-pointer"
+                      title="Gerenciar equipes cadastradas"
                     >
-                      + Nova equipe
+                      <Users className="w-3.5 h-3.5 text-[var(--cy)]" />
+                      Gerenciar Equipes
                     </button>
                     <button
                       type="button"
                       onClick={() => handleAddTrechoRow(currentOse!)}
-                      className="px-3.5 py-1.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white shadow-sm flex items-center gap-1.5"
+                      className="px-3.5 py-1.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white shadow-sm flex items-center gap-1.5 cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       Adicionar trecho
@@ -701,7 +762,7 @@ export const TrechosTab: React.FC = () => {
                 <thead>
                   <tr>
                     <th className="text-xs">Data</th>
-                    <th className="text-xs">Equipes</th>
+                    <th className="text-xs" style={{ width: '180px' }}>Equipes</th>
                     {tp.entradas.map((e: any) => (
                       <th
                         key={e.k}
@@ -722,6 +783,8 @@ export const TrechosTab: React.FC = () => {
                       >
                         {isClosedPeriod
                           ? 'Nenhum trecho registrado nesta medição fechada.'
+                          : filterEquipeId !== 'all'
+                          ? 'Nenhum trecho encontrado para o filtro de equipe selecionado.'
                           : 'Nenhum trecho lançado para esta OSE. Clique em "Adicionar trecho" acima para iniciar.'}
                       </td>
                     </tr>
@@ -762,48 +825,47 @@ export const TrechosTab: React.FC = () => {
                             </div>
                           </td>
 
-                          {/* Equipes Dropdown */}
-                          <td style={{ minWidth: '135px' }}>
+                          {/* Seletor Visual de Equipes sem Desconfigurar */}
+                          <td style={{ width: '180px' }}>
                             {isClosedPeriod ? (
-                              <span className="text-xs text-[var(--mu)] px-2 py-1 block">
+                              <span className="text-xs font-medium text-[var(--tx)] px-2 py-1 block truncate">
                                 {assignedEqNomes.join(', ') || '—'}
                               </span>
                             ) : (
-                              <details className="relative group">
-                                <summary className="cursor-pointer text-xs py-1 px-2 rounded-lg border border-[var(--ln)] hover:border-[var(--cy)] bg-[rgba(var(--w),0.05)] list-none flex items-center justify-between">
-                                  <span className="truncate">
-                                    {assignedEqNomes.join(', ') || '— equipes —'}
+                              <button
+                                type="button"
+                                onClick={() => setEditingEquipeRowIndex(originalIndex)}
+                                className={`w-full text-left py-1 px-2.5 rounded-xl border transition-all flex items-center justify-between gap-1.5 cursor-pointer shadow-sm group ${
+                                  assignedEqNomes.length > 0
+                                    ? 'border-blue-500/35 bg-blue-950/25 text-[var(--tx)] hover:border-[var(--cy)] hover:bg-blue-950/40'
+                                    : 'border-[var(--ln)] bg-[rgba(var(--w),0.04)] text-[var(--mu)] hover:border-[var(--cy)] hover:text-[var(--tx)]'
+                                }`}
+                                title={
+                                  assignedEqNomes.length > 0
+                                    ? `Equipes: ${assignedEqNomes.join(', ')} (clique para alterar)`
+                                    : 'Clique para selecionar equipes responsáveis'
+                                }
+                              >
+                                <div className="flex items-center gap-1.5 truncate min-w-0">
+                                  <Users
+                                    className={`w-3.5 h-3.5 shrink-0 ${
+                                      assignedEqNomes.length > 0
+                                        ? 'text-[var(--cy)]'
+                                        : 'text-[var(--mu)]'
+                                    }`}
+                                  />
+                                  <span className="truncate text-xs font-semibold leading-tight">
+                                    {assignedEqNomes.length === 0 ? (
+                                      <span className="font-normal italic text-[var(--mu)]">
+                                        — selecionar —
+                                      </span>
+                                    ) : (
+                                      assignedEqNomes.join(', ')
+                                    )}
                                   </span>
-                                  <ChevronDown className="w-3 h-3 ml-1 shrink-0 opacity-60" />
-                                </summary>
-                                <div className="absolute top-full left-0 mt-1 z-30 p-2.5 bg-[var(--tipbg)] border border-[var(--ln)] rounded-xl shadow-xl w-48 space-y-1.5 backdrop-blur-md">
-                                  {(cfg.equipes || []).length === 0 ? (
-                                    <span className="text-xs text-[var(--mu)] block">
-                                      Nenhuma equipe cadastrada.
-                                    </span>
-                                  ) : (
-                                    cfg.equipes.map((q: any) => {
-                                      const checked = (row.eq || []).includes(q.id);
-                                      return (
-                                        <label
-                                          key={q.id}
-                                          className="flex items-center gap-2 text-xs text-[var(--tx)] cursor-pointer hover:bg-white/5 p-1 rounded"
-                                        >
-                                          <input
-                                            type="checkbox"
-                                            checked={checked}
-                                            onChange={() =>
-                                              handleToggleEquipe(currentOse!, originalIndex, q.id)
-                                            }
-                                            className="rounded"
-                                          />
-                                          <span>{q.nome}</span>
-                                        </label>
-                                      );
-                                    })
-                                  )}
                                 </div>
-                              </details>
+                                <ChevronDown className="w-3.5 h-3.5 text-[var(--mu)] group-hover:text-[var(--cy)] shrink-0 transition-colors ml-1" />
+                              </button>
                             )}
                           </td>
 
@@ -868,7 +930,7 @@ export const TrechosTab: React.FC = () => {
                                 type="button"
                                 onClick={() => handleDeleteTrechoRow(currentOse!, originalIndex)}
                                 aria-label="Excluir trecho"
-                                className="text-[var(--mu)] hover:text-red-400 p-1 transition-colors"
+                                className="text-[var(--mu)] hover:text-red-400 p-1 transition-colors cursor-pointer"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -1005,7 +1067,7 @@ export const TrechosTab: React.FC = () => {
                                   type="button"
                                   onClick={() => handleDeleteAvulsoItem(av.i)}
                                   aria-label="Excluir serviço"
-                                  className="text-[var(--mu)] hover:text-red-400 p-1"
+                                  className="text-[var(--mu)] hover:text-red-400 p-1 cursor-pointer"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -1230,7 +1292,7 @@ export const TrechosTab: React.FC = () => {
             <button
               type="button"
               onClick={handleAddGeneralAvulso}
-              className="px-4 py-1.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white shadow-sm flex items-center gap-1.5"
+              className="px-4 py-1.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white shadow-sm flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               Lançar Geral
@@ -1294,7 +1356,7 @@ export const TrechosTab: React.FC = () => {
                             type="button"
                             onClick={() => handleDeleteAvulsoItem(item.i)}
                             aria-label="Excluir avulso"
-                            className="text-[var(--mu)] hover:text-red-400 p-1"
+                            className="text-[var(--mu)] hover:text-red-400 p-1 cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -1308,6 +1370,245 @@ export const TrechosTab: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* MODAL 1: SELETOR DE EQUIPES DO TRECHO (Nunca é cortado pela tabela) */}
+      {editingEquipeRowIndex !== null && currentOse && currentOse.rows[editingEquipeRowIndex] && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setEditingEquipeRowIndex(null)}
+        >
+          <div
+            className="bg-[var(--card)] border border-[var(--ln)] rounded-2xl shadow-2xl max-w-md w-full p-5 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between border-b border-[var(--ln)] pb-3">
+              <div>
+                <h3 className="text-base font-bold text-[var(--tx)] flex items-center gap-2">
+                  <Users className="w-5 h-5 text-[var(--cy)]" />
+                  Equipes Responsáveis pelo Trecho
+                </h3>
+                <p className="text-xs text-[var(--mu)] mt-0.5">
+                  Data: <span className="font-semibold text-[var(--tx)]">{dbr(currentOse.rows[editingEquipeRowIndex].d)}</span> · OSE: <span className="font-semibold text-[var(--tx)]">{currentOse.nome}</span>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingEquipeRowIndex(null)}
+                className="text-[var(--mu)] hover:text-[var(--tx)] p-1 rounded-lg cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+              {(cfg.equipes || []).length === 0 ? (
+                <div className="text-center py-6 text-xs text-[var(--mu)]">
+                  Nenhuma equipe cadastrada ainda. Digite o nome abaixo para cadastrar.
+                </div>
+              ) : (
+                (cfg.equipes || []).map((q: any) => {
+                  const isAssigned = (currentOse.rows[editingEquipeRowIndex!].eq || []).includes(q.id);
+                  return (
+                    <label
+                      key={q.id}
+                      className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
+                        isAssigned
+                          ? 'bg-blue-950/40 border-blue-500/60 text-white shadow-sm'
+                          : 'bg-[rgba(var(--w),0.03)] border-[var(--ln)] text-[var(--tx)] hover:bg-[rgba(var(--w),0.08)]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={isAssigned}
+                          onChange={() => handleToggleEquipe(currentOse!, editingEquipeRowIndex!, q.id)}
+                          className="w-4 h-4 rounded text-[var(--cy)] cursor-pointer"
+                        />
+                        <span className="text-sm font-bold">{q.nome}</span>
+                      </div>
+                      {isAssigned && (
+                        <span className="text-[11px] font-bold text-[var(--cy)] px-2 py-0.5 rounded bg-blue-500/20 border border-blue-500/30">
+                          ✓ Selecionada
+                        </span>
+                      )}
+                    </label>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Cadastrar nova equipe rapidamente */}
+            <div className="pt-3 border-t border-[var(--ln)] space-y-2">
+              <span className="text-xs text-[var(--mu)] font-medium block">
+                Cadastrar nova equipe:
+              </span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="ex: HENELILTON, EQUIPE 02..."
+                  value={quickTeamName}
+                  onChange={(e) => setQuickTeamName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (quickTeamName.trim()) {
+                        handleAddNewEquipe(quickTeamName);
+                        setQuickTeamName('');
+                      }
+                    }
+                  }}
+                  className="flex-1 px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-xs text-[var(--tx)] font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (quickTeamName.trim()) {
+                      handleAddNewEquipe(quickTeamName);
+                      setQuickTeamName('');
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.1)] border border-[var(--ln)] hover:border-[var(--cy)] text-xs font-bold text-[var(--tx)] cursor-pointer"
+                >
+                  + Cadastrar
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setEditingEquipeRowIndex(null)}
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white font-bold text-xs shadow-md cursor-pointer hover:opacity-95"
+              >
+                Concluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: GERENCIAMENTO GERAL DE EQUIPES */}
+      {showEquipesModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowEquipesModal(false)}
+        >
+          <div
+            className="bg-[var(--card)] border border-[var(--ln)] rounded-2xl shadow-2xl max-w-lg w-full p-5 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between border-b border-[var(--ln)] pb-3">
+              <div>
+                <h3 className="text-base font-bold text-[var(--tx)] flex items-center gap-2">
+                  <Users className="w-5 h-5 text-[var(--cy)]" />
+                  Gerenciamento de Equipes de Campo
+                </h3>
+                <p className="text-xs text-[var(--mu)] mt-0.5">
+                  Cadastre e gerencie as equipes de execução de obras e trechos.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEquipesModal(false)}
+                className="text-[var(--mu)] hover:text-[var(--tx)] p-1 rounded-lg cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Formulário de cadastro de nova equipe */}
+            <div className="p-3 rounded-xl bg-[rgba(var(--w),0.03)] border border-[var(--ln)] space-y-2">
+              <span className="text-xs font-bold text-[var(--tx)] block">
+                Cadastrar Nova Equipe
+              </span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Nome da equipe (ex: HENELILTON, EQUIPE 01, EQUIPE SANEAR)..."
+                  value={newTeamModalName}
+                  onChange={(e) => setNewTeamModalName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (newTeamModalName.trim()) {
+                        handleAddNewEquipe(newTeamModalName);
+                        setNewTeamModalName('');
+                      }
+                    }
+                  }}
+                  className="flex-1 px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-xs text-[var(--tx)] font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (newTeamModalName.trim()) {
+                      handleAddNewEquipe(newTeamModalName);
+                      setNewTeamModalName('');
+                    }
+                  }}
+                  className="px-4 py-1.5 rounded-xl bg-[var(--cy)] text-black font-bold text-xs shadow-sm cursor-pointer hover:opacity-90"
+                >
+                  + Cadastrar
+                </button>
+              </div>
+            </div>
+
+            {/* Lista de equipes existentes */}
+            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+              <span className="text-xs font-bold text-[var(--mu)] block">
+                Equipes Cadastradas ({(cfg.equipes || []).length})
+              </span>
+              {(cfg.equipes || []).length === 0 ? (
+                <div className="text-center py-6 text-xs text-[var(--mu)]">
+                  Nenhuma equipe cadastrada ainda.
+                </div>
+              ) : (
+                (cfg.equipes || []).map((q: any) => {
+                  const assignedCount = allRows.filter((r: any) => (r.eq || []).includes(q.id)).length;
+                  return (
+                    <div
+                      key={q.id}
+                      className="flex items-center justify-between p-3 rounded-xl bg-[rgba(var(--w),0.03)] border border-[var(--ln)] hover:border-[var(--cy)] transition-all"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-lg bg-[rgba(var(--w),0.07)] text-[var(--cy)]">
+                          <Users className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-bold text-[var(--tx)] block">
+                            {q.nome}
+                          </span>
+                          <span className="text-[11px] text-[var(--mu)]">
+                            {assignedCount} trecho(s) lançado(s) nesta OSE
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteEquipe(q.id, q.nome)}
+                        className="text-[var(--mu)] hover:text-red-400 p-1.5 rounded-lg transition-colors cursor-pointer"
+                        title="Remover equipe do cadastro"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowEquipesModal(false)}
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white font-bold text-xs shadow-md cursor-pointer hover:opacity-95"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
