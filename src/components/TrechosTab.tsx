@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import * as XLSX from 'xlsx';
 import { useData } from '../context/DataContext';
 import {
   calcOSE,
@@ -30,6 +31,10 @@ import {
   Users,
   X,
   Check,
+  FileSpreadsheet,
+  Download,
+  Filter,
+  Building2,
 } from 'lucide-react';
 import { AvulsoItem, Config, Fechamento, FrenteLancamentos, OSE, OSERow, PrecoItem } from '../types';
 
@@ -58,6 +63,10 @@ export const TrechosTab: React.FC = () => {
   // Modal states for equipes
   const [editingEquipeRowIndex, setEditingEquipeRowIndex] = useState<number | null>(null);
   const [showEquipesModal, setShowEquipesModal] = useState<boolean>(false);
+  const [equipesModalTab, setEquipesModalTab] = useState<'compilacao' | 'cadastro'>('compilacao');
+  const [compFilterEquipe, setCompFilterEquipe] = useState<string>('all');
+  const [compFilterContrato, setCompFilterContrato] = useState<string>('all');
+  const [compFilterTipo, setCompFilterTipo] = useState<string>('all');
   const [quickTeamName, setQuickTeamName] = useState<string>('');
   const [newTeamModalName, setNewTeamModalName] = useState<string>('');
 
@@ -304,6 +313,325 @@ export const TrechosTab: React.FC = () => {
       equipes: (prev.equipes || []).filter((q: any) => q.id !== equipeId),
     }));
     toast(`Equipe "${equipeNome}" removida.`);
+  };
+
+  // Compilação de todos os trechos por equipe e empreiteiro em todos os contratos e frentes
+  const compiledTrechos = useMemo(() => {
+    if (!cfg) return [];
+
+    const allEquipes = cfg.equipes || [];
+    const equipeMap = new Map<string, string>();
+    allEquipes.forEach((eq: any) => equipeMap.set(eq.id, eq.nome));
+
+    const contratoMap = new Map<string, any>();
+    (cfg.contratos || []).forEach((c: any) => {
+      contratoMap.set(c.id, c);
+      contratoMap.set(c.n, c);
+    });
+
+    const rowsList: Array<{
+      equipeId: string;
+      equipeNome: string;
+      frenteId: string;
+      frenteNome: string;
+      contratoId: string;
+      contratoNum: string;
+      contratoObra: string;
+      oseId: string;
+      oseNome: string;
+      oseTipo: string;
+      tipoNome: string;
+      data: string;
+      estaca: string;
+      extensao: number;
+      dn: string;
+      pavimento: string;
+      profundidade: number | string;
+      larguraVala: number | string;
+      rochaPct: number | string;
+    }> = [];
+
+    (cfg.frentes || []).forEach((frente: any) => {
+      const fLanc = ln[frente.id];
+      if (!fLanc || !fLanc.oses) return;
+
+      const cObj = contratoMap.get(frente.contrato);
+      const contratoNum = cObj ? cObj.n : frente.contrato || '—';
+      const contratoObra = cObj ? cObj.obra : '—';
+
+      fLanc.oses.forEach((ose: OSE) => {
+        const tpObj = tpl[ose.tipo];
+        const tipoNome = tpObj?.nome || ose.tipo;
+
+        (ose.rows || []).forEach((r: OSERow) => {
+          let extensao = 0;
+          if (ose.tipo === 'REP') {
+            extensao = pf(r.v['D']) || 0;
+          } else {
+            extensao = pf(r.v['C']) || pf(r.v['D']) || 0;
+          }
+
+          const estaca = String(r.v['A'] || '—');
+          const dn = r.v['B'] ? `${r.v['B']} mm` : '—';
+          let profundidade: any = '—';
+          if (ose.tipo === 'ESC') profundidade = r.v['F'] ? pf(r.v['F']) : '—';
+          else if (ose.tipo === 'MND') profundidade = r.v['D'] ? pf(r.v['D']) : '—';
+
+          let pavimento = '—';
+          if (ose.tipo === 'ESC') pavimento = r.v['Y'] || '—';
+          else if (ose.tipo === 'MND') pavimento = r.v['V'] || '—';
+          else if (ose.tipo === 'REP') pavimento = r.v['F'] || '—';
+
+          const larguraVala =
+            ose.tipo === 'ESC'
+              ? r.v['H'] ?? '—'
+              : ose.tipo === 'MND'
+              ? r.v['F'] ?? '—'
+              : ose.tipo === 'REP'
+              ? r.v['E'] ?? '—'
+              : '—';
+          const rochaPct =
+            ose.tipo === 'ESC' ? r.v['S'] ?? '—' : ose.tipo === 'MND' ? r.v['P'] ?? '—' : '—';
+
+          const assignedEqs = r.eq && r.eq.length > 0 ? r.eq : ['__none__'];
+
+          assignedEqs.forEach((eqId) => {
+            const eqNome =
+              eqId === '__none__' ? 'Sem equipe atribuída' : equipeMap.get(eqId) || eqId;
+            rowsList.push({
+              equipeId: eqId,
+              equipeNome: eqNome,
+              frenteId: frente.id,
+              frenteNome: frente.nome,
+              contratoId: frente.contrato,
+              contratoNum,
+              contratoObra,
+              oseId: ose.id,
+              oseNome: ose.nome,
+              oseTipo: ose.tipo,
+              tipoNome,
+              data: r.d || '',
+              estaca,
+              extensao,
+              dn,
+              pavimento,
+              profundidade,
+              larguraVala,
+              rochaPct,
+            });
+          });
+        });
+      });
+    });
+
+    return rowsList;
+  }, [cfg, ln, tpl]);
+
+  // Resumo estatístico compilado por equipe
+  const equipesSummaries = useMemo(() => {
+    const map = new Map<
+      string,
+      {
+        equipeId: string;
+        equipeNome: string;
+        totalExtensao: number;
+        totalMND: number;
+        totalEscavado: number;
+        totalReposicao: number;
+        qtdTrechos: number;
+        contratosSet: Set<string>;
+        frentesSet: Set<string>;
+        osesSet: Set<string>;
+      }
+    >();
+
+    // Inicializa com equipes cadastradas
+    (cfg.equipes || []).forEach((eq: any) => {
+      map.set(eq.id, {
+        equipeId: eq.id,
+        equipeNome: eq.nome,
+        totalExtensao: 0,
+        totalMND: 0,
+        totalEscavado: 0,
+        totalReposicao: 0,
+        qtdTrechos: 0,
+        contratosSet: new Set(),
+        frentesSet: new Set(),
+        osesSet: new Set(),
+      });
+    });
+
+    compiledTrechos.forEach((row) => {
+      let entry = map.get(row.equipeId);
+      if (!entry) {
+        entry = {
+          equipeId: row.equipeId,
+          equipeNome: row.equipeNome,
+          totalExtensao: 0,
+          totalMND: 0,
+          totalEscavado: 0,
+          totalReposicao: 0,
+          qtdTrechos: 0,
+          contratosSet: new Set(),
+          frentesSet: new Set(),
+          osesSet: new Set(),
+        };
+        map.set(row.equipeId, entry);
+      }
+
+      entry.totalExtensao += row.extensao;
+      if (row.oseTipo === 'MND') entry.totalMND += row.extensao;
+      else if (row.oseTipo === 'ESC') entry.totalEscavado += row.extensao;
+      else if (row.oseTipo === 'REP') entry.totalReposicao += row.extensao;
+
+      entry.qtdTrechos += 1;
+      if (row.contratoNum && row.contratoNum !== '—') entry.contratosSet.add(row.contratoNum);
+      if (row.frenteNome) entry.frentesSet.add(row.frenteNome);
+      if (row.oseNome) entry.osesSet.add(row.oseNome);
+    });
+
+    return Array.from(map.values()).sort((a, b) => b.totalExtensao - a.totalExtensao);
+  }, [cfg, compiledTrechos]);
+
+  // Filtro de trechos compilados para exibição na modal
+  const filteredCompiledRows = useMemo(() => {
+    return compiledTrechos.filter((r) => {
+      if (compFilterEquipe !== 'all') {
+        if (compFilterEquipe === '__none__' && r.equipeId !== '__none__') return false;
+        if (compFilterEquipe !== '__none__' && r.equipeId !== compFilterEquipe) return false;
+      }
+      if (
+        compFilterContrato !== 'all' &&
+        r.contratoId !== compFilterContrato &&
+        r.contratoNum !== compFilterContrato
+      ) {
+        return false;
+      }
+      if (compFilterTipo !== 'all' && r.oseTipo !== compFilterTipo) {
+        return false;
+      }
+      return true;
+    });
+  }, [compiledTrechos, compFilterEquipe, compFilterContrato, compFilterTipo]);
+
+  // Exportação Excel (.xlsx) nativa com 2 abas
+  const exportCompiledExcel = () => {
+    try {
+      const resumoData = equipesSummaries.map((s) => ({
+        'Equipe / Empreiteiro': s.equipeNome,
+        'Total Extensão Geral (m)': Number(s.totalExtensao.toFixed(2)),
+        'Extensão MND / Cravação (m)': Number(s.totalMND.toFixed(2)),
+        'Extensão Escavado / Vala Aberta (m)': Number(s.totalEscavado.toFixed(2)),
+        'Extensão Reposição (m)': Number(s.totalReposicao.toFixed(2)),
+        'Qtd. Trechos Executados': s.qtdTrechos,
+        'Contratos Atendidos': Array.from(s.contratosSet).join(', ') || '—',
+        'Municípios / Frentes': Array.from(s.frentesSet).join(', ') || '—',
+      }));
+
+      const detalheData = filteredCompiledRows.map((r) => ({
+        'Equipe / Empreiteiro': r.equipeNome,
+        'Contrato': r.contratoNum,
+        'Obra / Município': r.contratoObra,
+        'Frente': r.frenteNome,
+        'OSE': r.oseNome,
+        'Tipo de Serviço': r.tipoNome,
+        'Data de Execução': dbr(r.data),
+        'PV / Estaca / Trecho': r.estaca,
+        'Extensão Executada (m)': Number(r.extensao.toFixed(2)),
+        'Diâmetro DN': r.dn,
+        'Pavimento': r.pavimento,
+        'Profundidade (m)': typeof r.profundidade === 'number' ? Number(r.profundidade.toFixed(2)) : r.profundidade,
+        'Largura da Vala (m)': typeof r.larguraVala === 'number' ? Number(r.larguraVala.toFixed(2)) : r.larguraVala,
+        'Rocha (%)': typeof r.rochaPct === 'number' ? Number(r.rochaPct.toFixed(2)) : r.rochaPct,
+      }));
+
+      const wb = XLSX.utils.book_new();
+      const wsResumo = XLSX.utils.json_to_sheet(resumoData);
+      const wsDetalhe = XLSX.utils.json_to_sheet(detalheData);
+
+      wsResumo['!cols'] = [
+        { wch: 24 },
+        { wch: 24 },
+        { wch: 26 },
+        { wch: 30 },
+        { wch: 22 },
+        { wch: 22 },
+        { wch: 32 },
+        { wch: 28 },
+      ];
+
+      wsDetalhe['!cols'] = [
+        { wch: 24 },
+        { wch: 18 },
+        { wch: 24 },
+        { wch: 18 },
+        { wch: 28 },
+        { wch: 26 },
+        { wch: 16 },
+        { wch: 20 },
+        { wch: 22 },
+        { wch: 14 },
+        { wch: 18 },
+        { wch: 16 },
+        { wch: 18 },
+        { wch: 12 },
+      ];
+
+      XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo Empreiteiros');
+      XLSX.utils.book_append_sheet(wb, wsDetalhe, 'Trechos Detalhados');
+
+      XLSX.writeFile(wb, `GKF_Compilado_Equipes_Empreiteiros_${hoje()}.xlsx`);
+      toast('Planilha compilada por equipe (.xlsx) gerada com sucesso! ✓');
+    } catch (err: any) {
+      console.error('Erro ao gerar Excel:', err);
+      toast('Erro ao gerar arquivo Excel. Gerando CSV...');
+      exportCompiledCsv();
+    }
+  };
+
+  // Exportação CSV de contingência (BOM UTF-8, delimitador ;)
+  const exportCompiledCsv = () => {
+    const headers = [
+      'Equipe/Empreiteiro',
+      'Contrato',
+      'Obra/Municipio',
+      'Frente',
+      'OSE',
+      'Tipo de Servico',
+      'Data',
+      'PV/Estaca',
+      'Extensao (m)',
+      'DN',
+      'Pavimento',
+      'Profundidade (m)',
+    ];
+    const rows = filteredCompiledRows.map((r) => [
+      `"${r.equipeNome}"`,
+      `"${r.contratoNum}"`,
+      `"${r.contratoObra}"`,
+      `"${r.frenteNome}"`,
+      `"${r.oseNome}"`,
+      `"${r.tipoNome}"`,
+      `"${dbr(r.data)}"`,
+      `"${r.estaca}"`,
+      `"${fmt(r.extensao)}"`,
+      `"${r.dn}"`,
+      `"${r.pavimento}"`,
+      `"${typeof r.profundidade === 'number' ? fmt(r.profundidade) : r.profundidade}"`,
+    ]);
+
+    const csvContent =
+      '\uFEFF' + [headers.join(';'), ...rows.map((row) => row.join(';'))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `GKF_Compilado_Equipes_${hoje()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Arquivo CSV baixado com sucesso ✓');
   };
 
   const handleUpdateAjuste = (o: OSE, code: string, valStr: string) => {
@@ -612,6 +940,20 @@ export const TrechosTab: React.FC = () => {
         )}
 
         <div className="flex items-center gap-2 ml-auto">
+          {/* Gerenciar Equipes no Card Principal */}
+          <button
+            type="button"
+            onClick={() => {
+              setEquipesModalTab('compilacao');
+              setShowEquipesModal(true);
+            }}
+            className="px-3.5 py-1.5 rounded-xl font-bold text-xs bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] hover:border-[var(--cy)] hover:text-[var(--cy)] transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+            title="Gerenciar equipes e compilação de produção por empreiteiro"
+          >
+            <Users className="w-3.5 h-3.5 text-[var(--cy)]" />
+            Gerenciar Equipes
+          </button>
+
           {/* Delete OSE button */}
           {currentOse && !isClosedPeriod && (
             <button
@@ -1487,123 +1829,503 @@ export const TrechosTab: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL 2: GERENCIAMENTO GERAL DE EQUIPES */}
+      {/* MODAL 2: GERENCIAMENTO E COMPILAÇÃO DE EQUIPES / EMPREITEIROS */}
       {showEquipesModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-md"
           onClick={() => setShowEquipesModal(false)}
         >
           <div
-            className="bg-[var(--card)] border border-[var(--ln)] rounded-2xl shadow-2xl max-w-lg w-full p-5 space-y-4"
+            className="bg-[var(--card)] border border-[var(--ln)] rounded-3xl shadow-2xl max-w-5xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between border-b border-[var(--ln)] pb-3">
-              <div>
-                <h3 className="text-base font-bold text-[var(--tx)] flex items-center gap-2">
-                  <Users className="w-5 h-5 text-[var(--cy)]" />
-                  Gerenciamento de Equipes de Campo
-                </h3>
-                <p className="text-xs text-[var(--mu)] mt-0.5">
-                  Cadastre e gerencie as equipes de execução de obras e trechos.
-                </p>
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-[var(--ln)] p-5 pb-4 bg-[rgba(var(--w),0.02)]">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-2xl bg-[var(--cy)]/15 border border-[var(--cy)]/30 text-[var(--cy)]">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-[var(--tx)] flex items-center gap-2">
+                    Equipes & Empreiteiros · Compilação Geral
+                  </h3>
+                  <p className="text-xs text-[var(--mu)] mt-0.5">
+                    Controle compilado de produção por equipe/empreiteiro em todos os contratos e frentes ativas.
+                  </p>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowEquipesModal(false)}
-                className="text-[var(--mu)] hover:text-[var(--tx)] p-1 rounded-lg cursor-pointer"
+                className="text-[var(--mu)] hover:text-[var(--tx)] p-1.5 rounded-xl hover:bg-[rgba(var(--w),0.07)] transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Formulário de cadastro de nova equipe */}
-            <div className="p-3 rounded-xl bg-[rgba(var(--w),0.03)] border border-[var(--ln)] space-y-2">
-              <span className="text-xs font-bold text-[var(--tx)] block">
-                Cadastrar Nova Equipe
-              </span>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Nome da equipe (ex: HENELILTON, EQUIPE 01, EQUIPE SANEAR)..."
-                  value={newTeamModalName}
-                  onChange={(e) => setNewTeamModalName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (newTeamModalName.trim()) {
-                        handleAddNewEquipe(newTeamModalName);
-                        setNewTeamModalName('');
-                      }
-                    }
-                  }}
-                  className="flex-1 px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-xs text-[var(--tx)] font-medium"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (newTeamModalName.trim()) {
-                      handleAddNewEquipe(newTeamModalName);
-                      setNewTeamModalName('');
-                    }
-                  }}
-                  className="px-4 py-1.5 rounded-xl bg-[var(--cy)] text-black font-bold text-xs shadow-sm cursor-pointer hover:opacity-90"
-                >
-                  + Cadastrar
-                </button>
-              </div>
+            {/* Modal Navigation Tabs */}
+            <div className="flex items-center gap-2 px-5 pt-3 border-b border-[var(--ln)] bg-[rgba(var(--w),0.01)]">
+              <button
+                type="button"
+                onClick={() => setEquipesModalTab('compilacao')}
+                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${
+                  equipesModalTab === 'compilacao'
+                    ? 'border-[var(--cy)] text-[var(--cy)] bg-[rgba(var(--w),0.04)]'
+                    : 'border-transparent text-[var(--mu)] hover:text-[var(--tx)]'
+                }`}
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                Compilação por Empreiteiro (Todos os Contratos)
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[rgba(var(--w),0.08)]">
+                  {compiledTrechos.length} trechos
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setEquipesModalTab('cadastro')}
+                className={`px-4 py-2 text-xs font-bold rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-b-2 ${
+                  equipesModalTab === 'cadastro'
+                    ? 'border-[var(--cy)] text-[var(--cy)] bg-[rgba(var(--w),0.04)]'
+                    : 'border-transparent text-[var(--mu)] hover:text-[var(--tx)]'
+                }`}
+              >
+                <Users className="w-4 h-4" />
+                Cadastro de Equipes
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[rgba(var(--w),0.08)]">
+                  {(cfg.equipes || []).length} equipes
+                </span>
+              </button>
             </div>
 
-            {/* Lista de equipes existentes */}
-            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-              <span className="text-xs font-bold text-[var(--mu)] block">
-                Equipes Cadastradas ({(cfg.equipes || []).length})
-              </span>
-              {(cfg.equipes || []).length === 0 ? (
-                <div className="text-center py-6 text-xs text-[var(--mu)]">
-                  Nenhuma equipe cadastrada ainda.
-                </div>
-              ) : (
-                (cfg.equipes || []).map((q: any) => {
-                  const assignedCount = allRows.filter((r: any) => (r.eq || []).includes(q.id)).length;
-                  return (
-                    <div
-                      key={q.id}
-                      className="flex items-center justify-between p-3 rounded-xl bg-[rgba(var(--w),0.03)] border border-[var(--ln)] hover:border-[var(--cy)] transition-all"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-lg bg-[rgba(var(--w),0.07)] text-[var(--cy)]">
-                          <Users className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <span className="text-sm font-bold text-[var(--tx)] block">
-                            {q.nome}
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-5">
+              {equipesModalTab === 'compilacao' ? (
+                <>
+                  {/* Action / Filter Toolbar */}
+                  <div className="p-4 rounded-2xl bg-[rgba(var(--w),0.03)] border border-[var(--ln)] flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      {/* Filter by Team */}
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.06)] border border-[var(--ln)] text-xs">
+                        <Users className="w-3.5 h-3.5 text-[var(--cy)] shrink-0" />
+                        <span className="font-semibold text-[var(--mu)]">Equipe:</span>
+                        <select
+                          value={compFilterEquipe}
+                          onChange={(e) => setCompFilterEquipe(e.target.value)}
+                          className="bg-transparent border-0 text-xs font-bold text-[var(--tx)] cursor-pointer focus:ring-0 focus:outline-none p-0 pr-1"
+                        >
+                          <option value="all" className="bg-[var(--card)] text-[var(--tx)]">
+                            Todas as equipes ({compiledTrechos.length})
+                          </option>
+                          {(cfg.equipes || []).map((eq: any) => {
+                            const count = compiledTrechos.filter((r) => r.equipeId === eq.id).length;
+                            return (
+                              <option key={eq.id} value={eq.id} className="bg-[var(--card)] text-[var(--tx)]">
+                                {eq.nome} ({count})
+                              </option>
+                            );
+                          })}
+                          <option value="__none__" className="bg-[var(--card)] text-[var(--tx)]">
+                            Sem equipe atribuída ({compiledTrechos.filter((r) => r.equipeId === '__none__').length})
+                          </option>
+                        </select>
+                      </div>
+
+                      {/* Filter by Contract */}
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.06)] border border-[var(--ln)] text-xs">
+                        <Building2 className="w-3.5 h-3.5 text-[var(--cy)] shrink-0" />
+                        <span className="font-semibold text-[var(--mu)]">Contrato:</span>
+                        <select
+                          value={compFilterContrato}
+                          onChange={(e) => setCompFilterContrato(e.target.value)}
+                          className="bg-transparent border-0 text-xs font-bold text-[var(--tx)] cursor-pointer focus:ring-0 focus:outline-none p-0 pr-1"
+                        >
+                          <option value="all" className="bg-[var(--card)] text-[var(--tx)]">
+                            Todos os contratos ({cfg.contratos?.length || 0})
+                          </option>
+                          {(cfg.contratos || []).map((c: any) => (
+                            <option key={c.id} value={c.id} className="bg-[var(--card)] text-[var(--tx)]">
+                              {c.n} · {c.obra}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Filter by Type */}
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.06)] border border-[var(--ln)] text-xs">
+                        <Filter className="w-3.5 h-3.5 text-[var(--cy)] shrink-0" />
+                        <span className="font-semibold text-[var(--mu)]">Serviço:</span>
+                        <select
+                          value={compFilterTipo}
+                          onChange={(e) => setCompFilterTipo(e.target.value)}
+                          className="bg-transparent border-0 text-xs font-bold text-[var(--tx)] cursor-pointer focus:ring-0 focus:outline-none p-0 pr-1"
+                        >
+                          <option value="all" className="bg-[var(--card)] text-[var(--tx)]">
+                            Todos os tipos (MND, Escavado, Reposição)
+                          </option>
+                          <option value="MND" className="bg-[var(--card)] text-[var(--tx)]">
+                            MND (Método Não Destrutivo)
+                          </option>
+                          <option value="ESC" className="bg-[var(--card)] text-[var(--tx)]">
+                            Escavado (Vala Aberta)
+                          </option>
+                          <option value="REP" className="bg-[var(--card)] text-[var(--tx)]">
+                            Reposição de Pavimento
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Download Buttons */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={exportCompiledExcel}
+                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-md hover:shadow-emerald-900/30 transition-all cursor-pointer"
+                        title="Baixar planilha completa em formato Excel (.xlsx)"
+                      >
+                        <FileSpreadsheet className="w-4 h-4" />
+                        Baixar Planilha Excel (.xlsx)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={exportCompiledCsv}
+                        className="px-3 py-2 rounded-xl bg-[rgba(var(--w),0.07)] hover:bg-[rgba(var(--w),0.12)] border border-[var(--ln)] text-[var(--tx)] font-semibold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                        title="Baixar dados em formato CSV"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        CSV
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Summary Metric Counters */}
+                  {(() => {
+                    const totalExtGeral = filteredCompiledRows.reduce((acc, r) => acc + r.extensao, 0);
+                    const totalMndGeral = filteredCompiledRows
+                      .filter((r) => r.oseTipo === 'MND')
+                      .reduce((acc, r) => acc + r.extensao, 0);
+                    const totalEscavadoGeral = filteredCompiledRows
+                      .filter((r) => r.oseTipo === 'ESC')
+                      .reduce((acc, r) => acc + r.extensao, 0);
+                    const totalReposicaoGeral = filteredCompiledRows
+                      .filter((r) => r.oseTipo === 'REP')
+                      .reduce((acc, r) => acc + r.extensao, 0);
+
+                    return (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="p-3.5 rounded-2xl bg-[rgba(var(--w),0.03)] border border-[var(--ln)]">
+                          <span className="text-[11px] text-[var(--mu)] font-medium block">
+                            Extensão Total Compilada
                           </span>
-                          <span className="text-[11px] text-[var(--mu)]">
-                            {assignedCount} trecho(s) lançado(s) nesta OSE
+                          <span className="text-lg font-bold text-[var(--tx)] mt-0.5 block">
+                            {fmt(totalExtGeral)} m
+                          </span>
+                          <span className="text-[10px] text-[var(--mu)]">
+                            {filteredCompiledRows.length} trechos executados
+                          </span>
+                        </div>
+
+                        <div className="p-3.5 rounded-2xl bg-blue-950/20 border border-blue-500/30">
+                          <span className="text-[11px] text-blue-300 font-medium block">
+                            Cravação MND (Empreiteiros)
+                          </span>
+                          <span className="text-lg font-bold text-blue-400 mt-0.5 block">
+                            {fmt(totalMndGeral)} m
+                          </span>
+                          <span className="text-[10px] text-blue-300/70">
+                            Base para medição de MND
+                          </span>
+                        </div>
+
+                        <div className="p-3.5 rounded-2xl bg-amber-950/20 border border-amber-500/30">
+                          <span className="text-[11px] text-amber-300 font-medium block">
+                            Escavado / Vala Aberta
+                          </span>
+                          <span className="text-lg font-bold text-amber-400 mt-0.5 block">
+                            {fmt(totalEscavadoGeral)} m
+                          </span>
+                          <span className="text-[10px] text-amber-300/70">
+                            Extensão de escavação
+                          </span>
+                        </div>
+
+                        <div className="p-3.5 rounded-2xl bg-purple-950/20 border border-purple-500/30">
+                          <span className="text-[11px] text-purple-300 font-medium block">
+                            Reposição de Pavimento
+                          </span>
+                          <span className="text-lg font-bold text-purple-400 mt-0.5 block">
+                            {fmt(totalReposicaoGeral)} m
+                          </span>
+                          <span className="text-[10px] text-purple-300/70">
+                            Metragem de reposição
                           </span>
                         </div>
                       </div>
+                    );
+                  })()}
+
+                  {/* Resumo por Equipe Cards */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold text-[var(--tx)] uppercase tracking-wider flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-[var(--cy)]" />
+                        Totais Compilados por Empreiteiro / Equipe
+                      </h4>
+                      <span className="text-[11px] text-[var(--mu)]">
+                        {equipesSummaries.length} equipes identificadas
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {equipesSummaries.map((summary) => {
+                        const isFocused = compFilterEquipe === summary.equipeId;
+                        return (
+                          <div
+                            key={summary.equipeId}
+                            onClick={() =>
+                              setCompFilterEquipe(
+                                compFilterEquipe === summary.equipeId ? 'all' : summary.equipeId
+                              )
+                            }
+                            className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                              isFocused
+                                ? 'bg-[rgba(var(--cy),0.08)] border-[var(--cy)] shadow-lg'
+                                : 'bg-[rgba(var(--w),0.03)] border-[var(--ln)] hover:border-[var(--cy)]/50'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <span className="font-bold text-sm text-[var(--tx)] flex items-center gap-2">
+                                  {summary.equipeNome}
+                                  {isFocused && (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--cy)] text-black">
+                                      Filtrado
+                                    </span>
+                                  )}
+                                </span>
+                                <span className="text-[11px] text-[var(--mu)] mt-0.5 block">
+                                  {summary.qtdTrechos} trecho(s) · {summary.contratosSet.size} contrato(s)
+                                </span>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-xs text-[var(--mu)] block">Extensão Total</span>
+                                <span className="text-base font-extrabold text-[var(--cy)]">
+                                  {fmt(summary.totalExtensao)} m
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Breakdown por tipo */}
+                            <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[var(--ln)] text-xs">
+                              <div>
+                                <span className="text-[10px] text-blue-300/80 block">MND / Cravação</span>
+                                <span className="font-bold text-[var(--tx)]">
+                                  {fmt(summary.totalMND)} m
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-[10px] text-amber-300/80 block">Escavado</span>
+                                <span className="font-bold text-[var(--tx)]">
+                                  {fmt(summary.totalEscavado)} m
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-[10px] text-purple-300/80 block">Reposição</span>
+                                <span className="font-bold text-[var(--tx)]">
+                                  {fmt(summary.totalReposicao)} m
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Detalhamento de Trechos Compilados Table */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold text-[var(--tx)] uppercase tracking-wider flex items-center gap-1.5">
+                        <FileSpreadsheet className="w-3.5 h-3.5 text-[var(--cy)]" />
+                        Detalhamento de Trechos Executados ({filteredCompiledRows.length})
+                      </h4>
+                      {compFilterEquipe !== 'all' && (
+                        <button
+                          type="button"
+                          onClick={() => setCompFilterEquipe('all')}
+                          className="text-xs text-[var(--cy)] hover:underline cursor-pointer"
+                        >
+                          Limpar filtro de equipe
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="gkf-table-wrap max-h-80 overflow-y-auto border border-[var(--ln)] rounded-2xl">
+                      <table className="gkf-table text-xs">
+                        <thead>
+                          <tr>
+                            <th className="text-left">Equipe / Empreiteiro</th>
+                            <th className="text-left">Contrato / Frente</th>
+                            <th className="text-left">OSE / Tipo</th>
+                            <th className="text-left">Data</th>
+                            <th className="text-left">Estaca / Trecho</th>
+                            <th className="text-right">Extensão (m)</th>
+                            <th className="text-left">DN</th>
+                            <th className="text-left">Pavimento</th>
+                            <th className="text-right">Prof. (m)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredCompiledRows.length === 0 ? (
+                            <tr>
+                              <td colSpan={9} className="text-center py-8 text-[var(--mu)]">
+                                Nenhum trecho executado encontrado com os filtros selecionados.
+                              </td>
+                            </tr>
+                          ) : (
+                            filteredCompiledRows.map((row, idx) => (
+                              <tr key={`${row.equipeId}_${row.oseId}_${idx}`} className="hover:bg-[rgba(var(--w),0.03)]">
+                                <td className="font-semibold text-[var(--tx)] whitespace-nowrap">
+                                  {row.equipeNome}
+                                </td>
+                                <td className="whitespace-nowrap">
+                                  <span className="font-bold text-[var(--tx)]">{row.contratoNum}</span>
+                                  <span className="text-[10px] text-[var(--mu)] block">{row.frenteNome}</span>
+                                </td>
+                                <td>
+                                  <span className="font-medium text-[var(--tx)] block">{row.oseNome}</span>
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[rgba(var(--w),0.07)] text-[var(--mu)]">
+                                    {row.tipoNome}
+                                  </span>
+                                </td>
+                                <td className="whitespace-nowrap font-mono text-[11px]">
+                                  {dbr(row.data)}
+                                </td>
+                                <td className="font-mono">{row.estaca}</td>
+                                <td className="text-right font-extrabold text-[var(--cy)]">
+                                  {fmt(row.extensao)} m
+                                </td>
+                                <td>{row.dn}</td>
+                                <td>{row.pavimento}</td>
+                                <td className="text-right font-mono">
+                                  {typeof row.profundidade === 'number'
+                                    ? fmt(row.profundidade)
+                                    : row.profundidade}
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                /* TAB 2: CADASTRO E GERENCIAMENTO DE EQUIPES */
+                <div className="space-y-4 max-w-xl mx-auto">
+                  {/* Formulário de cadastro de nova equipe */}
+                  <div className="p-4 rounded-2xl bg-[rgba(var(--w),0.03)] border border-[var(--ln)] space-y-3">
+                    <span className="text-xs font-bold text-[var(--tx)] block">
+                      Cadastrar Nova Equipe ou Empreiteiro
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="Nome da equipe (ex: A&M, HENELILTON, EQUIPE 01)..."
+                        value={newTeamModalName}
+                        onChange={(e) => setNewTeamModalName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (newTeamModalName.trim()) {
+                              handleAddNewEquipe(newTeamModalName);
+                              setNewTeamModalName('');
+                            }
+                          }
+                        }}
+                        className="flex-1 px-3 py-2 rounded-xl bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-xs text-[var(--tx)] font-medium focus:border-[var(--cy)] focus:outline-none"
+                      />
                       <button
                         type="button"
-                        onClick={() => handleDeleteEquipe(q.id, q.nome)}
-                        className="text-[var(--mu)] hover:text-red-400 p-1.5 rounded-lg transition-colors cursor-pointer"
-                        title="Remover equipe do cadastro"
+                        onClick={() => {
+                          if (newTeamModalName.trim()) {
+                            handleAddNewEquipe(newTeamModalName);
+                            setNewTeamModalName('');
+                          }
+                        }}
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white font-bold text-xs shadow-md cursor-pointer hover:opacity-90"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        + Cadastrar
                       </button>
                     </div>
-                  );
-                })
+                  </div>
+
+                  {/* Lista de equipes cadastradas */}
+                  <div className="space-y-2">
+                    <span className="text-xs font-bold text-[var(--mu)] block">
+                      Equipes Cadastradas ({(cfg.equipes || []).length})
+                    </span>
+                    {(cfg.equipes || []).length === 0 ? (
+                      <div className="text-center py-8 text-xs text-[var(--mu)]">
+                        Nenhuma equipe cadastrada ainda. Digite um nome acima para começar.
+                      </div>
+                    ) : (
+                      (cfg.equipes || []).map((q: any) => {
+                        const countInCurrentOSE = allRows.filter((r: any) =>
+                          (r.eq || []).includes(q.id)
+                        ).length;
+                        const countOverall = compiledTrechos.filter(
+                          (r) => r.equipeId === q.id
+                        ).length;
+
+                        return (
+                          <div
+                            key={q.id}
+                            className="flex items-center justify-between p-3.5 rounded-xl bg-[rgba(var(--w),0.03)] border border-[var(--ln)] hover:border-[var(--cy)]/50 transition-all"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-lg bg-[rgba(var(--w),0.07)] text-[var(--cy)]">
+                                <Users className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <span className="text-sm font-bold text-[var(--tx)] block">
+                                  {q.nome}
+                                </span>
+                                <span className="text-[11px] text-[var(--mu)]">
+                                  {countOverall} trecho(s) no total de contratos · {countInCurrentOSE} nesta OSE
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteEquipe(q.id, q.nome)}
+                              className="text-[var(--mu)] hover:text-red-400 p-2 rounded-lg transition-colors cursor-pointer"
+                              title="Remover equipe do cadastro"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
               )}
             </div>
 
-            <div className="pt-2 flex justify-end">
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-[var(--ln)] bg-[rgba(var(--w),0.02)] flex items-center justify-between">
+              <span className="text-xs text-[var(--mu)]">
+                {equipesModalTab === 'compilacao'
+                  ? 'Planilha compilada pronta para conferência de medição e pagamento de empreiteiros.'
+                  : 'Equipes cadastradas ficam disponíveis para seleção em todos os trechos.'}
+              </span>
               <button
                 type="button"
                 onClick={() => setShowEquipesModal(false)}
                 className="px-5 py-2 rounded-xl bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white font-bold text-xs shadow-md cursor-pointer hover:opacity-95"
               >
-                Fechar
+                Concluir e Fechar
               </button>
             </div>
           </div>
