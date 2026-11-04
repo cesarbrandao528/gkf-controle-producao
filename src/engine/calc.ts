@@ -150,6 +150,8 @@ export function calcOSE(
       map['40804'] = map['40801'] * dmtSolo;
     }
     delete map['60102']; // Retirar item 60102 do Escavado
+    delete map['110101']; // Retirar item 110101 (Tomada de Água) do Escavado
+    delete map['110102']; // Retirar item 110102 (Ramal Predial) do Escavado
   }
 
   // Remove default template items 110101 and 110102 from MND (automatic formula)
@@ -179,7 +181,7 @@ export function calcOSE(
     .filter((c) => {
       // If it was explicitly launched as an avulso or manual adjustment, always keep it
       if (c in avulsosMap || c in aj || c in ajPct) return true;
-      if (o.tipo === 'ESC' && c === '60102') return false;
+      if (o.tipo === 'ESC' && (c === '60102' || c === '110101' || c === '110102')) return false;
       if (o.tipo === 'MND' && (c === '110101' || c === '110102')) return false;
       return true;
     })
