@@ -22,10 +22,13 @@ import {
   Eye,
   EyeOff,
   History,
-  CheckCircle2,
   Calendar,
+  Layers,
+  Wrench,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
-import { Config, Fechamento, FrenteLancamentos, OSE, OSERow, PrecoItem } from '../types';
+import { AvulsoItem, Config, Fechamento, FrenteLancamentos, OSE, OSERow, PrecoItem } from '../types';
 
 export const TrechosTab: React.FC = () => {
   const {
@@ -47,13 +50,17 @@ export const TrechosTab: React.FC = () => {
   const [showArchivedRows, setShowArchivedRows] = useState<boolean>(false);
 
   const [newOseName, setNewOseName] = useState('');
-  const [newOseType, setNewOseType] = useState('ESC');
+  const [newOseType, setNewOseType] = useState('MND');
 
-  // Form for avulsos
-  const [avData, setAvData] = useState(hoje());
-  const [avCodeInput, setAvCodeInput] = useState('');
-  const [avQtd, setAvQtd] = useState('');
-  const [avOid, setAvOid] = useState('');
+  // Form for avulsos inside the current OSE
+  const [oseAvData, setOseAvData] = useState(hoje());
+  const [oseAvCodeInput, setOseAvCodeInput] = useState('');
+  const [oseAvQtd, setOseAvQtd] = useState('');
+
+  // Form for general avulsos (unlinked)
+  const [genAvData, setGenAvData] = useState(hoje());
+  const [genAvCodeInput, setGenAvCodeInput] = useState('');
+  const [genAvQtd, setGenAvQtd] = useState('');
 
   if (!cfg) return null;
 
@@ -73,50 +80,60 @@ export const TrechosTab: React.FC = () => {
     : null;
   const isClosedPeriod = !!selectedFech;
 
-  // Active date bounds for filtering
+  // Active date bounds for calculations
   const periodBounds = isClosedPeriod
     ? { ini: selectedFech.ini, fim: selectedFech.fim }
     : isCurrentPeriod
     ? { ini: pAtivo.ini, fim: pAtivo.fim }
     : null;
 
-  // Filter OSEs based on selected period
+  // Filter OSEs: In current period, NEVER hide active OSEs or the currently selected OSE!
   const filteredOses = oses.filter((o: OSE) => {
+    // Currently selected OSE is always visible
+    if (o.id === oseId) return true;
     if (isAllPeriods) return true;
-    if (!periodBounds) return true;
 
-    // Does this OSE have trecho rows in this period?
-    const hasRowsInPeriod = (o.rows || []).some(
-      (r) => !r.d || (r.d >= periodBounds.ini && r.d <= periodBounds.fim)
-    );
-
-    // Has avulsos in this period?
-    const hasAvulsosInPeriod = (fLanc.itens || []).some(
-      (it) => it.oid === o.id && (!it.d || (it.d >= periodBounds.ini && it.d <= periodBounds.fim))
-    );
-
-    // In current active period: show if has active rows OR is brand new with 0 rows
+    // If in current active period:
     if (isCurrentPeriod) {
+      // If it's a newly created OSE or has active work, keep it
       if (!o.rows || o.rows.length === 0) return true;
-      return hasRowsInPeriod || hasAvulsosInPeriod;
+      // Also show if it has any rows or avulsos
+      return true;
     }
 
     // In closed period: only show OSEs that actually had data in this closed measurement
     if (isClosedPeriod && selectedFech) {
+      const hasRowsInClosedPeriod = (o.rows || []).some(
+        (r) => r.d && r.d >= selectedFech.ini && r.d <= selectedFech.fim
+      );
       const wasInClosedCols = (selectedFech.cols || []).some(
         (c) => c.nome === o.nome || c.nome.startsWith(o.nome)
       );
-      return hasRowsInPeriod || hasAvulsosInPeriod || wasInClosedCols;
+      return hasRowsInClosedPeriod || wasInClosedCols;
     }
 
     return true;
   });
 
   // Current selected OSE
-  let currentOse = filteredOses.find((x) => x.id === oseId);
+  let currentOse = oses.find((x) => x.id === oseId);
   if (!currentOse && oseId !== '__av') {
-    currentOse = filteredOses[0] || null;
+    currentOse = filteredOses[0] || oses[0] || null;
   }
+
+  // Avulsos linked to current OSE
+  const currentOseAvulsos: AvulsoItem[] = currentOse
+    ? (fLanc.itens || []).filter((x: any) => x.oid === currentOse!.id)
+    : [];
+
+  // General avulsos not linked to any OSE
+  const generalAvulsos: AvulsoItem[] = (fLanc.itens || []).filter((x: any) => !x.oid);
+
+  // Template and unified calculation for selected OSE (includes formula items + avulsos)
+  const tp = currentOse ? tpl[currentOse.tipo] : null;
+  const oseCalc = currentOse
+    ? calcOSE(currentOse, frenteId, cfg, prm, tpl, undefined, undefined, periodBounds, currentOseAvulsos)
+    : null;
 
   const handleCreateOSE = () => {
     if (!newOseName.trim()) {
@@ -134,11 +151,10 @@ export const TrechosTab: React.FC = () => {
       ...prev,
       oses: [...(prev.oses || []), newO],
     }));
-    // Switch to current period so user sees the newly created OSE immediately
     setSelectedPeriod('current');
     setOseId(newO.id);
     setNewOseName('');
-    toast(`OSE "${newO.nome}" criada no período atual ✓`);
+    toast(`OSE "${newO.nome}" criada com sucesso ✓`);
   };
 
   const handleDeleteOSE = (o: OSE) => {
@@ -146,7 +162,7 @@ export const TrechosTab: React.FC = () => {
       toast('Não é possível excluir OSE de uma medição já fechada.');
       return;
     }
-    if (!confirm(`Excluir a OSE "${o.nome}" e todos os seus trechos?`)) return;
+    if (!confirm(`Excluir a OSE "${o.nome}" e todos os seus lançamentos?`)) return;
     updateFrenteLancamento(frenteId, (prev: FrenteLancamentos) => ({
       ...prev,
       oses: (prev.oses || []).filter((x: OSE) => x.id !== o.id),
@@ -168,6 +184,7 @@ export const TrechosTab: React.FC = () => {
       defaultDate = pAtivo.ini;
     }
     const newRow: OSERow = {
+      id: uid(),
       d: lastRow ? lastRow.d : defaultDate,
       v: {},
       eq: lastRow ? [...(lastRow.eq || [])] : [],
@@ -183,7 +200,7 @@ export const TrechosTab: React.FC = () => {
     });
   };
 
-  const handleDeleteTrechoRow = (o: OSE, originalRowIndex: number) => {
+  const handleDeleteTrechoRow = (o: OSE, rowIndex: number) => {
     if (isClosedPeriod) {
       toast('Não é possível excluir trechos de uma medição já fechada.');
       return;
@@ -192,7 +209,7 @@ export const TrechosTab: React.FC = () => {
       const updatedOses = (prev.oses || []).map((x: OSE) => {
         if (x.id === o.id) {
           const nextRows = [...x.rows];
-          nextRows.splice(originalRowIndex, 1);
+          nextRows.splice(rowIndex, 1);
           return { ...x, rows: nextRows };
         }
         return x;
@@ -203,7 +220,7 @@ export const TrechosTab: React.FC = () => {
 
   const handleUpdateTrechoField = (
     o: OSE,
-    originalRowIndex: number,
+    rowIndex: number,
     fieldKey: string,
     value: any
   ) => {
@@ -212,7 +229,7 @@ export const TrechosTab: React.FC = () => {
       const updatedOses = (prev.oses || []).map((x: OSE) => {
         if (x.id === o.id) {
           const nextRows = x.rows.map((r: OSERow, i: number) => {
-            if (i === originalRowIndex) {
+            if (i === rowIndex) {
               if (fieldKey === 'd') {
                 return { ...r, d: value };
               }
@@ -220,9 +237,6 @@ export const TrechosTab: React.FC = () => {
             }
             return r;
           });
-          if (fieldKey === 'd') {
-            nextRows.sort((a: OSERow, b: OSERow) => (a.d || '9999').localeCompare(b.d || '9999'));
-          }
           return { ...x, rows: nextRows };
         }
         return x;
@@ -231,13 +245,13 @@ export const TrechosTab: React.FC = () => {
     });
   };
 
-  const handleToggleEquipe = (o: OSE, originalRowIndex: number, equipeId: string) => {
+  const handleToggleEquipe = (o: OSE, rowIndex: number, equipeId: string) => {
     if (isClosedPeriod) return;
     updateFrenteLancamento(frenteId, (prev: FrenteLancamentos) => {
       const updatedOses = (prev.oses || []).map((x: OSE) => {
         if (x.id === o.id) {
           const nextRows = x.rows.map((r: OSERow, i: number) => {
-            if (i === originalRowIndex) {
+            if (i === rowIndex) {
               const currentEq = r.eq || [];
               const nextEq = currentEq.includes(equipeId)
                 ? currentEq.filter((q: string) => q !== equipeId)
@@ -336,26 +350,25 @@ export const TrechosTab: React.FC = () => {
     { value: 'Placa', label: 'Placa' },
   ];
 
-  // Add Avulso
-  const handleAddAvulso = () => {
+  // Add Avulso directly to the selected OSE
+  const handleAddAvulsoToOSE = () => {
     if (isClosedPeriod) {
-      toast('Esta medição está fechada. Não é possível adicionar novos avulsos.');
+      toast('Esta medição está fechada. Volte para o período atual.');
       return;
     }
-    const code = avCodeInput.split(' ')[0].trim();
-    const q = pn(avQtd);
-    if (!avData || !prm[code] || !(q > 0)) {
-      toast('Informe uma data, selecione um serviço válido da lista e quantidade > 0.');
+    if (!currentOse) return;
+    const code = oseAvCodeInput.split(' ')[0].trim();
+    const q = pn(oseAvQtd);
+    if (!oseAvData || !prm[code] || !(q > 0)) {
+      toast('Informe uma data válida, selecione um serviço CASAN e informe quantidade > 0.');
       return;
     }
-    const targetOid = currentOse ? currentOse.id : avOid;
-    const linkedO = oses.find((x) => x.id === targetOid);
 
-    const newItem = {
+    const newItem: AvulsoItem = {
       i: uid(),
-      d: avData,
-      os: linkedO ? linkedO.nome : '',
-      oid: linkedO ? linkedO.id : undefined,
+      d: oseAvData,
+      os: currentOse.nome,
+      oid: currentOse.id,
       c: code,
       q,
     };
@@ -365,25 +378,57 @@ export const TrechosTab: React.FC = () => {
       itens: [...(prev.itens || []), newItem],
     }));
 
-    setAvQtd('');
-    setAvCodeInput('');
-    toast('Serviço avulso lançado ✓');
+    setOseAvQtd('');
+    setOseAvCodeInput('');
+    toast(`Serviço ${code} lançado na OSE "${currentOse.nome}" ✓`);
   };
 
-  const handleDeleteAvulso = (itemId: string) => {
+  // Add General Avulso (unlinked)
+  const handleAddGeneralAvulso = () => {
+    if (isClosedPeriod) {
+      toast('Esta medição está fechada.');
+      return;
+    }
+    const code = genAvCodeInput.split(' ')[0].trim();
+    const q = pn(genAvQtd);
+    if (!genAvData || !prm[code] || !(q > 0)) {
+      toast('Informe uma data válida, selecione um serviço CASAN e informe quantidade > 0.');
+      return;
+    }
+
+    const newItem: AvulsoItem = {
+      i: uid(),
+      d: genAvData,
+      os: '— Geral da Frente —',
+      oid: undefined,
+      c: code,
+      q,
+    };
+
+    updateFrenteLancamento(frenteId, (prev: FrenteLancamentos) => ({
+      ...prev,
+      itens: [...(prev.itens || []), newItem],
+    }));
+
+    setGenAvQtd('');
+    setGenAvCodeInput('');
+    toast(`Serviço geral ${code} lançado na frente ✓`);
+  };
+
+  const handleDeleteAvulsoItem = (itemId: string) => {
     if (isClosedPeriod) {
       toast('Não é possível excluir serviços de uma medição já fechada.');
       return;
     }
-    if (!confirm('Excluir este lançamento avulso?')) return;
+    if (!confirm('Excluir este serviço lançado?')) return;
     updateFrenteLancamento(frenteId, (prev: FrenteLancamentos) => ({
       ...prev,
       itens: (prev.itens || []).filter((x: any) => x.i !== itemId),
     }));
-    toast('Lançamento avulso excluído.');
+    toast('Serviço removido.');
   };
 
-  const handleUpdateAvulsoQtd = (itemId: string, newQtdStr: string) => {
+  const handleUpdateAvulsoItemQtd = (itemId: string, newQtdStr: string) => {
     if (isClosedPeriod) return;
     const q = pn(newQtdStr);
     updateFrenteLancamento(frenteId, (prev: FrenteLancamentos) => ({
@@ -392,7 +437,7 @@ export const TrechosTab: React.FC = () => {
     }));
   };
 
-  // Calculations for current frente / selected period
+  // KPI Calculations
   const bmValorAtual = bm(frenteId, cfg, ln, prm, tpl);
   const closedBmValor = selectedFech
     ? (selectedFech.cols || []).reduce(
@@ -405,28 +450,13 @@ export const TrechosTab: React.FC = () => {
   const displayCanteiroValor = displayBmValor * (cfg.k || 0);
   const displayExecPeriodoValor = displayBmValor * (1 + (cfg.k || 0));
 
-  // Template and calculation for selected OSE
-  const tp = currentOse ? tpl[currentOse.tipo] : null;
-  const oseCalc = currentOse
-    ? calcOSE(currentOse, frenteId, cfg, prm, tpl, undefined, undefined, periodBounds)
-    : null;
-
-  // Trecho rows filtering with original indices
+  // Trecho rows to show: In current period or all periods, SHOW ALL ROWS so nothing disappears while typing!
   const allRows = currentOse ? currentOse.rows || [] : [];
   const rowsWithIndex = allRows.map((row, index) => ({ row, originalIndex: index }));
   const visibleRowsWithIndex = rowsWithIndex.filter(({ row }) => {
-    if (showArchivedRows || isAllPeriods) return true;
+    if (isCurrentPeriod || isAllPeriods || showArchivedRows) return true;
     if (!periodBounds) return true;
     return !row.d || (row.d >= periodBounds.ini && row.d <= periodBounds.fim);
-  });
-  const archivedRowsCount = allRows.length - visibleRowsWithIndex.length;
-
-  // Filter avulsos for this view
-  const avulsosList = (fLanc.itens || []).filter((x: any) => {
-    if (currentOse && x.oid !== currentOse.id) return false;
-    if (isAllPeriods) return true;
-    if (!periodBounds) return true;
-    return !x.d || (x.d >= periodBounds.ini && x.d <= periodBounds.fim);
   });
 
   return (
@@ -467,7 +497,7 @@ export const TrechosTab: React.FC = () => {
           </span>
         </div>
 
-        {/* Período / Medição Selector (Hide/Show OSEs from closed periods) */}
+        {/* Período / Medição Selector */}
         <label className="flex flex-col gap-1 text-xs text-[var(--mu)] font-medium min-w-[220px]">
           <span className="flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-[var(--cy)]" />
@@ -499,24 +529,20 @@ export const TrechosTab: React.FC = () => {
           </select>
         </label>
 
-        {/* OSE Selector (Filtered to show only OSEs of the selected period) */}
-        <label className="flex flex-col gap-1 text-xs text-[var(--mu)] font-medium min-w-[200px]">
+        {/* OSE Selector */}
+        <label className="flex flex-col gap-1 text-xs text-[var(--mu)] font-medium min-w-[220px]">
           OSE / Tipo de Lançamento
           <select
             value={currentOse ? currentOse.id : '__av'}
             onChange={(e) => setOseId(e.target.value)}
             className="px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] font-semibold text-sm cursor-pointer"
           >
-            {filteredOses.length === 0 ? (
-              <option value="__av">Nenhuma OSE neste período (Serviços avulsos)</option>
-            ) : (
-              filteredOses.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.nome} ({tpl[o.tipo]?.nome || o.tipo})
-                </option>
-              ))
-            )}
-            <option value="__av">Serviços avulsos (por código CASAN)</option>
+            {filteredOses.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.nome} ({tpl[o.tipo]?.nome || o.tipo})
+              </option>
+            ))}
+            <option value="__av">Serviços avulsos gerais (sem OSE vinculada)</option>
           </select>
         </label>
 
@@ -527,10 +553,10 @@ export const TrechosTab: React.FC = () => {
             <div className="flex flex-wrap items-center gap-1.5">
               <input
                 type="text"
-                placeholder="ex: OSE 01 Rua X"
+                placeholder="ex: R. Mississipe (MND)"
                 value={newOseName}
                 onChange={(e) => setNewOseName(e.target.value)}
-                className="px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] text-sm w-44 min-w-[140px]"
+                className="px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] text-sm w-48 min-w-[150px]"
               />
               <select
                 value={newOseType}
@@ -628,7 +654,8 @@ export const TrechosTab: React.FC = () => {
       {/* OSE Trechos Section */}
       {currentOse && tp ? (
         <div className="space-y-4">
-          <div className="gkf-card space-y-3">
+          {/* Card 1: Trechos Físicos Executados & Serviços da OSE */}
+          <div className="gkf-card space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--ln)] pb-3">
               <div>
                 <div className="flex items-center gap-2">
@@ -642,42 +669,23 @@ export const TrechosTab: React.FC = () => {
                   )}
                 </div>
                 <p className="text-xs text-[var(--mu)]">
-                  Modelo: <span className="font-semibold">{tp.nome}</span> · Os serviços CASAN são calculados automaticamente por trecho.
+                  Modelo: <span className="font-semibold text-[var(--cy)]">{tp.nome}</span> · Os serviços físicos da CASAN são calculados automaticamente por trecho.
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                {archivedRowsCount > 0 && !isAllPeriods && (
-                  <button
-                    type="button"
-                    onClick={() => setShowArchivedRows(!showArchivedRows)}
-                    className="px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgba(var(--w),0.05)] border border-[var(--ln)] text-[var(--mu)] hover:text-[var(--tx)] flex items-center gap-1"
-                  >
-                    {showArchivedRows ? (
-                      <>
-                        <EyeOff className="w-3 h-3 text-[var(--cy)]" />
-                        Ocultar {archivedRowsCount} trecho(s) de períodos fechados
-                      </>
-                    ) : (
-                      <>
-                        <Eye className="w-3 h-3 text-[var(--cy)]" />
-                        Exibir {archivedRowsCount} trecho(s) de outros períodos
-                      </>
-                    )}
-                  </button>
-                )}
                 {!isClosedPeriod && (
                   <>
                     <button
                       type="button"
                       onClick={handleCreateEquipe}
-                      className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] hover:border-[var(--cy)]"
+                      className="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] hover:border-[var(--cy)]"
                     >
                       + Nova equipe
                     </button>
                     <button
                       type="button"
                       onClick={() => handleAddTrechoRow(currentOse!)}
-                      className="px-3 py-1.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white shadow-sm flex items-center gap-1"
+                      className="px-3.5 py-1.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white shadow-sm flex items-center gap-1.5"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       Adicionar trecho
@@ -714,7 +722,7 @@ export const TrechosTab: React.FC = () => {
                       >
                         {isClosedPeriod
                           ? 'Nenhum trecho registrado nesta medição fechada.'
-                          : 'Nenhum trecho lançado para esta OSE neste período. Clique em "Adicionar trecho" acima.'}
+                          : 'Nenhum trecho lançado para esta OSE. Clique em "Adicionar trecho" acima para iniciar.'}
                       </td>
                     </tr>
                   ) : (
@@ -726,25 +734,32 @@ export const TrechosTab: React.FC = () => {
 
                       return (
                         <tr
-                          key={originalIndex}
-                          className={!isInPeriod ? 'opacity-40 bg-black/20' : ''}
+                          key={row.id || originalIndex}
+                          className={!isInPeriod ? 'opacity-50 bg-amber-950/10' : ''}
                         >
                           {/* Date */}
-                          <td style={{ width: '125px' }}>
-                            <input
-                              type="date"
-                              disabled={isClosedPeriod}
-                              value={row.d || ''}
-                              onChange={(e) =>
-                                handleUpdateTrechoField(
-                                  currentOse!,
-                                  originalIndex,
-                                  'd',
-                                  e.target.value
-                                )
-                              }
-                              className="w-full text-xs disabled:opacity-75 disabled:cursor-not-allowed"
-                            />
+                          <td style={{ width: '135px' }}>
+                            <div className="space-y-1">
+                              <input
+                                type="date"
+                                disabled={isClosedPeriod}
+                                value={row.d || ''}
+                                onChange={(e) =>
+                                  handleUpdateTrechoField(
+                                    currentOse!,
+                                    originalIndex,
+                                    'd',
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full text-xs disabled:opacity-75 disabled:cursor-not-allowed"
+                              />
+                              {!isInPeriod && row.d && (
+                                <span className="block text-[10px] text-amber-400 font-semibold leading-tight">
+                                  Fora do período ativo
+                                </span>
+                              )}
+                            </div>
                           </td>
 
                           {/* Equipes Dropdown */}
@@ -866,14 +881,147 @@ export const TrechosTab: React.FC = () => {
                 </tbody>
               </table>
             </div>
-            {archivedRowsCount > 0 && !showArchivedRows && (
-              <p className="text-xs text-[var(--mu)] italic">
-                * {archivedRowsCount} trecho(s) de medições anteriores estão ocultos para manter os lançamentos organizados.
-              </p>
-            )}
+
+            {/* SEÇÃO INTEGRADA: Serviços Complementares / Avulsos desta OSE */}
+            <div className="pt-3 border-t border-[var(--ln)] space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--cy)] flex items-center gap-1.5">
+                    <Wrench className="w-3.5 h-3.5" />
+                    Serviços Complementares / Avulsos desta OSE ({currentOse.nome})
+                  </h4>
+                  <p className="text-[11px] text-[var(--mu)]">
+                    Estes serviços entram diretamente no cálculo e somam ao subtotal da OSE abaixo.
+                  </p>
+                </div>
+              </div>
+
+              {/* Formulário para Lançar Serviço Avulso diretamente na OSE */}
+              {!isClosedPeriod && (
+                <div className="flex flex-wrap items-end gap-2 p-2.5 rounded-xl bg-[rgba(var(--w),0.03)] border border-[var(--ln)]">
+                  <label className="flex flex-col gap-1 text-[11px] text-[var(--mu)]">
+                    Data
+                    <input
+                      type="date"
+                      value={oseAvData}
+                      onChange={(e) => setOseAvData(e.target.value)}
+                      className="px-2 py-1 rounded-lg bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] text-xs"
+                    />
+                  </label>
+
+                  <label className="flex flex-col gap-1 text-[11px] text-[var(--mu)] flex-1 min-w-[260px]">
+                    Serviço CASAN (código ou descrição)
+                    <input
+                      type="text"
+                      list="dl-precos-ose"
+                      placeholder="Digite o código (ex: 110101, 110102, 170314...) ou nome..."
+                      value={oseAvCodeInput}
+                      onChange={(e) => setOseAvCodeInput(e.target.value)}
+                      className="px-2.5 py-1 rounded-lg bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] text-xs w-full"
+                    />
+                    <datalist id="dl-precos-ose">
+                      {cfg.precos.map((p: PrecoItem) => (
+                        <option key={p.c} value={`${p.c} — ${p.d} (R$ ${fmt(p.p)}/${p.u})`} />
+                      ))}
+                    </datalist>
+                  </label>
+
+                  <label className="flex flex-col gap-1 text-[11px] text-[var(--mu)] w-24">
+                    Quantidade
+                    <input
+                      type="text"
+                      placeholder="0,00"
+                      value={oseAvQtd}
+                      onChange={(e) => setOseAvQtd(e.target.value)}
+                      className="px-2 py-1 rounded-lg bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] text-xs text-right font-medium"
+                    />
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={handleAddAvulsoToOSE}
+                    className="px-3 py-1 rounded-lg font-bold text-xs bg-[var(--cy)] text-black hover:opacity-90 shadow-sm flex items-center gap-1 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Lançar Serviço na OSE
+                  </button>
+                </div>
+              )}
+
+              {/* Tabela de Serviços Avulsos lançados para esta OSE */}
+              {currentOseAvulsos.length > 0 && (
+                <div className="gkf-table-wrap">
+                  <table className="gkf-table">
+                    <thead>
+                      <tr>
+                        <th className="text-[11px]">Data</th>
+                        <th className="text-[11px]">Código</th>
+                        <th className="text-[11px]">Serviço CASAN</th>
+                        <th className="text-[11px]">Und.</th>
+                        <th className="text-right text-[11px]" style={{ width: '90px' }}>Quantidade</th>
+                        <th className="text-right text-[11px]">Unitário R$</th>
+                        <th className="text-right text-[11px]">Valor R$</th>
+                        {!isClosedPeriod && <th></th>}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentOseAvulsos.map((av) => {
+                        const p = prm[av.c] || { d: 'Item ' + av.c, u: 'un', p: 0 };
+                        const isInPeriod = inP(av.d, cfg, frenteId, periodBounds);
+                        const v = (av.q || 0) * (p.p || 0);
+
+                        return (
+                          <tr
+                            key={av.i}
+                            className={!isInPeriod ? 'opacity-50 bg-amber-950/10' : ''}
+                          >
+                            <td className="text-xs">
+                              {dbr(av.d)}
+                              {!isInPeriod && (
+                                <span className="block text-[9px] text-amber-400 font-semibold">
+                                  Fora do período
+                                </span>
+                              )}
+                            </td>
+                            <td className="text-xs font-bold text-[var(--cy)]">{av.c}</td>
+                            <td className="text-xs max-w-xs truncate">{p.d}</td>
+                            <td className="text-xs text-[var(--mu)]">{p.u}</td>
+                            <td className="text-right">
+                              <input
+                                type="text"
+                                disabled={isClosedPeriod}
+                                value={fmt(av.q)}
+                                onChange={(e) => handleUpdateAvulsoItemQtd(av.i, e.target.value)}
+                                className="text-right text-xs border border-[var(--ln)] rounded px-1.5 py-0.5 bg-black/20 w-16 disabled:opacity-75"
+                              />
+                            </td>
+                            <td className="text-right text-xs">{fmt(p.p)}</td>
+                            <td className="text-right text-xs font-bold text-[var(--cy)]">
+                              {fmt(v)}
+                            </td>
+                            {!isClosedPeriod && (
+                              <td className="text-right">
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteAvulsoItem(av.i)}
+                                  aria-label="Excluir serviço"
+                                  className="text-[var(--mu)] hover:text-red-400 p-1"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Quantidades e Ajustes da OSE */}
+          {/* Card 2: Memória de Cálculo UNIFICADA da OSE (Quantidades e Serviços CASAN) */}
           {oseCalc && oseCalc.itens.length > 0 && (
             <div className="gkf-card space-y-3.5">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -882,14 +1030,12 @@ export const TrechosTab: React.FC = () => {
                     Memória de Cálculo da OSE (Quantidades e Serviços CASAN)
                   </h3>
                   <p className="text-xs text-[var(--mu)]">
-                    {isClosedPeriod
-                      ? 'Quantitativos consolidados e apurados nesta medição fechada.'
-                      : 'Valores apurados pelas fórmulas do modelo. Digite em "Ajuste (%)" ou "Ajuste Qtd" para fixar quantitativo diferente.'}
+                    Total unificado apurado das fórmulas do modelo e dos serviços complementares lançados para esta OSE.
                   </p>
                 </div>
                 <div className="text-right">
                   <span className="text-xs text-[var(--mu)] block">Subtotal desta OSE:</span>
-                  <span className="text-base font-extrabold text-[var(--cy)]">
+                  <span className="text-lg font-extrabold text-[var(--cy)]">
                     R$ {fmt(oseCalc.total)}
                   </span>
                 </div>
@@ -936,9 +1082,10 @@ export const TrechosTab: React.FC = () => {
                     <tr>
                       <th className="text-xs">Código</th>
                       <th className="text-xs">Descrição do Serviço</th>
+                      <th className="text-xs">Origem</th>
                       <th className="text-xs">Und.</th>
                       <th className="text-right text-xs">Unitário R$</th>
-                      <th className="text-right text-xs">Qtd. Trechos</th>
+                      <th className="text-right text-xs">Qtd. Apurada</th>
                       <th className="text-right text-xs" style={{ width: '85px' }}>Ajuste (%)</th>
                       <th className="text-right text-xs" style={{ width: '95px' }}>Ajuste Qtd</th>
                       <th className="text-right text-xs">Qtd. Final</th>
@@ -950,9 +1097,20 @@ export const TrechosTab: React.FC = () => {
                       <tr key={it.c}>
                         <td className="font-bold text-xs text-[var(--cy)]">{it.c}</td>
                         <td className="text-xs max-w-md truncate">{it.d}</td>
+                        <td className="text-xs">
+                          {it.isAvulso ? (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                              Avulso
+                            </span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-500/10 text-blue-300">
+                              Fórmula
+                            </span>
+                          )}
+                        </td>
                         <td className="text-xs text-[var(--mu)]">{it.u}</td>
                         <td className="text-right text-xs">{fmt(it.p)}</td>
-                        <td className="text-right text-xs text-[var(--mu)]">
+                        <td className="text-right text-xs text-[var(--mu)] font-medium">
                           {fmt(it.q)}
                         </td>
                         {/* Ajuste em porcentagem (%) */}
@@ -993,8 +1151,8 @@ export const TrechosTab: React.FC = () => {
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colSpan={8} className="text-right font-bold text-xs">
-                        Total desta OSE no período:
+                      <td colSpan={9} className="text-right font-bold text-xs">
+                        Total desta OSE no período (Trechos + Serviços Complementares):
                       </td>
                       <td className="text-right text-sm font-extrabold text-[var(--cy)]">
                         R$ {fmt(oseCalc.total)}
@@ -1008,75 +1166,50 @@ export const TrechosTab: React.FC = () => {
         </div>
       ) : (
         <div className="gkf-card text-center py-6 text-[var(--mu)]">
-          {filteredOses.length === 0 ? (
-            isClosedPeriod ? (
-              <p>Nenhuma OSE foi executada nesta medição fechada ({selectedFech?.n}).</p>
-            ) : (
-              <p>
-                Nenhuma OSE lançada para este período ativo. Crie uma nova OSE no campo "Nova OSE" acima para iniciar os lançamentos.
-              </p>
-            )
+          {oses.length === 0 ? (
+            <p>Nenhuma OSE criada nesta frente. Utilize o campo "Nova OSE" acima para criar a primeira.</p>
           ) : (
-            <p>Selecione uma OSE na barra superior para visualizar e lançar os trechos.</p>
+            <p>Selecione uma OSE na barra superior para visualizar os trechos e memória de cálculo.</p>
           )}
         </div>
       )}
 
-      {/* Serviços Avulsos Section */}
+      {/* Serviços Avulsos GERAIS da Frente (sem OSE vinculada) */}
       <div className="gkf-card space-y-4">
         <div>
-          <h3 className="text-base font-bold text-[var(--tx)]">
-            {currentOse
-              ? `Serviços avulsos desta OSE (${currentOse.nome})`
-              : 'Serviços avulsos (Geral da Frente)'}
+          <h3 className="text-base font-bold text-[var(--tx)] flex items-center gap-2">
+            <Layers className="w-4 h-4 text-[var(--cy)]" />
+            Serviços Avulsos Gerais da Frente (sem OSE vinculada)
           </h3>
           <p className="text-xs text-[var(--mu)]">
-            Lance serviços complementares que não saem diretamente dos trechos. Eles entram no BM CASAN em coluna própria.
+            Utilize esta seção para lançar serviços gerais do canteiro ou da frente que não pertencem a nenhuma rua ou OSE específica.
           </p>
         </div>
 
-        {/* Form to Add Avulso (Active Period only) */}
+        {/* Form to Add General Avulso */}
         {!isClosedPeriod && (
           <div className="flex flex-wrap items-end gap-2.5 p-3 rounded-xl bg-[rgba(var(--w),0.03)] border border-[var(--ln)]">
             <label className="flex flex-col gap-1 text-xs text-[var(--mu)]">
               Data
               <input
                 type="date"
-                value={avData}
-                onChange={(e) => setAvData(e.target.value)}
+                value={genAvData}
+                onChange={(e) => setGenAvData(e.target.value)}
                 className="px-2.5 py-1.5 rounded-xl bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] text-xs"
               />
             </label>
-
-            {!currentOse && (
-              <label className="flex flex-col gap-1 text-xs text-[var(--mu)]">
-                Vincular a OSE
-                <select
-                  value={avOid}
-                  onChange={(e) => setAvOid(e.target.value)}
-                  className="px-2.5 py-1.5 rounded-xl bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] text-xs cursor-pointer"
-                >
-                  <option value="">— avulso geral (sem OSE) —</option>
-                  {filteredOses.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.nome} ({tpl[o.tipo]?.nome || o.tipo})
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
 
             <label className="flex flex-col gap-1 text-xs text-[var(--mu)] flex-1 min-w-[280px]">
               Serviço CASAN (código ou descrição)
               <input
                 type="text"
-                list="dl-precos"
+                list="dl-precos-gen"
                 placeholder="Digite o código (ex: 20201) ou nome do serviço..."
-                value={avCodeInput}
-                onChange={(e) => setAvCodeInput(e.target.value)}
+                value={genAvCodeInput}
+                onChange={(e) => setGenAvCodeInput(e.target.value)}
                 className="px-3 py-1.5 rounded-xl bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] text-xs w-full"
               />
-              <datalist id="dl-precos">
+              <datalist id="dl-precos-gen">
                 {cfg.precos.map((p: PrecoItem) => (
                   <option key={p.c} value={`${p.c} — ${p.d} (R$ ${fmt(p.p)}/${p.u})`} />
                 ))}
@@ -1088,32 +1221,31 @@ export const TrechosTab: React.FC = () => {
               <input
                 type="text"
                 placeholder="0,00"
-                value={avQtd}
-                onChange={(e) => setAvQtd(e.target.value)}
+                value={genAvQtd}
+                onChange={(e) => setGenAvQtd(e.target.value)}
                 className="px-2.5 py-1.5 rounded-xl bg-[rgba(var(--w),0.07)] border border-[var(--ln)] text-[var(--tx)] text-xs text-right font-medium"
               />
             </label>
 
             <button
               type="button"
-              onClick={handleAddAvulso}
+              onClick={handleAddGeneralAvulso}
               className="px-4 py-1.5 rounded-xl font-bold text-xs bg-gradient-to-r from-[var(--cy)] to-blue-600 text-white shadow-sm flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" />
-              Adicionar
+              Lançar Geral
             </button>
           </div>
         )}
 
-        {/* Avulsos Table */}
+        {/* General Avulsos Table */}
         <div className="gkf-table-wrap">
           <table className="gkf-table">
             <thead>
               <tr>
                 <th>Data</th>
-                <th>OSE</th>
                 <th>Código</th>
-                <th>Serviço</th>
+                <th>Serviço CASAN</th>
                 <th>Und.</th>
                 <th className="text-right">Quantidade</th>
                 <th className="text-right">Unitário R$</th>
@@ -1122,19 +1254,17 @@ export const TrechosTab: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {avulsosList.length === 0 ? (
+              {generalAvulsos.length === 0 ? (
                 <tr>
-                  <td colSpan={isClosedPeriod ? 8 : 9} className="text-center py-5 text-[var(--mu)] text-xs">
-                    Nenhum serviço avulso lançado para este período.
+                  <td colSpan={isClosedPeriod ? 7 : 8} className="text-center py-5 text-[var(--mu)] text-xs">
+                    Nenhum serviço avulso geral lançado na frente.
                   </td>
                 </tr>
               ) : (
-                avulsosList.map((item: any) => {
+                generalAvulsos.map((item: any) => {
                   const p = prm[item.c] || { d: 'Item ' + item.c, u: 'un', p: 0 };
                   const isInPeriod = inP(item.d, cfg, frenteId, periodBounds);
-                  const o = oses.find((y) => y.id === item.oid);
-                  const oseNome = o ? o.nome : item.os || '— avulso geral —';
-                  const valor = item.q * (p.p || 0);
+                  const valor = (item.q || 0) * (p.p || 0);
 
                   return (
                     <tr
@@ -1142,8 +1272,7 @@ export const TrechosTab: React.FC = () => {
                       className={!isInPeriod ? 'opacity-40 bg-black/20' : ''}
                     >
                       <td className="text-xs">{dbr(item.d)}</td>
-                      <td className="text-xs font-medium text-[var(--tx)]">{oseNome}</td>
-                      <td className="text-xs font-bold">{item.c}</td>
+                      <td className="text-xs font-bold text-[var(--cy)]">{item.c}</td>
                       <td className="text-xs max-w-xs truncate">{p.d}</td>
                       <td className="text-xs text-[var(--mu)]">{p.u}</td>
                       <td className="text-right" style={{ width: '100px' }}>
@@ -1151,7 +1280,7 @@ export const TrechosTab: React.FC = () => {
                           type="text"
                           disabled={isClosedPeriod}
                           value={fmt(item.q)}
-                          onChange={(e) => handleUpdateAvulsoQtd(item.i, e.target.value)}
+                          onChange={(e) => handleUpdateAvulsoItemQtd(item.i, e.target.value)}
                           className="text-right text-xs border border-[var(--ln)] rounded px-1.5 py-0.5 bg-black/20 disabled:opacity-75 disabled:cursor-not-allowed"
                         />
                       </td>
@@ -1163,7 +1292,7 @@ export const TrechosTab: React.FC = () => {
                         <td className="text-right">
                           <button
                             type="button"
-                            onClick={() => handleDeleteAvulso(item.i)}
+                            onClick={() => handleDeleteAvulsoItem(item.i)}
                             aria-label="Excluir avulso"
                             className="text-[var(--mu)] hover:text-red-400 p-1"
                           >

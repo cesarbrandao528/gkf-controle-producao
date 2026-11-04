@@ -77,6 +77,7 @@ export interface AvulsoItem {
 }
 
 export interface OSERow {
+  id?: string;
   d: string; // date YYYY-MM-DD
   v: Record<string, any>; // column key -> value
   eq?: string[]; // array of team ids

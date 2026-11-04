@@ -1,4 +1,5 @@
 import {
+  AvulsoItem,
   CalcResult,
   Config,
   Contrato,
@@ -100,9 +101,13 @@ export function calcOSE(
   tpl: Record<string, Template>,
   memo?: Record<string, any>,
   tplc?: Record<string, any>,
-  customPeriod?: { ini: string; fim: string } | null
+  customPeriod?: { ini: string; fim: string } | null,
+  avulsosDaOse?: AvulsoItem[]
 ) {
-  const memoKey = customPeriod ? `${o.id}_${customPeriod.ini}_${customPeriod.fim}` : o.id;
+  const avLen = (avulsosDaOse || []).length;
+  const memoKey = customPeriod
+    ? `${o.id}_${customPeriod.ini}_${customPeriod.fim}_${avLen}`
+    : `${o.id}_${avLen}`;
   if (memo && memo[memoKey]) return memo[memoKey];
   const tp = tpl[o.tipo];
   if (!tp) return { itens: [], total: 0 };
@@ -147,10 +152,21 @@ export function calcOSE(
     delete map['60102']; // Retirar item 60102 do Escavado
   }
 
-  // Remove items 110101 and 110102 from MND
+  // Remove default template items 110101 and 110102 from MND (automatic formula)
   if (o.tipo === 'MND') {
     delete map['110101'];
     delete map['110102'];
+  }
+
+  // Map avulso services launched directly for this OSE
+  const avulsosMap: Record<string, number> = {};
+  if (avulsosDaOse && avulsosDaOse.length > 0) {
+    avulsosDaOse.forEach((av) => {
+      if (!av.d || inP(av.d, cfg, frenteId, customPeriod)) {
+        avulsosMap[av.c] = (avulsosMap[av.c] || 0) + (av.q || 0);
+        map[av.c] = (map[av.c] || 0) + (av.q || 0);
+      }
+    });
   }
 
   const round2 = (num: number) => Math.round((num + Number.EPSILON) * 100) / 100;
@@ -158,9 +174,11 @@ export function calcOSE(
   const aj = o.aj || {};
   const ajPct = o.ajPct || {};
   const allCodes = Array.from(
-    new Set([...Object.keys(map), ...Object.keys(aj), ...Object.keys(ajPct)])
+    new Set([...Object.keys(map), ...Object.keys(aj), ...Object.keys(ajPct), ...Object.keys(avulsosMap)])
   )
     .filter((c) => {
+      // If it was explicitly launched as an avulso or manual adjustment, always keep it
+      if (c in avulsosMap || c in aj || c in ajPct) return true;
       if (o.tipo === 'ESC' && c === '60102') return false;
       if (o.tipo === 'MND' && (c === '110101' || c === '110102')) return false;
       return true;
@@ -184,6 +202,7 @@ export function calcOSE(
     const unitPrice = p.p || 0;
     const calcQty = hasManualAj || hasPctAj ? qf : (map[c] !== undefined ? map[c] : qf);
     const v = round2(calcQty * unitPrice);
+    const isAvulso = Boolean(avulsosMap[c]);
 
     return {
       c,
@@ -196,6 +215,8 @@ export function calcOSE(
       ajPct: hasPctAj ? ajPct[c] : undefined,
       qf,
       v,
+      isAvulso,
+      avulsoQtd: avulsosMap[c] || 0,
     };
   });
 
@@ -214,14 +235,17 @@ export const bm = (
   tplc?: Record<string, any>
 ): number => {
   const fLanc = ln[frenteId] || { itens: [], oses: [] };
-  const avulsos = (fLanc.itens || [])
-    .filter((x) => inP(x.d, cfg, frenteId))
+  // Apenas avulsos gerais sem OSE vinculada (oid vazio)
+  const avulsosGerais = (fLanc.itens || [])
+    .filter((x) => !x.oid && inP(x.d, cfg, frenteId))
     .reduce((t, x) => t + x.q * ((prm[x.c] || {}).p || 0), 0);
-  const osesTotal = (fLanc.oses || []).reduce(
-    (t, o) => t + calcOSE(o, frenteId, cfg, prm, tpl, memo, tplc).total,
-    0
-  );
-  return avulsos + osesTotal;
+
+  const osesTotal = (fLanc.oses || []).reduce((t, o) => {
+    const oAvulsos = (fLanc.itens || []).filter((x) => x.oid === o.id);
+    return t + calcOSE(o, frenteId, cfg, prm, tpl, memo, tplc, null, oAvulsos).total;
+  }, 0);
+
+  return avulsosGerais + osesTotal;
 };
 
 export const exe = (
@@ -415,8 +439,9 @@ export function colsFrente(
   const cols: FechamentoCol[] = [];
 
   (L.oses || []).forEach((o) => {
+    const oAvulsos = (L.itens || []).filter((x) => x.oid === o.id);
     const q: Record<string, number> = {};
-    calcOSE(o, id, cfg, prm, tpl, memo, tplc).itens.forEach((x: any) => {
+    calcOSE(o, id, cfg, prm, tpl, memo, tplc, null, oAvulsos).itens.forEach((x: any) => {
       if (x.qf) q[x.c] = x.qf;
     });
     if (Object.keys(q).length) {
@@ -434,20 +459,14 @@ export function colsFrente(
     }
   });
 
-  const avO: Record<string, FechamentoCol> = {};
+  // Apenas serviços avulsos gerais sem OSE vinculada
   const avG: FechamentoCol = { nome: 'SERVIÇOS AVULSOS', q: {} };
-
   (L.itens || [])
-    .filter((x) => inP(x.d, cfg, id))
+    .filter((x) => !x.oid && inP(x.d, cfg, id))
     .forEach((x) => {
-      const o = (L.oses || []).find((y) => y.id === x.oid);
-      const T = o
-        ? (avO[o.id] = avO[o.id] || { nome: o.nome + ' - AVULSOS', q: {} })
-        : avG;
-      T.q[x.c] = (T.q[x.c] || 0) + x.q;
+      avG.q[x.c] = (avG.q[x.c] || 0) + x.q;
     });
 
-  cols.push(...Object.values(avO));
   if (Object.keys(avG.q).length) cols.push(avG);
   return cols;
 }
