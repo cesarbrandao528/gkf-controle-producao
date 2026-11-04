@@ -54,20 +54,17 @@ export async function hashPassword(password: string): Promise<string> {
     .join('');
 }
 
-export const DEFAULT_DIRECT_PROFILE: UserProfile = {
-  id: 'equipe_gkf',
-  email: 'equipe@gkfengenharia.com.br',
-  displayName: 'Equipe GKF (Acesso Direto)',
-  role: 'gestor',
-  createdAt: '2025-01-01T00:00:00.000Z',
-};
-
-export function getSavedUserProfile(): UserProfile {
+export function getSavedUserProfile(): UserProfile | null {
   try {
     const raw = localStorage.getItem('cp_gkf_user_profile');
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (p && p.id !== 'equipe_gkf' && p.email && p.email !== 'equipe@gkfengenharia.com.br') {
+        return p;
+      }
+    }
   } catch {}
-  return DEFAULT_DIRECT_PROFILE;
+  return null;
 }
 
 export function saveUserProfileLocal(p: UserProfile | null) {

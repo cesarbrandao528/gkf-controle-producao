@@ -175,7 +175,8 @@ export function calcOSE(
     }
 
     const unitPrice = p.p || 0;
-    const v = round2(qf * unitPrice);
+    const calcQty = hasManualAj || hasPctAj ? qf : (map[c] !== undefined ? map[c] : qf);
+    const v = round2(calcQty * unitPrice);
 
     return {
       c,

@@ -20,7 +20,6 @@ import {
   loadCentralProduction,
   getSavedUserProfile,
   saveUserProfileLocal,
-  DEFAULT_DIRECT_PROFILE,
   UserProfile,
   FirebaseUser,
 } from '../firebase';

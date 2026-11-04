@@ -167,13 +167,54 @@ export const FluxoObrasTab: React.FC = () => {
   };
 
   const handleDownloadCopy = () => {
-    if (!srcDocContent) return;
+    if (!fluxt) return;
 
-    // Use srcDocContent which contains the exact live fluxd data and PREVISTO_FATURAMENTO from the app
+    // Retrieve active dataset directly from iframe memory or state
+    const liveD = (iframeRef.current?.contentWindow as any)?.D || fluxd;
+    let baseHtml = fluxt;
+
+    if (liveD && Array.isArray(liveD.obras)) {
+      const i = baseHtml.indexOf('let D=');
+      if (i >= 0) {
+        let d = 0;
+        let k = i + 6;
+        let ins = false;
+        let esc = false;
+        for (; k < baseHtml.length; k++) {
+          const c = baseHtml[k];
+          if (ins) {
+            if (esc) esc = false;
+            else if (c === '\\') esc = true;
+            else if (c === '"') ins = false;
+          } else if (c === '"') ins = true;
+          else if (c === '{') d++;
+          else if (c === '}') {
+            d--;
+            if (d === 0) {
+              k++;
+              break;
+            }
+          }
+        }
+        baseHtml =
+          baseHtml.slice(0, i + 6) +
+          JSON.stringify(liveD).replace(/<\//g, '<\\/') +
+          baseHtml.slice(k);
+      }
+    }
+
+    // Capture currently selected dropdown filters
+    const liveDoc = iframeRef.current?.contentDocument;
+    const curFs = (liveDoc?.getElementById('fs') as HTMLSelectElement)?.value || 'VALE';
+    const curFo = (liveDoc?.getElementById('fo') as HTMLSelectElement)?.value || '';
+    const curFy = (liveDoc?.getElementById('fy') as HTMLSelectElement)?.value || '';
+
+    // Standalone styling with native app background, full scrolling, and GKF brand logo visible
     const standaloneStyle = `
       <style>
         html, body {
-          background: ${theme === 'light' ? '#f0f5fa' : '#030813'} !important;
+          background: radial-gradient(900px 500px at 12% -5%,rgba(var(--cyr),.13),transparent 60%),radial-gradient(800px 500px at 95% 5%,rgba(var(--vir),.15),transparent 60%),linear-gradient(165deg,var(--bgA) 0%,var(--bgB) 50%,var(--bgC) 100%) !important;
+          background-attachment: fixed !important;
           color: ${theme === 'light' ? '#1b2733' : '#e8eefb'} !important;
           margin: 0 !important;
           padding: 24px 20px 80px !important;
@@ -187,22 +228,32 @@ export const FluxoObrasTab: React.FC = () => {
           margin: 0 auto !important;
           padding: 0 0 60px !important;
         }
-        header .brand { display: none !important; }
+        header .brand { display: flex !important; align-items: center !important; }
       </style>
+      <script>
+        window.PREVISTO_FATURAMENTO = ${JSON.stringify({
+          total: totalPrevistoFaturamento,
+          porObra: previstoFaturamentoPorObra,
+        })};
+        window.addEventListener('DOMContentLoaded', function() {
+          try {
+            if (document.getElementById('fs')) document.getElementById('fs').value = ${JSON.stringify(curFs)};
+            if (typeof fo === 'function') fo();
+            if (document.getElementById('fo')) document.getElementById('fo').value = ${JSON.stringify(curFo)};
+            if (document.getElementById('fy')) document.getElementById('fy').value = ${JSON.stringify(curFy)};
+            if (typeof fill === 'function') fill();
+            if (typeof render === 'function') render();
+          } catch (e) {
+            console.warn(e);
+          }
+        });
+      </script>
     `;
 
-    // Replace the iframe scroll-lock styles with the full-scroll standalone styling
-    let finalHtml = srcDocContent
-      .replace(
-        /overflow-y:\s*hidden\s*!important;/g,
-        'overflow-y: auto !important; min-height: 100vh !important;'
-      )
-      .replace(
-        /background:\s*transparent\s*!important;/g,
-        `background: ${theme === 'light' ? '#f0f5fa' : '#030813'} !important; color: ${theme === 'light' ? '#1b2733' : '#e8eefb'} !important;`
-      );
-
-    finalHtml = finalHtml.replace('</head>', `${standaloneStyle}</head>`);
+    let finalHtml = baseHtml
+      .replace(/<html([^>]*)>/i, `<html$1 data-theme="${theme}">`)
+      .replace(/localStorage\.getItem\(['"]cp_gkf_fluxd_v3['"]\)/g, 'null')
+      .replace('</head>', `${standaloneStyle}</head>`);
 
     const blob = new Blob([finalHtml], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -213,7 +264,7 @@ export const FluxoObrasTab: React.FC = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast('Fluxo e Resultado exportado com dados e design idênticos ao aplicativo ✓');
+    toast('Fluxo e Resultado exportado com dados, filtros e design idênticos ao aplicativo ✓');
   };
 
   if (!fluxt) {

@@ -89,12 +89,22 @@ export const DashboardTab: React.FC = () => {
   }, [dasht, cfg, ln, prm, tpl, theme]);
 
   const handleDownloadCopy = () => {
-    if (!srcDocContent) return;
+    if (!dasht || !cfg) return;
+
+    // Build the latest dashboard rows from memory
+    const rows = dashRows(cfg, ln, prm, tpl);
+    const htmlWithData = buildDash(dasht, rows, hoje());
+
+    // Capture currently selected filters from iframe
+    const liveDoc = iframeRef.current?.contentDocument;
+    const curFc = (liveDoc?.getElementById('fc') as HTMLSelectElement)?.value || '';
+    const curFs = (liveDoc?.getElementById('fs') as HTMLSelectElement)?.value || '';
 
     const standaloneStyle = `
       <style>
         html, body {
-          background: ${theme === 'light' ? '#f0f5fa' : '#030813'} !important;
+          background: radial-gradient(900px 500px at 12% -5%,rgba(var(--cyr),.13),transparent 60%),radial-gradient(800px 500px at 95% 5%,rgba(var(--vir),.15),transparent 60%),linear-gradient(165deg,var(--bgA) 0%,var(--bgB) 50%,var(--bgC) 100%) !important;
+          background-attachment: fixed !important;
           color: ${theme === 'light' ? '#1b2733' : '#e8eefb'} !important;
           margin: 0 !important;
           padding: 24px 20px 80px !important;
@@ -108,21 +118,24 @@ export const DashboardTab: React.FC = () => {
           margin: 0 auto !important;
           padding: 0 0 60px !important;
         }
-        header .brand { display: none !important; }
+        header .brand { display: flex !important; align-items: center !important; }
       </style>
+      <script>
+        window.addEventListener('DOMContentLoaded', function() {
+          try {
+            if (document.getElementById('fc')) document.getElementById('fc').value = ${JSON.stringify(curFc)};
+            if (document.getElementById('fs')) document.getElementById('fs').value = ${JSON.stringify(curFs)};
+            if (typeof render === 'function') render();
+          } catch(e) {
+            console.warn(e);
+          }
+        });
+      </script>
     `;
 
-    let finalHtml = srcDocContent
-      .replace(
-        /overflow-y:\s*hidden\s*!important;/g,
-        'overflow-y: auto !important; min-height: 100vh !important;'
-      )
-      .replace(
-        /background:\s*transparent\s*!important;/g,
-        `background: ${theme === 'light' ? '#f0f5fa' : '#030813'} !important; color: ${theme === 'light' ? '#1b2733' : '#e8eefb'} !important;`
-      );
-
-    finalHtml = finalHtml.replace('</head>', `${standaloneStyle}</head>`);
+    let finalHtml = htmlWithData
+      .replace(/<html([^>]*)>/i, `<html$1 data-theme="${theme}">`)
+      .replace('</head>', `${standaloneStyle}</head>`);
 
     const blob = new Blob([finalHtml], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -133,7 +146,7 @@ export const DashboardTab: React.FC = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast('Dashboard exportado com dados e design idênticos ao aplicativo ✓');
+    toast('Dashboard exportado com dados, filtros e design idênticos ao aplicativo ✓');
   };
 
   const handleIframeLoad = () => {

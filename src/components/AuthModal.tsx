@@ -3,7 +3,6 @@ import {
   authenticateWithPassword,
   registerWithPassword,
   signInWithGoogle,
-  DEFAULT_DIRECT_PROFILE,
   saveUserProfileLocal,
   UserProfile,
 } from '../firebase';

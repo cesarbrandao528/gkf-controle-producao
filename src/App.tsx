@@ -10,7 +10,6 @@ import { FluxoObrasTab } from './components/FluxoObrasTab';
 import { AuthModal } from './components/AuthModal';
 import { Toast } from './components/Toast';
 import { Loader2, Info } from 'lucide-react';
-import { DEFAULT_DIRECT_PROFILE } from './firebase';
 
 const AppContent: React.FC = () => {
   const { tab, setTab, loading, currentUser, userProfile, authChecked, canEdit, setUserProfile } =
