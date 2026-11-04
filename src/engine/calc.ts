@@ -66,9 +66,14 @@ export const per = (cfg: Config, frenteId: string) => {
   return (f && f.periodo) || cfg.periodo;
 };
 
-export const inP = (d: string | null | undefined, cfg: Config, frenteId: string): boolean => {
+export const inP = (
+  d: string | null | undefined,
+  cfg: Config,
+  frenteId: string,
+  customPeriod?: { ini: string; fim: string } | null
+): boolean => {
   if (!d) return false;
-  const p = per(cfg, frenteId);
+  const p = customPeriod || per(cfg, frenteId);
   return d >= p.ini && d <= p.fim;
 };
 
@@ -94,15 +99,17 @@ export function calcOSE(
   prm: Record<string, PrecoItem>,
   tpl: Record<string, Template>,
   memo?: Record<string, any>,
-  tplc?: Record<string, any>
+  tplc?: Record<string, any>,
+  customPeriod?: { ini: string; fim: string } | null
 ) {
-  if (memo && memo[o.id]) return memo[o.id];
+  const memoKey = customPeriod ? `${o.id}_${customPeriod.ini}_${customPeriod.fim}` : o.id;
+  if (memo && memo[memoKey]) return memo[memoKey];
   const tp = tpl[o.tipo];
   if (!tp) return { itens: [], total: 0 };
 
   const cacheTPLC = tplc || {};
   const C = cacheTPLC[o.tipo] || (cacheTPLC[o.tipo] = Motor.build(tp.cells));
-  const act = o.rows.filter((r) => !r.d || inP(r.d, cfg, frenteId));
+  const act = o.rows.filter((r) => !r.d || inP(r.d, cfg, frenteId, customPeriod));
   const cap = tp.r1 - tp.r0 + 1;
   const map: Record<string, number> = {};
 
@@ -193,7 +200,7 @@ export function calcOSE(
   });
 
   const res = { itens, total: round2(itens.reduce((t, x) => t + x.v, 0)) };
-  if (memo) memo[o.id] = res;
+  if (memo) memo[memoKey] = res;
   return res;
 }
 
