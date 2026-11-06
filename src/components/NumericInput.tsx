@@ -7,6 +7,7 @@ interface NumericInputProps {
   className?: string;
   placeholder?: string;
   disabled?: boolean;
+  title?: string;
   style?: React.CSSProperties;
 }
 
@@ -21,6 +22,7 @@ export const NumericInput: React.FC<NumericInputProps> = ({
   className = '',
   placeholder = '0,00',
   disabled = false,
+  title,
   style,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -62,6 +64,7 @@ export const NumericInput: React.FC<NumericInputProps> = ({
       onKeyDown={handleKeyDown}
       placeholder={placeholder}
       disabled={disabled}
+      title={title}
       style={style}
       className={className}
     />

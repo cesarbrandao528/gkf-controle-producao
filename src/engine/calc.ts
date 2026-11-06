@@ -139,15 +139,25 @@ export function calcOSE(
     });
   }
 
-  // DMT multiplier logic for Escavado (item 40608 = 40607 * dmtPo, item 40804 = 40801 * dmtSolo)
+  // DMT multiplier logic and custom formulas for Escavado
   if (o.tipo === 'ESC') {
     const dmtPo = o.dmtPo !== undefined && !isNaN(o.dmtPo) ? o.dmtPo : 5;
     const dmtSolo = o.dmtSolo !== undefined && !isNaN(o.dmtSolo) ? o.dmtSolo : 5;
+
+    // Fórmula solicitada: Item 40801 = (40201 + 40301 ou seja o volume total escavado - 40602)
+    const escManual = map['40201'] || 0;
+    const escMecanizada = map['40301'] || 0;
+    const reaterro = map['40602'] || 0;
+    const volumeBotaFora = Math.max(0, (escManual + escMecanizada) - reaterro);
+    map['40801'] = volumeBotaFora;
+
     if (map['40607']) {
       map['40608'] = map['40607'] * dmtPo;
     }
     if (map['40801']) {
       map['40804'] = map['40801'] * dmtSolo;
+    } else {
+      map['40804'] = 0;
     }
     delete map['60102']; // Retirar item 60102 do Escavado
     delete map['110101']; // Retirar item 110101 (Tomada de Água) do Escavado
@@ -326,6 +336,7 @@ export function calc(
 
   const L = c.L || 0;
   const fc = fechCt(c, cfg, ln);
+  const remSaida = remDe(c, cfg);
   const O =
     (c.O || 0) +
     remO(c, cfg) +
@@ -335,14 +346,20 @@ export function calc(
     remP(c, cfg) +
     fc.filter((x) => x.st === 'med').reduce((t, x) => t + fechTot(x, cfg, prm), 0);
 
-  const T = L - P > 0 ? L - P : 0;
-  const M = T > 0 ? (T - N - O < 0 ? T : N + O) : 0;
-  const Q = 'qo' in c && c.qo !== undefined ? c.qo : L - P > 0 ? 0 : P - L;
-  const R = T > 0 ? Math.max(L - N - P - O, 0) : 0;
-  const S = 'so' in c && c.so !== undefined ? c.so : L - N - O - P > 0 ? 0 : L - N - O - P;
+  const r2 = (n: number) => {
+    const v = Math.round((n + Number.EPSILON) * 100) / 100;
+    return Object.is(v, -0) || Math.abs(v) < 1e-9 ? 0 : v;
+  };
+  const T = r2(L - P > 0 ? L - P : 0);
+  const M = r2(T > 0 ? (T - N - O < 0 ? T : N + O) : 0);
+  const baseQ = 'qo' in c && c.qo !== undefined ? c.qo : L - P > 0 ? 0 : P - L;
+  const Q = r2(Math.max(0, baseQ - remSaida));
+  const R = r2(T > 0 ? Math.max(L - N - P - O, 0) : 0);
+  const baseS = 'so' in c && c.so !== undefined ? c.so : L - N - O - P > 0 ? 0 : L - N - O - P;
+  const S = r2(baseS < 0 ? Math.min(0, baseS + remSaida) : baseS);
   const U = M === 0 ? (N > 0 ? 1 : 0) : N / M;
 
-  return { N, M, Q, R, S, T, U, O, P };
+  return { N: r2(N), M, Q, R, S, T, U, O: r2(O), P: r2(P) };
 }
 
 const RX = /^(\d+)\/(\d{4})$/;

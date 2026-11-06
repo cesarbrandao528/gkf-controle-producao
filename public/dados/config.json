@@ -1,1 +1,1386 @@
-{"periodo":{"ini":"2026-10-21","fim":"2026-11-20"},"k":0.015453381788878166,"precos":[{"c":"20201","d":"PESQUISA DE INTERFERÊNCIAS","u":"m³","p":81.23,"q":3000},{"c":"20301","d":"LOCAÇÃO E NIVELAMENTO DE REDES DE ÁGUA E ADUTORAS","u":"m","p":1.3,"q":150000},{"c":"20401","d":"CADASTRO DE ADUTORA","u":"m","p":1.72,"q":50000},{"c":"20402","d":"CADASTRO DE REDE DE ÁGUA","u":"m","p":1.01,"q":100000},{"c":"30205","d":"PASSADIÇOS COM CHAPAS  DE AÇO","u":"m²","p":7.248,"q":2500},{"c":"30207","d":"SINALIZAÇÃO DE TRÂNSITO, COM PLACAS","u":"m²","p":16.58,"q":1000},{"c":"30208","d":"FITA PLÁSTICA","u":"m","p":0.28,"q":35000},{"c":"30209","d":"CERCA COM TELA TAPUME","u":"m","p":0.87,"q":35000},{"c":"30502","d":"DEMOLIÇÃO  DE CONCRETO ARMADO OU SIMPLES, COM EQUIPAMENTO","u":"m³","p":267.23,"q":80},{"c":"40201","d":"ESCAVAÇÃO MANUAL DE ÁREAS, VALAS, POÇOS E CAVAS EM SOLO NÃO ROCHOSO, COM PROFUND. ATÉ 1,25 M","u":"m³","p":51.289,"q":20000},{"c":"40301","d":"ESCAVAÇÃO MECANIZADA DE VALAS, POÇOS E CAVAS EM SOLO NÃO ROCHOSO, COM PROFUND DE ATÉ 1,25 M","u":"m³","p":9.99,"q":70000},{"c":"40302","d":"ESCAVAÇÃO MECANIZADA DE VALAS, POÇOS E CAVAS EM SOLO NÃO ROCHOSO, COM PROFUND. DE 0,00 A 2,00 M","u":"m³","p":12.2,"q":2000},{"c":"40402","d":"ESCAVAÇÃO DE ROCHA COMPACTA A  FRIO, EM VALAS, POÇOS E CAVAS","u":"m³","p":395.7689,"q":1000},{"c":"40403","d":"ESCAVAÇÃO EM ROCHA BRANDA A FRIO, EM VALAS, POÇOS E CAVAS","u":"m³","p":311.81,"q":1000},{"c":"40602","d":"ATERRO/REATERRO DE VALAS, POÇOS E CAVAS COMPACTADO MECANICAMENTE, SEM CONTROLE DO G.C.","u":"m³","p":13.18,"q":40000},{"c":"40607","d":"ATERRO/REATERRO DE VALAS, POÇOS E CAVAS, COM FORN. DE AREIA/PÓ DE PEDRA, G.C.>=100%, SEM TRANSPORTE","u":"m³","p":164.83,"q":34000},{"c":"40608","d":"TRANSPORTE DE AREIA / PÓ DE PEDRA PARA ATERRO","u":"m³xKm","p":2.18,"q":340000},{"c":"40801","d":"CARGA  E DESCARGA - SOLO","u":"m³","p":2.39,"q":34000},{"c":"40802","d":"CARGA E DESCARGA - ROCHA","u":"m³","p":3.11,"q":2000},{"c":"40803","d":"CARGA E DESCARGA - ENTULHO","u":"m³","p":3.11,"q":6000},{"c":"40804","d":"TRANSPORTE DE MATERIAL ESCAVADO - SOLO","u":"m³xKm","p":1.344,"q":170000},{"c":"40805","d":"TRANSPORTE DE MATERIAL ESCAVADO - ROCHA","u":"m³xKm","p":2.5,"q":10000},{"c":"40806","d":"TRANSPORTE DE MATERIAL - ENTULHO","u":"m³xKm","p":2.5,"q":30000},{"c":"50601","d":"PONTALETEAMENTO","u":"m²","p":16.51408,"q":1000},{"c":"50602","d":"ESCORAMENTO COM BLINDADO LEVE","u":"m²","p":20.145,"q":2000},{"c":"60102","d":"CONJUNTO MOTO-BOMBA","u":"h","p":13.23,"q":3000},{"c":"80404","d":"LASTRO DE PÓ DE PEDRA","u":"m³","p":160.28,"q":400},{"c":"80804","d":"TELA DE ACO CA-60","u":"kg","p":13.41,"q":1},{"c":"81004","d":"CONCRETO ESTRUTURAL, FCK = 25,0 MPA","u":"m³","p":769.35,"q":1},{"c":"81801","d":"CAIXA DE PROTEÇÃO PARA REGISTRO DE MANOBRA","u":"un","p":569.03,"q":250},{"c":"81806","d":"CAIXA DE PROTEÇÃO P/ DESCARGA, DIÂM.  ATÉ  200 MM, COM PROFUNDIDADE ATÉ 2,00 M","u":"un","p":1985.022,"q":250},{"c":"82007","d":"CAIXA DE TIJOLOS MACIÇOS DE 1/2 VEZ, DE 1,00 X 1,00 M, ATÉ 0,50 M","u":"un","p":612.82,"q":30},{"c":"82009","d":"CAIXA DE TIJOLOS MACIÇOS DE 1/2 VEZ, DE 1,00 X 1,20 M, ATÉ 0,50 M","u":"un","p":685.18,"q":30},{"c":"82016","d":"ACRÉSCIMO DE ALVENARIA DE 1/2 VEZ, PARA CAIXA DE 1,00 X 1,00 M","u":"m","p":665.08,"q":20},{"c":"82018","d":"ACRÉSCIMO DE ALVENARIA DE 1/2 VEZ, PARA CAIXA DE 1,00 X 1,20 M","u":"m","p":725.77,"q":20},{"c":"82109","d":"BOCA DE LOBO","u":"un","p":1930.84,"q":50},{"c":"82110","d":"TAMPA EM CONCRETO ARMADO","u":"m³","p":2540.29,"q":20},{"c":"82113","d":"ASSENTAMENTO DE CAIXA FOFO PARA REGISTRO T- 5","u":"un","p":65.38,"q":250},{"c":"90501","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,   J.E.,   DN 50 MM","u":"m","p":1.87,"q":30000},{"c":"90502","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,   J.E.,   DN 75 MM","u":"m","p":1.93,"q":20000},{"c":"90503","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,  J.E.,  DN 100 MM","u":"m","p":1.99,"q":30000},{"c":"90504","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,  J.E.,  DN 150 MM","u":"m","p":2.34,"q":15000},{"c":"90505","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,  J.E.,  DN 200 MM","u":"m","p":2.52,"q":10000},{"c":"90506","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,  J.E.,  DN 250 MM","u":"m","p":2.69,"q":10000},{"c":"90507","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,  J.E.,  DN 300 MM","u":"m","p":2.98,"q":10000},{"c":"90608","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 160 MM","u":"m","p":14.175,"q":15000},{"c":"90611","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 225 MM","u":"m","p":18.34,"q":15000},{"c":"90613","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 280 MM","u":"m","p":21.728,"q":15000},{"c":"90615","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 63 MM (ROLO)","u":"m","p":3.34,"q":80000},{"c":"90617","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 90 MM (ROLO)","u":"m","p":3.76,"q":50000},{"c":"90618","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 110 MM (ROLO)","u":"m","p":3.072,"q":80000},{"c":"90701","d":"ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 315 MM","u":"m","p":20.718,"q":15000},{"c":"91402","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 50 MM","u":"m","p":0.58,"q":30000},{"c":"91403","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 75 MM","u":"m","p":0.82,"q":20000},{"c":"91404","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 100 MM","u":"m","p":0.9,"q":30000},{"c":"91405","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 150 MM","u":"m","p":1.37,"q":15000},{"c":"91406","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 200 MM","u":"m","p":1.81,"q":10000},{"c":"91407","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 250 MM","u":"m","p":2.26,"q":10000},{"c":"91408","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 300 MM","u":"m","p":2.73,"q":10000},{"c":"91603","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 63 MM","u":"m","p":0.58,"q":80000},{"c":"91605","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 90 MM","u":"m","p":0.89,"q":50000},{"c":"91606","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 110 MM","u":"m","p":1.04,"q":80000},{"c":"91609","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 160 MM","u":"m","p":1.47,"q":15000},{"c":"91612","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 225 MM","u":"m","p":2.05,"q":15000},{"c":"91614","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 280 MM","u":"m","p":2.64,"q":15000},{"c":"91615","d":"CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 315 MM","u":"m","p":2.93,"q":15000},{"c":"100101","d":"REMOÇÃO DE PAVIMENTAÇÃO ASFALTICA","u":"m²","p":23.3155,"q":20000},{"c":"100102","d":"REMOÇÃO DE PAVIMENTAÇÃO ASFALTICA COM BASE DE PEDRA IRREGULAR, PARALELEPÍPEDO, OU LAJOTA","u":"m²","p":28.8,"q":7000},{"c":"100103","d":"REMOÇÃO DE PAVIMENTAÇÃO EM PARALELEPIPEDO OU LAJOTA SEXTAVADA","u":"m²","p":11.3175,"q":60000},{"c":"100104","d":"REMOÇÃO DE PAVIMENTAÇÃO EM  PEDRA IRREGULAR","u":"m²","p":15.09,"q":2000},{"c":"100105","d":"REMOÇÃO DE PAVIMENTAÇÃO EM PLACAS DE CONCRETO","u":"m²","p":11.61,"q":4500},{"c":"100107","d":"REMOÇÃO DE PASSEIO EM LADRILHO HIDRAULICO OU CERÂMICO","u":"m²","p":7.845,"q":45000},{"c":"100108","d":"REMOÇÃO DE PASSEIO CIMENTADO","u":"m²","p":6.975,"q":45000},{"c":"100109","d":"REMOÇÃO DE MEIO-FIO","u":"m","p":8.12,"q":2000},{"c":"100110","d":"REMOÇÃO DE SARJETAS","u":"m³","p":93.85,"q":200},{"c":"100111","d":"REMOÇÃO DE PASSEIO COM GRAMA","u":"m²","p":6.98,"q":12000},{"c":"100112","d":"CORTE DE PAVIMENTAÇÃO ASFALTICA COM ESPESSURA ATÉ 0,10M","u":"m","p":2.247,"q":60000},{"c":"100113","d":"REMOÇÃO DE PAVIMENTAÇÃO EM BLOCO DE CONCRETO INTERTRAVADO TIPO PAVER","u":"m²","p":15.09,"q":5000},{"c":"100201","d":"REPOSIÇÃO DE PAVIMENTAÇÃO EM PARALELEPIPEDO OU PEDRA IRREGULAR","u":"m²","p":61.616,"q":30000},{"c":"100202","d":"FORNECIMENTO DE PARALELEPIPEDO","u":"m²","p":101.96,"q":1500},{"c":"100203","d":"REPOSIÇÃO DE PAVIMENTAÇÃO EM LAJOTA SEXTAVADA","u":"m²","p":22.872,"q":30000},{"c":"100204","d":"FORNECIMENTO DE LAJOTA SEXTAVADA","u":"m²","p":82.99,"q":3000},{"c":"100205","d":"REPOSIÇÃO DE PAVIMENTAÇÃO EM PLACAS DE CONCRETO","u":"m²","p":42.9,"q":4500},{"c":"100206","d":"FORNECIMENTO DE PLACAS DE CONCRETO","u":"m²","p":94.73,"q":500},{"c":"100209","d":"REPOSIÇÃO DE PASSEIO EM LADRILHO HIDRAULICO OU CERÂMICO","u":"m²","p":65.1,"q":45000},{"c":"100210","d":"FORNECIMENTO DE LADRILHO HIDRAULICO OU CERÂMICO","u":"m²","p":76.83,"q":5000},{"c":"100211","d":"REPOSIÇÃO DE PASSEIO CIMENTADO","u":"m²","p":76.94,"q":45000},{"c":"100212","d":"REPOSIÇÃO DE MEIO-FIO","u":"m","p":26.33,"q":2000},{"c":"100213","d":"FORNECIMENTO DE MEIO-FIO","u":"m","p":38.23,"q":300},{"c":"100214","d":"REPOSIÇÃO DE SARJETA","u":"m³","p":746.921,"q":200},{"c":"100215","d":"REPOSIÇÃO DE PASSEIO COM GRAMA","u":"m²","p":21.96,"q":12000},{"c":"100216","d":"REPOSIÇÃO DE PAVIMENTAÇÃO EM BLOCO DE CONCRETO INTERTRAVADO TIPO PAVER","u":"m²","p":61.616,"q":5000},{"c":"100217","d":"FORNECIMENTO DE BLOCO DE CONCRETO INTERTRAVADO TIPO PAVER","u":"m²","p":82.99,"q":500},{"c":"100303","d":"EXECUÇÃO DE IMPRIMAÇÃO LIGANTE","u":"m²","p":9.2925,"q":27000},{"c":"100308","d":"TRANSPORTE DE CONCRETO ASFÁLTICO USINADO À QUENTE - CAUQ","u":"txKm","p":0.99,"q":97200},{"c":"100310","d":"TRANSPORTE DE BICA CORRIDA","u":"m³xKm","p":2.36,"q":15000},{"c":"100311","d":"EXECUÇÃO DE PINTURA DE LIGAÇÃO","u":"m²","p":3.22,"q":27000},{"c":"100312","d":"EXECUÇÃO DE CAUQ EM VALA COM LARGURA <= 2,00 M","u":"t","p":709.416,"q":3900},{"c":"100316","d":"EXECUÇÃO DE SUB-BASE/REFORÇO DE SUBLEITO EM BICA CORRIDA, COM CONTROLE DO G.C.=100%, SEM TRANSPORTE","u":"m³","p":135.8045,"q":5400},{"c":"100403","d":"REVESTIMENTO COM BRITA","u":"m³","p":135.78,"q":1000},{"c":"100404","d":"REVESTIMENTO COM PEDRISCO","u":"m³","p":155.75,"q":1000},{"c":"100406","d":"REVESTIMENTO COM BICA CORRIDA, SEM TRANSPORTE","u":"m³","p":126.66,"q":1000},{"c":"110101","d":"TOMADA DE ÁGUA","u":"un","p":34.785,"q":12000},{"c":"110102","d":"RAMAL PREDIAL DE ÁGUA","u":"m","p":13.408,"q":36000},{"c":"MND63","d":"CRAVAÇÃO EM MND PEAD DE 63","u":"m","p":179.5,"q":20000},{"c":"MND90","d":"CRAVAÇÃO EM MND PEAD DE 90","u":"m","p":197.15,"q":20000},{"c":"MND110","d":"CRAVAÇÃO EM MND PEAD DE 110","u":"m","p":249.1,"q":20000},{"c":"MND160","d":"CRAVAÇÃO EM MND PEAD DE 160","u":"m","p":374.73,"q":15000},{"c":"MND225","d":"CRAVAÇÃO EM MND PEAD DE 225","u":"m","p":492.28,"q":15000},{"c":"MND280","d":"CRAVAÇÃO EM MND PEAD DE 280","u":"m","p":650.36,"q":20000},{"c":"MND315","d":"CRAVAÇÃO EM MND PEAD DE 315","u":"m","p":872.34,"q":20000},{"c":"170305","d":"INTERLIGAÇÃO COM REDE DE F°F°, DIÂMETRO 200 MM","u":"un","p":662.51,"q":30},{"c":"170306","d":"INTERLIGAÇÃO COM REDE DE F°F°, DIÂMETRO 250 MM","u":"un","p":798.86,"q":50},{"c":"170307","d":"INTERLIGAÇÃO COM REDE DE F°F°, DIÂMETRO 300 MM","u":"un","p":854.33,"q":50},{"c":"170308","d":"INTERLIGAÇÃO COM REDE DE F°F°, DIÂMETRO 350 MM OU 400 MM","u":"un","p":1088.29,"q":20},{"c":"170314","d":"INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 50 MM","u":"un","p":391.32,"q":50},{"c":"170315","d":"INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 75 MM","u":"un","p":406.4,"q":50},{"c":"170316","d":"INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 100 MM","u":"un","p":421.04,"q":100},{"c":"170317","d":"INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 125 MM A 150 MM","u":"un","p":491.31,"q":150},{"c":"170318","d":"INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 200 MM","u":"un","p":319.32,"q":150},{"c":"170319","d":"INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 250 MM","u":"un","p":451.073,"q":100},{"c":"170320","d":"INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 300 MM","u":"un","p":419.682,"q":100},{"c":"191412","d":"RECOMPOSIÇÃO PROVISÓRIA EM LAJOTA OU PAVER PELA MANUTENÇÃO PARA INTERVENÇÕES EM ASFALTO","u":"m²","p":72.51495,"q":3000}],"contratos":[{"id":"r8","n":"4072/2026","obra":"Pouso Redondo - SC","L":430000.0,"O":0.0,"P":430000.0,"nl":0.0,"p":"Rio do Sul","di":"2026-04-17","df":"2026-10-11","resp":"-"},{"id":"r9","n":"4299/2026","obra":"Apiúna - SC","L":166892.52,"O":0.0,"P":165670.66,"nl":0.0,"p":"Rio do Sul","di":"2026-09-16","df":"2027-03-15","resp":"FÁBIO"},{"id":"r10","n":"4084/2026","obra":"Indaial - SC","L":415000.0,"O":0.0,"P":415260.57,"nl":0.0,"p":"Rio do Sul","di":"2026-04-17","df":"2026-10-14","resp":"EDISON"},{"id":"r11","n":"4130/2026","obra":"Indaial","L":1000000.0,"O":0.0,"P":1000344.2,"nl":0.0,"p":"Rio do Sul","di":"2026-05-20","df":"2026-11-16","resp":""},{"id":"r12","n":"4281/2026","obra":"Indaial","L":1122528.48,"O":0.0,"P":1122528.48,"nl":0.0,"p":"Rio do Sul","di":"2026-09-04","df":"2027-03-03","resp":""},{"id":"r13","n":"4063/2026","obra":"Rio do Sul - SC","L":415000.0,"O":0.0,"P":415000.0,"nl":0.0,"p":"Rio do Sul","di":"2026-04-14","df":"2026-10-11","resp":"ACIR"},{"id":"r14","n":"4161/2026","obra":"Rio do Sul","L":500000.0,"O":0.0,"P":510670.99,"nl":0.0,"p":"Rio do Sul","di":"2026-06-03","df":"2026-11-30","resp":"","qo":0.0,"so":0.0},{"id":"r15","n":"4184/2026","obra":"Rio do Sul","L":600000.0,"O":0.0,"P":608662.62,"nl":0.0,"p":"Rio do Sul","di":"2026-07-03","df":"2026-12-30","resp":"","qo":0.0,"so":0.0},{"id":"r16","n":"4270/2026","obra":"Rio do Sul","L":1008321.63,"O":0.0,"P":1008496.54,"nl":0.0,"p":"Rio do Sul","di":"2026-09-01","df":"2027-02-28","resp":""},{"id":"r17","n":"4316/2026","obra":"Rio do Sul","L":1130371.63,"O":320000.0,"P":818203.77,"nl":0.0,"p":"Rio do Sul","di":"2026-09-24","df":"2027-03-23","resp":""},{"id":"r18","n":"4073/2026","obra":"Vitor Meireles - SC","L":550000.0,"O":0.0,"P":690541.41,"nl":0.0,"p":"Rio do Sul","di":"2026-04-17","df":"2026-10-14","resp":"DINOEL","qo":0.0,"so":0.0},{"id":"r19","n":"4182/2026","obra":"Vitor Meireles","L":212920.94,"O":0.0,"P":174424.15,"nl":0.0,"p":"Rio do Sul","di":"2026-06-29","df":"2026-12-26","resp":""},{"id":"r20","n":"Aguardando","obra":"Ascurra - SC","L":0.0,"O":119073.93,"P":0.0,"nl":0.0,"p":"Rio do Sul","di":null,"df":null,"resp":"FÁBIO"},{"id":"r21","n":"4061/2026","obra":"São Cristovão - SC","L":110000.0,"O":0.0,"P":42458.06,"nl":0.0,"p":"Rio do Sul","di":"2026-04-14","df":"2026-10-11","resp":"-"},{"id":"r22","n":"4146/2026","obra":"Lontras - SC","L":700000.0,"O":0.0,"P":703848.81,"nl":0.0,"p":"Rio do Sul","di":"2026-05-28","df":"2026-11-24","resp":"DINOEL"},{"id":"r23","n":"4254/2026","obra":"Lontras","L":1044719.68,"O":0.0,"P":993898.58,"nl":2190.84,"p":"Rio do Sul","di":"2026-08-20","df":"2027-02-16","resp":""},{"id":"r24","n":"4189/2026","obra":"Trombudo Central - SC","L":350000.0,"O":0.0,"P":350000.0,"nl":0.0,"p":"Rio do Sul","di":"2026-07-06","df":"2027-01-02","resp":"DINOEL"},{"id":"r25","n":"Aguardando","obra":"Trombudo Central","L":0.0,"O":334197.6,"P":0.0,"nl":0.0,"p":"Rio do Sul","di":null,"df":null,"resp":""},{"id":"r26","n":"4181/2026","obra":"José Boiteux - SC","L":525000.0,"O":0.0,"P":704159.68,"nl":0.0,"p":"Rio do Sul","di":"2026-06-29","df":"2026-12-26","resp":"DINOEL","qo":0.0,"so":0.0},{"id":"r27","n":"4282/2026","obra":"José Boiteux","L":469393.69,"O":161573.19,"P":480260.77,"nl":0.0,"p":"Rio do Sul","di":"2026-09-08","df":"2027-03-07","resp":""},{"id":"r28","n":"4181/2026","obra":"Ibirama - SC","L":450000.0,"O":0.0,"P":450000.0,"nl":0.0,"p":"Rio do Sul","di":"2026-06-29","df":"2026-12-26","resp":"DINOEL"},{"id":"r30","n":"4181/2026","obra":"Rodeio - SC","L":450000.0,"O":22146.28,"P":371916.43,"nl":0.0,"p":"Rio do Sul","di":"2026-06-29","df":"2026-12-26","resp":"DINOEL"},{"id":"r31","n":"4183/2026","obra":"Dr. Pedrinho","L":200000.0,"O":0.0,"P":0.0,"nl":0.0,"p":"Rio do Sul","di":"2026-06-29","df":"2026-12-26","resp":"FÁBIO"},{"id":"r32","n":"4131/2026","obra":"Petrolândia - SC","L":200000.0,"O":0.0,"P":209943.97,"nl":0.0,"p":"Rio do Sul","di":"2026-05-20","df":"2026-11-16","resp":"FÁBIO","qo":0.0,"so":0.0},{"id":"r33","n":"Aguardando","obra":"Santa Terezinha","L":0.0,"O":299839.62,"P":0.0,"nl":0.0,"p":"Rio do Sul","di":null,"df":null,"resp":"DINOEL"},{"id":"r34","n":"Aguardando","obra":"Benedito Novo","L":0.0,"O":353878.8,"P":0.0,"nl":0.0,"p":"Rio do Sul","di":null,"df":null,"resp":"FÁBIO"},{"id":"r35","n":"Aguardando","obra":"Presidente Nereu","L":0.0,"O":262778.76,"P":0.0,"nl":0.0,"p":"Rio do Sul","di":null,"df":null,"resp":"DINOEL"},{"id":"n4332","n":"4332/2026","obra":"Petrolândia","L":246731.36,"O":0.0,"P":246731.36,"nl":0.0,"p":"Rio do Sul","di":"2026-09-28","df":"2027-03-27","resp":"DINOEL","qo":0.0,"so":0.0},{"id":"n4341","n":"4341/2026","obra":"Ibirama","L":598391.27,"O":0.0,"P":352171.41,"nl":7783.45,"p":"Rio do Sul","di":"2026-10-06","df":"2027-04-04","resp":""},{"id":"aimbuia","n":"Aguardando","obra":"Imbuia","L":0.0,"P":0.0,"O":84810.18,"nl":0.0,"p":"Rio do Sul","resp":"DINOEL"},{"id":"apousoredondo","n":"Aguardando","obra":"Pouso Redondo","L":0.0,"P":0.0,"O":108762.14,"nl":0.0,"p":"Rio do Sul","resp":"DINOEL"},{"id":"aindaial","n":"Aguardando","obra":"Indaial","L":0.0,"P":0.0,"O":48637.95,"nl":2677.45,"p":"Rio do Sul","resp":"DINOEL"},{"id":"aapiuna","n":"Aguardando","obra":"Apiúna","L":0.0,"P":0.0,"O":120069.66,"nl":0.0,"p":"Rio do Sul","resp":"DINOEL"}],"frentes":[{"id":"rio_do_sul","nome":"Rio do Sul","contrato":"r17","oses":["OSE 01 63mm Pedro Américo MND","OSE 02 63mm Rua Henrique D.","OSE 03 63mm Soldatelli MND","OSE 04 63mm Rua Henrique D.","OSE 05 63mm Lauro Muller","OSE 06 63mm R. Terezinha M.","OSE 07 63mm R. Ercílio M.","OSE 08 63mm R. jose Cimardi","OSE 09 63mm R. Durval V.","Reposição de Pav. - Demétrio F.","Reposição de Pav. - Lauro F."]},{"id":"apiuna","nome":"Apiúna","contrato":"","oses":["OSE 01 XXXXXXXXX MND"]},{"id":"ibirama","nome":"Ibirama","contrato":"n4341","oses":["OSE 01 ADUTORA ESC 250mm","OSE 02 63mm - SC-340 - MND","OSE 03 63mm - Anita G. - MND"]},{"id":"presidente_nereu","nome":"Presidente Nereu","contrato":"r35","oses":["OSE 01 63mm - 110mm | Rodovia"]}],"equipes":[],"rem":[]}
+{
+  "periodo": {
+    "ini": "2026-10-21",
+    "fim": "2026-11-20"
+  },
+  "k": 0.015453381788878166,
+  "precos": [
+    {
+      "c": "20201",
+      "d": "PESQUISA DE INTERFERÊNCIAS",
+      "u": "m³",
+      "p": 81.23,
+      "q": 3000
+    },
+    {
+      "c": "20301",
+      "d": "LOCAÇÃO E NIVELAMENTO DE REDES DE ÁGUA E ADUTORAS",
+      "u": "m",
+      "p": 1.3,
+      "q": 150000
+    },
+    {
+      "c": "20401",
+      "d": "CADASTRO DE ADUTORA",
+      "u": "m",
+      "p": 1.72,
+      "q": 50000
+    },
+    {
+      "c": "20402",
+      "d": "CADASTRO DE REDE DE ÁGUA",
+      "u": "m",
+      "p": 1.01,
+      "q": 100000
+    },
+    {
+      "c": "30205",
+      "d": "PASSADIÇOS COM CHAPAS  DE AÇO",
+      "u": "m²",
+      "p": 7.248,
+      "q": 2500
+    },
+    {
+      "c": "30207",
+      "d": "SINALIZAÇÃO DE TRÂNSITO, COM PLACAS",
+      "u": "m²",
+      "p": 16.58,
+      "q": 1000
+    },
+    {
+      "c": "30208",
+      "d": "FITA PLÁSTICA",
+      "u": "m",
+      "p": 0.28,
+      "q": 35000
+    },
+    {
+      "c": "30209",
+      "d": "CERCA COM TELA TAPUME",
+      "u": "m",
+      "p": 0.87,
+      "q": 35000
+    },
+    {
+      "c": "30502",
+      "d": "DEMOLIÇÃO  DE CONCRETO ARMADO OU SIMPLES, COM EQUIPAMENTO",
+      "u": "m³",
+      "p": 267.23,
+      "q": 80
+    },
+    {
+      "c": "40201",
+      "d": "ESCAVAÇÃO MANUAL DE ÁREAS, VALAS, POÇOS E CAVAS EM SOLO NÃO ROCHOSO, COM PROFUND. ATÉ 1,25 M",
+      "u": "m³",
+      "p": 51.289,
+      "q": 20000
+    },
+    {
+      "c": "40301",
+      "d": "ESCAVAÇÃO MECANIZADA DE VALAS, POÇOS E CAVAS EM SOLO NÃO ROCHOSO, COM PROFUND DE ATÉ 1,25 M",
+      "u": "m³",
+      "p": 9.99,
+      "q": 70000
+    },
+    {
+      "c": "40302",
+      "d": "ESCAVAÇÃO MECANIZADA DE VALAS, POÇOS E CAVAS EM SOLO NÃO ROCHOSO, COM PROFUND. DE 0,00 A 2,00 M",
+      "u": "m³",
+      "p": 12.2,
+      "q": 2000
+    },
+    {
+      "c": "40402",
+      "d": "ESCAVAÇÃO DE ROCHA COMPACTA A  FRIO, EM VALAS, POÇOS E CAVAS",
+      "u": "m³",
+      "p": 395.7689,
+      "q": 1000
+    },
+    {
+      "c": "40403",
+      "d": "ESCAVAÇÃO EM ROCHA BRANDA A FRIO, EM VALAS, POÇOS E CAVAS",
+      "u": "m³",
+      "p": 311.81,
+      "q": 1000
+    },
+    {
+      "c": "40602",
+      "d": "ATERRO/REATERRO DE VALAS, POÇOS E CAVAS COMPACTADO MECANICAMENTE, SEM CONTROLE DO G.C.",
+      "u": "m³",
+      "p": 13.18,
+      "q": 40000
+    },
+    {
+      "c": "40607",
+      "d": "ATERRO/REATERRO DE VALAS, POÇOS E CAVAS, COM FORN. DE AREIA/PÓ DE PEDRA, G.C.>=100%, SEM TRANSPORTE",
+      "u": "m³",
+      "p": 164.83,
+      "q": 34000
+    },
+    {
+      "c": "40608",
+      "d": "TRANSPORTE DE AREIA / PÓ DE PEDRA PARA ATERRO",
+      "u": "m³xKm",
+      "p": 2.18,
+      "q": 340000
+    },
+    {
+      "c": "40801",
+      "d": "CARGA  E DESCARGA - SOLO",
+      "u": "m³",
+      "p": 2.39,
+      "q": 34000
+    },
+    {
+      "c": "40802",
+      "d": "CARGA E DESCARGA - ROCHA",
+      "u": "m³",
+      "p": 3.11,
+      "q": 2000
+    },
+    {
+      "c": "40803",
+      "d": "CARGA E DESCARGA - ENTULHO",
+      "u": "m³",
+      "p": 3.11,
+      "q": 6000
+    },
+    {
+      "c": "40804",
+      "d": "TRANSPORTE DE MATERIAL ESCAVADO - SOLO",
+      "u": "m³xKm",
+      "p": 1.344,
+      "q": 170000
+    },
+    {
+      "c": "40805",
+      "d": "TRANSPORTE DE MATERIAL ESCAVADO - ROCHA",
+      "u": "m³xKm",
+      "p": 2.5,
+      "q": 10000
+    },
+    {
+      "c": "40806",
+      "d": "TRANSPORTE DE MATERIAL - ENTULHO",
+      "u": "m³xKm",
+      "p": 2.5,
+      "q": 30000
+    },
+    {
+      "c": "50601",
+      "d": "PONTALETEAMENTO",
+      "u": "m²",
+      "p": 16.51408,
+      "q": 1000
+    },
+    {
+      "c": "50602",
+      "d": "ESCORAMENTO COM BLINDADO LEVE",
+      "u": "m²",
+      "p": 20.145,
+      "q": 2000
+    },
+    {
+      "c": "60102",
+      "d": "CONJUNTO MOTO-BOMBA",
+      "u": "h",
+      "p": 13.23,
+      "q": 3000
+    },
+    {
+      "c": "80404",
+      "d": "LASTRO DE PÓ DE PEDRA",
+      "u": "m³",
+      "p": 160.28,
+      "q": 400
+    },
+    {
+      "c": "80804",
+      "d": "TELA DE ACO CA-60",
+      "u": "kg",
+      "p": 13.41,
+      "q": 1
+    },
+    {
+      "c": "81004",
+      "d": "CONCRETO ESTRUTURAL, FCK = 25,0 MPA",
+      "u": "m³",
+      "p": 769.35,
+      "q": 1
+    },
+    {
+      "c": "81801",
+      "d": "CAIXA DE PROTEÇÃO PARA REGISTRO DE MANOBRA",
+      "u": "un",
+      "p": 569.03,
+      "q": 250
+    },
+    {
+      "c": "81806",
+      "d": "CAIXA DE PROTEÇÃO P/ DESCARGA, DIÂM.  ATÉ  200 MM, COM PROFUNDIDADE ATÉ 2,00 M",
+      "u": "un",
+      "p": 1985.022,
+      "q": 250
+    },
+    {
+      "c": "82007",
+      "d": "CAIXA DE TIJOLOS MACIÇOS DE 1/2 VEZ, DE 1,00 X 1,00 M, ATÉ 0,50 M",
+      "u": "un",
+      "p": 612.82,
+      "q": 30
+    },
+    {
+      "c": "82009",
+      "d": "CAIXA DE TIJOLOS MACIÇOS DE 1/2 VEZ, DE 1,00 X 1,20 M, ATÉ 0,50 M",
+      "u": "un",
+      "p": 685.18,
+      "q": 30
+    },
+    {
+      "c": "82016",
+      "d": "ACRÉSCIMO DE ALVENARIA DE 1/2 VEZ, PARA CAIXA DE 1,00 X 1,00 M",
+      "u": "m",
+      "p": 665.08,
+      "q": 20
+    },
+    {
+      "c": "82018",
+      "d": "ACRÉSCIMO DE ALVENARIA DE 1/2 VEZ, PARA CAIXA DE 1,00 X 1,20 M",
+      "u": "m",
+      "p": 725.77,
+      "q": 20
+    },
+    {
+      "c": "82109",
+      "d": "BOCA DE LOBO",
+      "u": "un",
+      "p": 1930.84,
+      "q": 50
+    },
+    {
+      "c": "82110",
+      "d": "TAMPA EM CONCRETO ARMADO",
+      "u": "m³",
+      "p": 2540.29,
+      "q": 20
+    },
+    {
+      "c": "82113",
+      "d": "ASSENTAMENTO DE CAIXA FOFO PARA REGISTRO T- 5",
+      "u": "un",
+      "p": 65.38,
+      "q": 250
+    },
+    {
+      "c": "90501",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,   J.E.,   DN 50 MM",
+      "u": "m",
+      "p": 1.87,
+      "q": 30000
+    },
+    {
+      "c": "90502",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,   J.E.,   DN 75 MM",
+      "u": "m",
+      "p": 1.93,
+      "q": 20000
+    },
+    {
+      "c": "90503",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,  J.E.,  DN 100 MM",
+      "u": "m",
+      "p": 1.99,
+      "q": 30000
+    },
+    {
+      "c": "90504",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,  J.E.,  DN 150 MM",
+      "u": "m",
+      "p": 2.34,
+      "q": 15000
+    },
+    {
+      "c": "90505",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,  J.E.,  DN 200 MM",
+      "u": "m",
+      "p": 2.52,
+      "q": 10000
+    },
+    {
+      "c": "90506",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,  J.E.,  DN 250 MM",
+      "u": "m",
+      "p": 2.69,
+      "q": 10000
+    },
+    {
+      "c": "90507",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PVC, RPVC, PVC  DEFºFº, PRFV,  J.E.,  DN 300 MM",
+      "u": "m",
+      "p": 2.98,
+      "q": 10000
+    },
+    {
+      "c": "90608",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 160 MM",
+      "u": "m",
+      "p": 14.175,
+      "q": 15000
+    },
+    {
+      "c": "90611",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 225 MM",
+      "u": "m",
+      "p": 18.34,
+      "q": 15000
+    },
+    {
+      "c": "90613",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 280 MM",
+      "u": "m",
+      "p": 21.728,
+      "q": 15000
+    },
+    {
+      "c": "90615",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 63 MM (ROLO)",
+      "u": "m",
+      "p": 3.34,
+      "q": 80000
+    },
+    {
+      "c": "90617",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 90 MM (ROLO)",
+      "u": "m",
+      "p": 3.76,
+      "q": 50000
+    },
+    {
+      "c": "90618",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 110 MM (ROLO)",
+      "u": "m",
+      "p": 3.072,
+      "q": 80000
+    },
+    {
+      "c": "90701",
+      "d": "ASSENTAMENTO DE TUBOS E CONEXÕES EM PEAD, DE 315 MM",
+      "u": "m",
+      "p": 20.718,
+      "q": 15000
+    },
+    {
+      "c": "91402",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 50 MM",
+      "u": "m",
+      "p": 0.58,
+      "q": 30000
+    },
+    {
+      "c": "91403",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 75 MM",
+      "u": "m",
+      "p": 0.82,
+      "q": 20000
+    },
+    {
+      "c": "91404",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 100 MM",
+      "u": "m",
+      "p": 0.9,
+      "q": 30000
+    },
+    {
+      "c": "91405",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 150 MM",
+      "u": "m",
+      "p": 1.37,
+      "q": 15000
+    },
+    {
+      "c": "91406",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 200 MM",
+      "u": "m",
+      "p": 1.81,
+      "q": 10000
+    },
+    {
+      "c": "91407",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 250 MM",
+      "u": "m",
+      "p": 2.26,
+      "q": 10000
+    },
+    {
+      "c": "91408",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PVC, RPVC, PVC DEFºFº, PRFV DN 300 MM",
+      "u": "m",
+      "p": 2.73,
+      "q": 10000
+    },
+    {
+      "c": "91603",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 63 MM",
+      "u": "m",
+      "p": 0.58,
+      "q": 80000
+    },
+    {
+      "c": "91605",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 90 MM",
+      "u": "m",
+      "p": 0.89,
+      "q": 50000
+    },
+    {
+      "c": "91606",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 110 MM",
+      "u": "m",
+      "p": 1.04,
+      "q": 80000
+    },
+    {
+      "c": "91609",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 160 MM",
+      "u": "m",
+      "p": 1.47,
+      "q": 15000
+    },
+    {
+      "c": "91612",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 225 MM",
+      "u": "m",
+      "p": 2.05,
+      "q": 15000
+    },
+    {
+      "c": "91614",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 280 MM",
+      "u": "m",
+      "p": 2.64,
+      "q": 15000
+    },
+    {
+      "c": "91615",
+      "d": "CARGA, TRANSPORTE ATÉ 10 KM E DESCARGA DE TUBOS E CONEXÕES EM PEAD, DE 315 MM",
+      "u": "m",
+      "p": 2.93,
+      "q": 15000
+    },
+    {
+      "c": "100101",
+      "d": "REMOÇÃO DE PAVIMENTAÇÃO ASFALTICA",
+      "u": "m²",
+      "p": 23.3155,
+      "q": 20000
+    },
+    {
+      "c": "100102",
+      "d": "REMOÇÃO DE PAVIMENTAÇÃO ASFALTICA COM BASE DE PEDRA IRREGULAR, PARALELEPÍPEDO, OU LAJOTA",
+      "u": "m²",
+      "p": 28.8,
+      "q": 7000
+    },
+    {
+      "c": "100103",
+      "d": "REMOÇÃO DE PAVIMENTAÇÃO EM PARALELEPIPEDO OU LAJOTA SEXTAVADA",
+      "u": "m²",
+      "p": 11.3175,
+      "q": 60000
+    },
+    {
+      "c": "100104",
+      "d": "REMOÇÃO DE PAVIMENTAÇÃO EM  PEDRA IRREGULAR",
+      "u": "m²",
+      "p": 15.09,
+      "q": 2000
+    },
+    {
+      "c": "100105",
+      "d": "REMOÇÃO DE PAVIMENTAÇÃO EM PLACAS DE CONCRETO",
+      "u": "m²",
+      "p": 11.61,
+      "q": 4500
+    },
+    {
+      "c": "100107",
+      "d": "REMOÇÃO DE PASSEIO EM LADRILHO HIDRAULICO OU CERÂMICO",
+      "u": "m²",
+      "p": 7.845,
+      "q": 45000
+    },
+    {
+      "c": "100108",
+      "d": "REMOÇÃO DE PASSEIO CIMENTADO",
+      "u": "m²",
+      "p": 6.975,
+      "q": 45000
+    },
+    {
+      "c": "100109",
+      "d": "REMOÇÃO DE MEIO-FIO",
+      "u": "m",
+      "p": 8.12,
+      "q": 2000
+    },
+    {
+      "c": "100110",
+      "d": "REMOÇÃO DE SARJETAS",
+      "u": "m³",
+      "p": 93.85,
+      "q": 200
+    },
+    {
+      "c": "100111",
+      "d": "REMOÇÃO DE PASSEIO COM GRAMA",
+      "u": "m²",
+      "p": 6.98,
+      "q": 12000
+    },
+    {
+      "c": "100112",
+      "d": "CORTE DE PAVIMENTAÇÃO ASFALTICA COM ESPESSURA ATÉ 0,10M",
+      "u": "m",
+      "p": 2.247,
+      "q": 60000
+    },
+    {
+      "c": "100113",
+      "d": "REMOÇÃO DE PAVIMENTAÇÃO EM BLOCO DE CONCRETO INTERTRAVADO TIPO PAVER",
+      "u": "m²",
+      "p": 15.09,
+      "q": 5000
+    },
+    {
+      "c": "100201",
+      "d": "REPOSIÇÃO DE PAVIMENTAÇÃO EM PARALELEPIPEDO OU PEDRA IRREGULAR",
+      "u": "m²",
+      "p": 61.616,
+      "q": 30000
+    },
+    {
+      "c": "100202",
+      "d": "FORNECIMENTO DE PARALELEPIPEDO",
+      "u": "m²",
+      "p": 101.96,
+      "q": 1500
+    },
+    {
+      "c": "100203",
+      "d": "REPOSIÇÃO DE PAVIMENTAÇÃO EM LAJOTA SEXTAVADA",
+      "u": "m²",
+      "p": 22.872,
+      "q": 30000
+    },
+    {
+      "c": "100204",
+      "d": "FORNECIMENTO DE LAJOTA SEXTAVADA",
+      "u": "m²",
+      "p": 82.99,
+      "q": 3000
+    },
+    {
+      "c": "100205",
+      "d": "REPOSIÇÃO DE PAVIMENTAÇÃO EM PLACAS DE CONCRETO",
+      "u": "m²",
+      "p": 42.9,
+      "q": 4500
+    },
+    {
+      "c": "100206",
+      "d": "FORNECIMENTO DE PLACAS DE CONCRETO",
+      "u": "m²",
+      "p": 94.73,
+      "q": 500
+    },
+    {
+      "c": "100209",
+      "d": "REPOSIÇÃO DE PASSEIO EM LADRILHO HIDRAULICO OU CERÂMICO",
+      "u": "m²",
+      "p": 65.1,
+      "q": 45000
+    },
+    {
+      "c": "100210",
+      "d": "FORNECIMENTO DE LADRILHO HIDRAULICO OU CERÂMICO",
+      "u": "m²",
+      "p": 76.83,
+      "q": 5000
+    },
+    {
+      "c": "100211",
+      "d": "REPOSIÇÃO DE PASSEIO CIMENTADO",
+      "u": "m²",
+      "p": 76.94,
+      "q": 45000
+    },
+    {
+      "c": "100212",
+      "d": "REPOSIÇÃO DE MEIO-FIO",
+      "u": "m",
+      "p": 26.33,
+      "q": 2000
+    },
+    {
+      "c": "100213",
+      "d": "FORNECIMENTO DE MEIO-FIO",
+      "u": "m",
+      "p": 38.23,
+      "q": 300
+    },
+    {
+      "c": "100214",
+      "d": "REPOSIÇÃO DE SARJETA",
+      "u": "m³",
+      "p": 746.921,
+      "q": 200
+    },
+    {
+      "c": "100215",
+      "d": "REPOSIÇÃO DE PASSEIO COM GRAMA",
+      "u": "m²",
+      "p": 21.96,
+      "q": 12000
+    },
+    {
+      "c": "100216",
+      "d": "REPOSIÇÃO DE PAVIMENTAÇÃO EM BLOCO DE CONCRETO INTERTRAVADO TIPO PAVER",
+      "u": "m²",
+      "p": 61.616,
+      "q": 5000
+    },
+    {
+      "c": "100217",
+      "d": "FORNECIMENTO DE BLOCO DE CONCRETO INTERTRAVADO TIPO PAVER",
+      "u": "m²",
+      "p": 82.99,
+      "q": 500
+    },
+    {
+      "c": "100303",
+      "d": "EXECUÇÃO DE IMPRIMAÇÃO LIGANTE",
+      "u": "m²",
+      "p": 9.2925,
+      "q": 27000
+    },
+    {
+      "c": "100308",
+      "d": "TRANSPORTE DE CONCRETO ASFÁLTICO USINADO À QUENTE - CAUQ",
+      "u": "txKm",
+      "p": 0.99,
+      "q": 97200
+    },
+    {
+      "c": "100310",
+      "d": "TRANSPORTE DE BICA CORRIDA",
+      "u": "m³xKm",
+      "p": 2.36,
+      "q": 15000
+    },
+    {
+      "c": "100311",
+      "d": "EXECUÇÃO DE PINTURA DE LIGAÇÃO",
+      "u": "m²",
+      "p": 3.22,
+      "q": 27000
+    },
+    {
+      "c": "100312",
+      "d": "EXECUÇÃO DE CAUQ EM VALA COM LARGURA <= 2,00 M",
+      "u": "t",
+      "p": 709.416,
+      "q": 3900
+    },
+    {
+      "c": "100316",
+      "d": "EXECUÇÃO DE SUB-BASE/REFORÇO DE SUBLEITO EM BICA CORRIDA, COM CONTROLE DO G.C.=100%, SEM TRANSPORTE",
+      "u": "m³",
+      "p": 135.8045,
+      "q": 5400
+    },
+    {
+      "c": "100403",
+      "d": "REVESTIMENTO COM BRITA",
+      "u": "m³",
+      "p": 135.78,
+      "q": 1000
+    },
+    {
+      "c": "100404",
+      "d": "REVESTIMENTO COM PEDRISCO",
+      "u": "m³",
+      "p": 155.75,
+      "q": 1000
+    },
+    {
+      "c": "100406",
+      "d": "REVESTIMENTO COM BICA CORRIDA, SEM TRANSPORTE",
+      "u": "m³",
+      "p": 126.66,
+      "q": 1000
+    },
+    {
+      "c": "110101",
+      "d": "TOMADA DE ÁGUA",
+      "u": "un",
+      "p": 34.785,
+      "q": 12000
+    },
+    {
+      "c": "110102",
+      "d": "RAMAL PREDIAL DE ÁGUA",
+      "u": "m",
+      "p": 13.408,
+      "q": 36000
+    },
+    {
+      "c": "MND63",
+      "d": "CRAVAÇÃO EM MND PEAD DE 63",
+      "u": "m",
+      "p": 179.5,
+      "q": 20000
+    },
+    {
+      "c": "MND90",
+      "d": "CRAVAÇÃO EM MND PEAD DE 90",
+      "u": "m",
+      "p": 197.15,
+      "q": 20000
+    },
+    {
+      "c": "MND110",
+      "d": "CRAVAÇÃO EM MND PEAD DE 110",
+      "u": "m",
+      "p": 249.1,
+      "q": 20000
+    },
+    {
+      "c": "MND160",
+      "d": "CRAVAÇÃO EM MND PEAD DE 160",
+      "u": "m",
+      "p": 374.73,
+      "q": 15000
+    },
+    {
+      "c": "MND225",
+      "d": "CRAVAÇÃO EM MND PEAD DE 225",
+      "u": "m",
+      "p": 492.28,
+      "q": 15000
+    },
+    {
+      "c": "MND280",
+      "d": "CRAVAÇÃO EM MND PEAD DE 280",
+      "u": "m",
+      "p": 650.36,
+      "q": 20000
+    },
+    {
+      "c": "MND315",
+      "d": "CRAVAÇÃO EM MND PEAD DE 315",
+      "u": "m",
+      "p": 872.34,
+      "q": 20000
+    },
+    {
+      "c": "170305",
+      "d": "INTERLIGAÇÃO COM REDE DE F°F°, DIÂMETRO 200 MM",
+      "u": "un",
+      "p": 662.51,
+      "q": 30
+    },
+    {
+      "c": "170306",
+      "d": "INTERLIGAÇÃO COM REDE DE F°F°, DIÂMETRO 250 MM",
+      "u": "un",
+      "p": 798.86,
+      "q": 50
+    },
+    {
+      "c": "170307",
+      "d": "INTERLIGAÇÃO COM REDE DE F°F°, DIÂMETRO 300 MM",
+      "u": "un",
+      "p": 854.33,
+      "q": 50
+    },
+    {
+      "c": "170308",
+      "d": "INTERLIGAÇÃO COM REDE DE F°F°, DIÂMETRO 350 MM OU 400 MM",
+      "u": "un",
+      "p": 1088.29,
+      "q": 20
+    },
+    {
+      "c": "170314",
+      "d": "INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 50 MM",
+      "u": "un",
+      "p": 391.32,
+      "q": 50
+    },
+    {
+      "c": "170315",
+      "d": "INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 75 MM",
+      "u": "un",
+      "p": 406.4,
+      "q": 50
+    },
+    {
+      "c": "170316",
+      "d": "INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 100 MM",
+      "u": "un",
+      "p": 421.04,
+      "q": 100
+    },
+    {
+      "c": "170317",
+      "d": "INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 125 MM A 150 MM",
+      "u": "un",
+      "p": 491.31,
+      "q": 150
+    },
+    {
+      "c": "170318",
+      "d": "INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 200 MM",
+      "u": "un",
+      "p": 319.32,
+      "q": 150
+    },
+    {
+      "c": "170319",
+      "d": "INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 250 MM",
+      "u": "un",
+      "p": 451.073,
+      "q": 100
+    },
+    {
+      "c": "170320",
+      "d": "INTERLIGAÇÃO COM REDE DE PVC, DIÂMETRO 300 MM",
+      "u": "un",
+      "p": 419.682,
+      "q": 100
+    },
+    {
+      "c": "191412",
+      "d": "RECOMPOSIÇÃO PROVISÓRIA EM LAJOTA OU PAVER PELA MANUTENÇÃO PARA INTERVENÇÕES EM ASFALTO",
+      "u": "m²",
+      "p": 72.51495,
+      "q": 3000
+    }
+  ],
+  "contratos": [
+    {
+      "id": "r8",
+      "n": "4072/2026",
+      "obra": "Pouso Redondo - SC",
+      "L": 430000,
+      "O": 0,
+      "P": 430000,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-04-17",
+      "df": "2026-10-11",
+      "resp": "-"
+    },
+    {
+      "id": "r9",
+      "n": "4299/2026",
+      "obra": "Apiúna - SC",
+      "L": 166892.52,
+      "O": 0,
+      "P": 165670.66,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-09-16",
+      "df": "2027-03-15",
+      "resp": "FÁBIO"
+    },
+    {
+      "id": "r10",
+      "n": "4084/2026",
+      "obra": "Indaial - SC",
+      "L": 415000,
+      "O": 0,
+      "P": 415260.57,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-04-17",
+      "df": "2026-10-14",
+      "resp": "EDISON"
+    },
+    {
+      "id": "r11",
+      "n": "4130/2026",
+      "obra": "Indaial",
+      "L": 1000000,
+      "O": 0,
+      "P": 1000344.2,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-05-20",
+      "df": "2026-11-16",
+      "resp": ""
+    },
+    {
+      "id": "r12",
+      "n": "4281/2026",
+      "obra": "Indaial",
+      "L": 1122528.48,
+      "O": 0,
+      "P": 1122528.48,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-09-04",
+      "df": "2027-03-03",
+      "resp": ""
+    },
+    {
+      "id": "r13",
+      "n": "4063/2026",
+      "obra": "Rio do Sul - SC",
+      "L": 415000,
+      "O": 0,
+      "P": 415000,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-04-14",
+      "df": "2026-10-11",
+      "resp": "ACIR"
+    },
+    {
+      "id": "r14",
+      "n": "4161/2026",
+      "obra": "Rio do Sul",
+      "L": 500000,
+      "O": 0,
+      "P": 510670.99,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-06-03",
+      "df": "2026-11-30",
+      "resp": "",
+      "qo": 0,
+      "so": 0
+    },
+    {
+      "id": "r15",
+      "n": "4184/2026",
+      "obra": "Rio do Sul",
+      "L": 600000,
+      "O": 0,
+      "P": 608662.62,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-07-03",
+      "df": "2026-12-30",
+      "resp": "",
+      "qo": 0,
+      "so": 0
+    },
+    {
+      "id": "r16",
+      "n": "4270/2026",
+      "obra": "Rio do Sul",
+      "L": 1008321.63,
+      "O": 0,
+      "P": 1008496.54,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-09-01",
+      "df": "2027-02-28",
+      "resp": ""
+    },
+    {
+      "id": "r17",
+      "n": "4316/2026",
+      "obra": "Rio do Sul",
+      "L": 1130371.63,
+      "O": 320000,
+      "P": 818378.68,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-09-24",
+      "df": "2027-03-23",
+      "resp": ""
+    },
+    {
+      "id": "r18",
+      "n": "4073/2026",
+      "obra": "Vitor Meireles - SC",
+      "L": 550000,
+      "O": 0,
+      "P": 690541.41,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-04-17",
+      "df": "2026-10-14",
+      "resp": "DINOEL",
+      "qo": 0,
+      "so": 0
+    },
+    {
+      "id": "r19",
+      "n": "4182/2026",
+      "obra": "Vitor Meireles",
+      "L": 212920.94,
+      "O": 0,
+      "P": 174424.15,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-06-29",
+      "df": "2026-12-26",
+      "resp": ""
+    },
+    {
+      "id": "r20",
+      "n": "Aguardando",
+      "obra": "Ascurra - SC",
+      "L": 0,
+      "O": 119073.93,
+      "P": 0,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": null,
+      "df": null,
+      "resp": "FÁBIO"
+    },
+    {
+      "id": "r21",
+      "n": "4061/2026",
+      "obra": "São Cristovão - SC",
+      "L": 110000,
+      "O": 0,
+      "P": 42458.06,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-04-14",
+      "df": "2026-10-11",
+      "resp": "-"
+    },
+    {
+      "id": "r22",
+      "n": "4146/2026",
+      "obra": "Lontras - SC",
+      "L": 700000,
+      "O": 0,
+      "P": 703848.81,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-05-28",
+      "df": "2026-11-24",
+      "resp": "DINOEL"
+    },
+    {
+      "id": "r23",
+      "n": "4254/2026",
+      "obra": "Lontras",
+      "L": 1044719.68,
+      "O": 0,
+      "P": 993898.58,
+      "nl": 2190.84,
+      "p": "Rio do Sul",
+      "di": "2026-08-20",
+      "df": "2027-02-16",
+      "resp": ""
+    },
+    {
+      "id": "r24",
+      "n": "4189/2026",
+      "obra": "Trombudo Central - SC",
+      "L": 350000,
+      "O": 0,
+      "P": 350000,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-07-06",
+      "df": "2027-01-02",
+      "resp": "DINOEL"
+    },
+    {
+      "id": "r25",
+      "n": "Aguardando",
+      "obra": "Trombudo Central",
+      "L": 0,
+      "O": 334197.6,
+      "P": 0,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": null,
+      "df": null,
+      "resp": ""
+    },
+    {
+      "id": "r26",
+      "n": "4181/2026",
+      "obra": "José Boiteux - SC",
+      "L": 525000,
+      "O": 0,
+      "P": 704159.68,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-06-29",
+      "df": "2026-12-26",
+      "resp": "DINOEL",
+      "qo": 0,
+      "so": 0
+    },
+    {
+      "id": "r27",
+      "n": "4282/2026",
+      "obra": "José Boiteux",
+      "L": 469393.69,
+      "O": 161573.19,
+      "P": 480260.77,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-09-08",
+      "df": "2027-03-07",
+      "resp": ""
+    },
+    {
+      "id": "r28",
+      "n": "4181/2026",
+      "obra": "Ibirama - SC",
+      "L": 450000,
+      "O": 0,
+      "P": 450000,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-06-29",
+      "df": "2026-12-26",
+      "resp": "DINOEL"
+    },
+    {
+      "id": "r30",
+      "n": "4181/2026",
+      "obra": "Rodeio - SC",
+      "L": 450000,
+      "O": 22146.28,
+      "P": 371916.43,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-06-29",
+      "df": "2026-12-26",
+      "resp": "DINOEL"
+    },
+    {
+      "id": "r31",
+      "n": "4183/2026",
+      "obra": "Dr. Pedrinho",
+      "L": 200000,
+      "O": 0,
+      "P": 0,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-06-29",
+      "df": "2026-12-26",
+      "resp": "FÁBIO"
+    },
+    {
+      "id": "r32",
+      "n": "4131/2026",
+      "obra": "Petrolândia - SC",
+      "L": 200000,
+      "O": 0,
+      "P": 209943.97,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-05-20",
+      "df": "2026-11-16",
+      "resp": "FÁBIO",
+      "qo": 0,
+      "so": 0
+    },
+    {
+      "id": "r33",
+      "n": "Aguardando",
+      "obra": "Santa Terezinha",
+      "L": 0,
+      "O": 299839.62,
+      "P": 0,
+      "nl": 182365.24,
+      "p": "Rio do Sul",
+      "di": null,
+      "df": null,
+      "resp": "DINOEL"
+    },
+    {
+      "id": "r34",
+      "n": "Aguardando",
+      "obra": "Benedito Novo",
+      "L": 0,
+      "O": 399526.9,
+      "P": 0,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": null,
+      "df": null,
+      "resp": "FÁBIO"
+    },
+    {
+      "id": "r35",
+      "n": "Aguardando",
+      "obra": "Presidente Nereu",
+      "L": 0,
+      "O": 401640.05,
+      "P": 0,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": null,
+      "df": null,
+      "resp": "DINOEL"
+    },
+    {
+      "id": "n4332",
+      "n": "4332/2026",
+      "obra": "Petrolândia",
+      "L": 246731.36,
+      "O": 0,
+      "P": 246731.36,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "di": "2026-09-28",
+      "df": "2027-03-27",
+      "resp": "DINOEL",
+      "qo": 0,
+      "so": 0
+    },
+    {
+      "id": "n4341",
+      "n": "4341/2026",
+      "obra": "Ibirama",
+      "L": 598391.27,
+      "O": 0,
+      "P": 352171.41,
+      "nl": 7783.45,
+      "p": "Rio do Sul",
+      "di": "2026-10-06",
+      "df": "2027-04-04",
+      "resp": ""
+    },
+    {
+      "id": "aimbuia",
+      "n": "Aguardando",
+      "obra": "Imbuia",
+      "L": 0,
+      "P": 0,
+      "O": 86174.5,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "resp": "DINOEL"
+    },
+    {
+      "id": "apousoredondo",
+      "n": "Aguardando",
+      "obra": "Pouso Redondo",
+      "L": 0,
+      "P": 0,
+      "O": 108762.14,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "resp": "DINOEL"
+    },
+    {
+      "id": "aindaial",
+      "n": "Aguardando",
+      "obra": "Indaial",
+      "L": 0,
+      "P": 0,
+      "O": 48637.95,
+      "nl": 2677.45,
+      "p": "Rio do Sul",
+      "resp": "DINOEL"
+    },
+    {
+      "id": "aapiuna",
+      "n": "Aguardando",
+      "obra": "Apiúna",
+      "L": 0,
+      "P": 0,
+      "O": 120069.66,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "resp": "DINOEL"
+    },
+    {
+      "id": "acuritibanos",
+      "n": "Aguardando",
+      "obra": "Curitibanos",
+      "L": 0,
+      "O": 0,
+      "P": 0,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "resp": "DINOEL"
+    },
+    {
+      "id": "avidalramos",
+      "n": "Aguardando",
+      "obra": "Vidal Ramos",
+      "L": 0,
+      "O": 0,
+      "P": 0,
+      "nl": 308623.8,
+      "p": "Rio do Sul",
+      "resp": "DINOEL"
+    },
+    {
+      "id": "ajoseboiteux",
+      "n": "Aguardando",
+      "obra": "José Boiteux",
+      "L": 0,
+      "O": 0,
+      "P": 0,
+      "nl": 0,
+      "p": "Rio do Sul",
+      "resp": "DINOEL"
+    }
+  ],
+  "frentes": [
+    {
+      "id": "rio_do_sul",
+      "nome": "Rio do Sul",
+      "contrato": "r17",
+      "oses": [
+        "OSE 01 63mm Pedro Américo MND",
+        "OSE 02 63mm Rua Henrique D.",
+        "OSE 03 63mm Soldatelli MND",
+        "OSE 04 63mm Rua Henrique D.",
+        "OSE 05 63mm Lauro Muller",
+        "OSE 06 63mm R. Terezinha M.",
+        "OSE 07 63mm R. Ercílio M.",
+        "OSE 08 63mm R. jose Cimardi",
+        "OSE 09 63mm R. Durval V.",
+        "Reposição de Pav. - Demétrio F.",
+        "Reposição de Pav. - Lauro F."
+      ]
+    },
+    {
+      "id": "apiuna",
+      "nome": "Apiúna",
+      "contrato": "",
+      "oses": [
+        "OSE 01 XXXXXXXXX MND"
+      ]
+    },
+    {
+      "id": "ibirama",
+      "nome": "Ibirama",
+      "contrato": "n4341",
+      "oses": [
+        "OSE 01 ADUTORA ESC 250mm",
+        "OSE 02 63mm - SC-340 - MND",
+        "OSE 03 63mm - Anita G. - MND"
+      ]
+    },
+    {
+      "id": "presidente_nereu",
+      "nome": "Presidente Nereu",
+      "contrato": "r35",
+      "oses": [
+        "OSE 01 63mm - 110mm | Rodovia"
+      ]
+    }
+  ],
+  "equipes": [],
+  "rem": []
+}

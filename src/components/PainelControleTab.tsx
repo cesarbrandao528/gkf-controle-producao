@@ -62,7 +62,7 @@ export const PainelControleTab: React.FC = () => {
       ...prev,
       contratos: prev.contratos.map((c: Contrato) => {
         if (c.id === cId) {
-          const isNum = ['L', 'nl'].includes(key);
+          const isNum = ['L', 'nl', 'O', 'P'].includes(key);
           return {
             ...c,
             [key]: isNum ? (typeof val === 'number' ? val : pn(val)) : val,
@@ -227,11 +227,13 @@ export const PainelControleTab: React.FC = () => {
                     </td>
 
                     {/* Pendente de medição (O) */}
-                    <td
-                      className="text-right text-xs text-amber-300 font-semibold py-1 px-1.5"
-                      title={hasRem ? 'Inclui valor remanejado de saldo retido' : undefined}
-                    >
-                      {fmt(r.O)}
+                    <td className="text-right py-1 px-1.5">
+                      <NumericInput
+                        value={c.O || 0}
+                        onChange={(val) => handleUpdateField(c.id, 'O', val)}
+                        className="text-right text-xs text-amber-300 font-semibold py-0.5 px-1 rounded border border-transparent hover:border-[var(--ln)] focus:border-[var(--cy)] bg-transparent w-24"
+                        title={hasRem ? `Base: R$ ${fmt(c.O || 0)} | Total com remanejamento: R$ ${fmt(r.O)}` : undefined}
+                      />
                     </td>
 
                     {/* Acumulado medido (P) */}

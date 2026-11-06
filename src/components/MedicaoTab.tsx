@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useData } from '../context/DataContext';
 import {
   snapAtual,
@@ -7,6 +7,8 @@ import {
   fmt,
   dbr,
   pn,
+  pf,
+  inP,
   addD,
   addM,
   fechTot,
@@ -17,7 +19,16 @@ import {
   uid,
   hoje,
 } from '../engine/calc';
-import { Download, CheckCircle, RefreshCcw, ArrowRightLeft, Trash2, Calendar } from 'lucide-react';
+import {
+  Download,
+  CheckCircle,
+  RefreshCcw,
+  ArrowRightLeft,
+  Trash2,
+  Calendar,
+  Layers,
+  FileSpreadsheet,
+} from 'lucide-react';
 import { Config, Contrato, Fechamento, Frente, FrenteLancamentos, Remanejamento } from '../types';
 
 export const MedicaoTab: React.FC = () => {
@@ -56,6 +67,56 @@ export const MedicaoTab: React.FC = () => {
   const k = cfg.k || 0;
 
   const allCodes = Array.from(new Set([...Object.keys(qAtual), ...Object.keys(antAtual)])).sort();
+
+  // Resumo das OSEs lançadas no período da frente atual
+  const osesSummary = useMemo(() => {
+    const currentOses = fLanc.oses || [];
+    const list = currentOses.map((o: any) => {
+      const col = sn.cols.find((c) => c.nome === o.nome);
+      const valor = col ? valorQ(col.q, prm) : 0;
+      const activeRows = (o.rows || []).filter((r: any) => !r.d || inP(r.d, cfg, frenteId));
+      let extensao = 0;
+      activeRows.forEach((r: any) => {
+        if (o.tipo === 'REP') {
+          extensao += pf(r.v['D']) || 0;
+        } else {
+          extensao += pf(r.v['C']) || pf(r.v['D']) || 0;
+        }
+      });
+      return {
+        id: o.id,
+        nome: o.nome,
+        tipo: o.tipo,
+        tipoNome: tpl[o.tipo]?.nome || o.tipo,
+        qtdTrechos: activeRows.length,
+        extensao,
+        valor,
+        pct: vp > 0 ? (valor / vp) * 100 : 0,
+        hasProduction: valor > 0 || activeRows.length > 0,
+      };
+    });
+
+    // Serviços avulsos gerais sem OSE vinculada
+    const avCol = sn.cols.find((c) => c.nome === 'SERVIÇOS AVULSOS');
+    const avValor = avCol ? valorQ(avCol.q, prm) : 0;
+    const generalAvulsosCount = (fLanc.itens || []).filter(
+      (x: any) => !x.oid && inP(x.d, cfg, frenteId)
+    ).length;
+
+    // Ordenar: OSEs com produção primeiro (pelo maior valor), depois as inativas
+    list.sort((a, b) => {
+      if (a.hasProduction && !b.hasProduction) return -1;
+      if (!a.hasProduction && b.hasProduction) return 1;
+      return b.valor - a.valor;
+    });
+
+    return {
+      oses: list,
+      avValor,
+      generalAvulsosCount,
+      totalValor: vp,
+    };
+  }, [fLanc, sn.cols, prm, tpl, cfg, frenteId, vp]);
 
   // Fechar Medição
   const handleFecharMedicao = async () => {
@@ -164,7 +225,7 @@ export const MedicaoTab: React.FC = () => {
 
   // Remanejamento actions
   const contratosList = ordC(cfg.contratos);
-  const retidoDisponivel = (c: Contrato) => Math.max(0, calc(c, cfg, ln, prm, tpl).Q - remDe(c, cfg));
+  const retidoDisponivel = (c: Contrato) => Math.max(0, calc(c, cfg, ln, prm, tpl).Q);
 
   const handleRemanejar = () => {
     if (!remOrigem || !remDestino || remOrigem === remDestino) {
@@ -307,6 +368,244 @@ export const MedicaoTab: React.FC = () => {
         <div className="gkf-kpi">
           <span>Acumulado após esta medição</span>
           <b>R$ {fmt((vp + va) * (1 + k))}</b>
+        </div>
+      </div>
+
+      {/* Resumo das OSE Lançadas no Período (com valores por OSE) */}
+      <div className="gkf-card space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--ln)] pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-[var(--cy)]/15 border border-[var(--cy)]/30 text-[var(--cy)]">
+              <Layers className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-[var(--tx)] flex items-center gap-2">
+                Resumo das OSE Lançadas no Período
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-[rgba(var(--w),0.07)] text-[var(--cy)] font-semibold border border-[var(--ln)]">
+                  {osesSummary.oses.filter((o) => o.hasProduction).length}{' '}
+                  {osesSummary.oses.filter((o) => o.hasProduction).length === 1
+                    ? 'OSE com produção'
+                    : 'OSEs com produção'}
+                </span>
+              </h3>
+              <p className="text-xs text-[var(--mu)] mt-0.5">
+                Demonstrativo de valores apurados por OSE e serviços que compõem o valor medido no BM nº {sn.n} ({dbr(sn.ini)} a {dbr(sn.fim)}).
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <span className="text-[11px] text-[var(--mu)] block">Subtotal dos Serviços do Período</span>
+            <span className="text-lg font-extrabold text-[var(--cy)]">R$ {fmt(vp)}</span>
+          </div>
+        </div>
+
+        {/* Cards por OSE */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {osesSummary.oses.length === 0 && osesSummary.avValor === 0 ? (
+            <div className="col-span-full text-center py-6 text-xs text-[var(--mu)]">
+              Nenhuma OSE cadastrada para esta frente de trabalho.
+            </div>
+          ) : (
+            osesSummary.oses.map((ose) => {
+              const isMND = ose.tipo === 'MND';
+              const isESC = ose.tipo === 'ESC';
+              const isREP = ose.tipo === 'REP';
+
+              return (
+                <div
+                  key={ose.id}
+                  className={`p-3.5 rounded-2xl border transition-all ${
+                    ose.hasProduction
+                      ? 'bg-[rgba(var(--w),0.03)] border-[var(--ln)] hover:border-[var(--cy)]/50'
+                      : 'bg-[rgba(var(--w),0.01)] border-[var(--ln)]/40 opacity-60'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <span className="font-bold text-sm text-[var(--tx)] truncate block" title={ose.nome}>
+                        {ose.nome}
+                      </span>
+                      <span
+                        className={`inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                          isMND
+                            ? 'bg-blue-500/15 text-blue-300 border-blue-500/30'
+                            : isESC
+                            ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                            : isREP
+                            ? 'bg-purple-500/15 text-purple-300 border-purple-500/30'
+                            : 'bg-[rgba(var(--w),0.07)] text-[var(--mu)] border-[var(--ln)]'
+                        }`}
+                      >
+                        {ose.tipoNome}
+                      </span>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="text-sm font-extrabold text-[var(--tx)] block">
+                        R$ {fmt(ose.valor)}
+                      </span>
+                      <span className="text-[10px] text-[var(--cy)] font-semibold">
+                        {ose.pct.toFixed(1)}% do período
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Métricas secundárias da OSE */}
+                  <div className="mt-3 pt-2.5 border-t border-[var(--ln)] flex items-center justify-between text-xs text-[var(--mu)]">
+                    <span>
+                      Trechos: <b className="text-[var(--tx)]">{ose.qtdTrechos}</b>
+                    </span>
+                    <span>
+                      Extensão: <b className="text-[var(--tx)]">{fmt(ose.extensao)} m</b>
+                    </span>
+                  </div>
+
+                  {/* Barra de participação percentual */}
+                  <div className="mt-2 w-full h-1.5 rounded-full bg-[rgba(var(--w),0.08)] overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-[var(--cy)] to-blue-500 transition-all duration-300"
+                      style={{ width: `${Math.min(100, Math.max(0, ose.pct))}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })
+          )}
+
+          {/* Card para Serviços Avulsos Gerais (se houver) */}
+          {osesSummary.avValor > 0 && (
+            <div className="p-3.5 rounded-2xl border bg-[rgba(var(--w),0.03)] border-[var(--ln)] hover:border-[var(--cy)]/50 transition-all">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <span className="font-bold text-sm text-[var(--tx)] block">
+                    Serviços Avulsos Gerais
+                  </span>
+                  <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                    Geral da Frente
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-sm font-extrabold text-[var(--tx)] block">
+                    R$ {fmt(osesSummary.avValor)}
+                  </span>
+                  <span className="text-[10px] text-[var(--cy)] font-semibold">
+                    {((osesSummary.avValor / (vp || 1)) * 100).toFixed(1)}% do período
+                  </span>
+                </div>
+              </div>
+              <div className="mt-3 pt-2.5 border-t border-[var(--ln)] flex items-center justify-between text-xs text-[var(--mu)]">
+                <span>
+                  Itens avulsos: <b className="text-[var(--tx)]">{osesSummary.generalAvulsosCount}</b>
+                </span>
+                <span className="text-emerald-400 font-semibold">Lançamento direto</span>
+              </div>
+              <div className="mt-2 w-full h-1.5 rounded-full bg-[rgba(var(--w),0.08)] overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-emerald-500 transition-all duration-300"
+                  style={{
+                    width: `${Math.min(100, Math.max(0, (osesSummary.avValor / (vp || 1)) * 100))}%`,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Tabela Resumo Detalhada com Extensão, Trechos, Tipo e Valores */}
+        <div className="gkf-table-wrap border border-[var(--ln)] rounded-2xl overflow-hidden">
+          <table className="gkf-table text-xs">
+            <thead>
+              <tr>
+                <th className="text-left">OSE / Descrição do Lançamento</th>
+                <th className="text-left">Tipo de Obra</th>
+                <th className="text-right">Qtd. Trechos</th>
+                <th className="text-right">Extensão Total (m)</th>
+                <th className="text-right">Participação (%)</th>
+                <th className="text-right">Valor Apurado no Período R$</th>
+              </tr>
+            </thead>
+            <tbody>
+              {osesSummary.oses.map((ose) => (
+                <tr key={`tbl_${ose.id}`} className="hover:bg-[rgba(var(--w),0.02)]">
+                  <td className="font-semibold text-[var(--tx)] flex items-center gap-2">
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        ose.hasProduction ? 'bg-emerald-400' : 'bg-gray-500'
+                      }`}
+                    />
+                    {ose.nome}
+                  </td>
+                  <td>
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[rgba(var(--w),0.06)] text-[var(--tx)]">
+                      {ose.tipoNome}
+                    </span>
+                  </td>
+                  <td className="text-right font-mono">{ose.qtdTrechos}</td>
+                  <td className="text-right font-mono font-medium">
+                    {ose.extensao > 0 ? `${fmt(ose.extensao)} m` : '—'}
+                  </td>
+                  <td className="text-right font-mono text-[var(--mu)]">
+                    {ose.pct.toFixed(2)}%
+                  </td>
+                  <td className="text-right font-bold text-[var(--tx)]">
+                    R$ {fmt(ose.valor)}
+                  </td>
+                </tr>
+              ))}
+
+              {osesSummary.avValor > 0 && (
+                <tr className="hover:bg-[rgba(var(--w),0.02)]">
+                  <td className="font-semibold text-[var(--tx)] flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    Serviços Avulsos Gerais (sem OSE vinculada)
+                  </td>
+                  <td>
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-500/15 text-emerald-300">
+                      Avulso
+                    </span>
+                  </td>
+                  <td className="text-right font-mono">{osesSummary.generalAvulsosCount} item(ns)</td>
+                  <td className="text-right font-mono text-[var(--mu)]">—</td>
+                  <td className="text-right font-mono text-[var(--mu)]">
+                    {((osesSummary.avValor / (vp || 1)) * 100).toFixed(2)}%
+                  </td>
+                  <td className="text-right font-bold text-[var(--tx)]">
+                    R$ {fmt(osesSummary.avValor)}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+            <tfoot>
+              <tr className="bg-[rgba(var(--w),0.04)] font-bold border-t-2 border-[var(--ln)]">
+                <td colSpan={4} className="text-right text-[var(--tx)]">
+                  Total das OSEs (Serviços do Período):
+                </td>
+                <td className="text-right font-mono text-[var(--cy)]">100.00%</td>
+                <td className="text-right text-base text-[var(--cy)]">
+                  R$ {fmt(vp)}
+                </td>
+              </tr>
+              <tr className="bg-[rgba(var(--w),0.02)] text-xs text-[var(--mu)]">
+                <td colSpan={4} className="text-right">
+                  + Canteiro de Obras / Administração Local ({(k * 100).toFixed(2)}%):
+                </td>
+                <td className="text-right font-mono">{(k * 100).toFixed(2)}%</td>
+                <td className="text-right font-bold text-[var(--tx)]">
+                  R$ {fmt(vp * k)}
+                </td>
+              </tr>
+              <tr className="bg-[rgba(var(--cy),0.08)] font-extrabold text-sm border-t border-[var(--cy)]/30 text-[var(--tx)]">
+                <td colSpan={4} className="text-right text-[var(--cy)]">
+                  Valor Total da Medição BM nº {sn.n}:
+                </td>
+                <td className="text-right font-mono text-[var(--cy)]">
+                  {((1 + k) * 100).toFixed(2)}%
+                </td>
+                <td className="text-right text-lg text-[var(--cy)]">
+                  R$ {fmt(vp * (1 + k))}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
 

@@ -250,3 +250,36 @@ body {
   color: transparent;
   white-space: nowrap;
 }
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 8mm;
+  }
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    overflow: visible !important;
+    height: auto !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  header, nav, .no-print, [role="tablist"] {
+    display: none !important;
+  }
+  iframe {
+    border: none !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+  .gkf-card {
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
+

@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { useData } from '../context/DataContext';
 import { calc } from '../engine/calc';
-import { Download } from 'lucide-react';
+import { Download, Printer } from 'lucide-react';
 
 export const FluxoObrasTab: React.FC = () => {
   const { cfg, ln, prm, tpl, fluxt, fluxd, setFluxD, toast, theme } = useData() as any;
@@ -121,6 +121,68 @@ export const FluxoObrasTab: React.FC = () => {
         gap: 12px 20px !important;
       }
       header .acts, header .filters { justify-content: flex-start !important; }
+      @media print {
+        @page {
+          size: A4 landscape;
+          margin: 8mm;
+        }
+        html, body {
+          background: #ffffff !important;
+          color: #0f172a !important;
+          overflow: visible !important;
+          overflow-y: visible !important;
+          overflow-x: visible !important;
+          height: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+        .app {
+          max-width: 100% !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          overflow: visible !important;
+          height: auto !important;
+        }
+        .grid {
+          display: block !important;
+        }
+        .card {
+          opacity: 1 !important;
+          transform: none !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+          box-shadow: none !important;
+          border: 1px solid #cbd5e1 !important;
+          background: #ffffff !important;
+          color: #0f172a !important;
+          break-inside: avoid !important;
+          page-break-inside: avoid !important;
+          margin-bottom: 16px !important;
+          width: 100% !important;
+        }
+        .tw {
+          overflow: visible !important;
+          max-height: none !important;
+        }
+        table {
+          width: 100% !important;
+          border-collapse: collapse !important;
+        }
+        tr {
+          break-inside: avoid !important;
+          page-break-inside: avoid !important;
+        }
+        th, td {
+          color: #0f172a !important;
+          border-color: #cbd5e1 !important;
+          white-space: normal !important;
+        }
+        header, header .side, .filters, .acts, #up, #toast, #tip, .btn, button, .hbtn, #vb, #ed {
+          display: none !important;
+        }
+      }
     </style>
     <script>
       window.PREVISTO_FATURAMENTO = ${JSON.stringify({
@@ -267,6 +329,19 @@ export const FluxoObrasTab: React.FC = () => {
     toast('Fluxo e Resultado exportado com dados, filtros e design idênticos ao aplicativo ✓');
   };
 
+  const handlePrint = () => {
+    if (iframeRef.current?.contentWindow) {
+      try {
+        iframeRef.current.contentWindow.focus();
+        iframeRef.current.contentWindow.print();
+      } catch (e) {
+        window.print();
+      }
+    } else {
+      window.print();
+    }
+  };
+
   if (!fluxt) {
     return (
       <div className="gkf-card text-center py-12 text-[var(--mu)]">
@@ -282,14 +357,25 @@ export const FluxoObrasTab: React.FC = () => {
         <span className="text-xs text-[var(--mu)]">
           Fluxo financeiro, custos diretos e indiretos, receitas e margens por obra integrados.
         </span>
-        <button
-          type="button"
-          onClick={handleDownloadCopy}
-          className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[rgba(var(--w),0.07)] border border-[var(--ln)] hover:border-[var(--cy)] flex items-center gap-1.5 text-[var(--tx)] transition-all cursor-pointer"
-        >
-          <Download className="w-3.5 h-3.5 text-blue-400" />
-          Baixar arquivo HTML do Fluxo
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[rgba(var(--w),0.07)] border border-[var(--ln)] hover:border-emerald-400 flex items-center gap-1.5 text-[var(--tx)] transition-all cursor-pointer"
+            title="Imprimir ou Salvar em PDF os cards de Fluxo e Resultado"
+          >
+            <Printer className="w-3.5 h-3.5 text-emerald-400" />
+            Imprimir / PDF
+          </button>
+          <button
+            type="button"
+            onClick={handleDownloadCopy}
+            className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[rgba(var(--w),0.07)] border border-[var(--ln)] hover:border-[var(--cy)] flex items-center gap-1.5 text-[var(--tx)] transition-all cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5 text-blue-400" />
+            Baixar arquivo HTML do Fluxo
+          </button>
+        </div>
       </div>
 
       {/* Seamless Native-integrated Fluxo (no suspended window, no double scrollbar) */}

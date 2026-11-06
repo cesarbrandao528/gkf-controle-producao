@@ -104,3 +104,53 @@ test('buildDash: injects serialized dashboard rows into template script tag', ()
   assert.ok(out.includes('"Pouso Redondo"'));
   assert.ok(out.includes('"2026-10-29"'));
 });
+
+test('Calc: remanejamento deducts from origin Q and relieves S, adds to destination P/O', () => {
+  const cfg: Config = {
+    periodo: { ini: '2026-10-01', fim: '2026-10-31' },
+    k: 0.015,
+    precos: [],
+    contratos: [
+      {
+        id: 'c1',
+        n: '4084/2026',
+        obra: 'Indaial',
+        L: 415000,
+        O: 0,
+        P: 415260.57, // baseQ = 260.57, baseS = -260.57
+        nl: 0,
+        p: 'Rio do Sul',
+      },
+      {
+        id: 'c2',
+        n: '4316/2026',
+        obra: 'Rio do Sul',
+        L: 1000000,
+        O: 0,
+        P: 100000,
+        nl: 0,
+        p: 'Rio do Sul',
+      },
+    ],
+    frentes: [],
+    equipes: [],
+    rem: [
+      {
+        id: 'rem1',
+        de: 'c1',
+        para: 'c2',
+        valor: 260.57,
+        data: '2026-11-01',
+        st: 'med',
+      },
+    ],
+  };
+
+  const resOrigem = calc(cfg.contratos[0], cfg, {}, {}, {});
+  assert.equal(resOrigem.Q, 0); // 260.57 deducted from retained balance
+  assert.equal(resOrigem.S, 0); // -260.57 + 260.57 = 0
+
+  const resDestino = calc(cfg.contratos[1], cfg, {}, {}, {});
+  assert.equal(resDestino.P, 100260.57); // 260.57 added to accumulated measured
+});
+
