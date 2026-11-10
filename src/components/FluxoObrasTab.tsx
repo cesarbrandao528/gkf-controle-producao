@@ -182,6 +182,25 @@ export const FluxoObrasTab: React.FC = () => {
         header, header .side, .filters, .acts, #up, #toast, #tip, .btn, button, .hbtn, #vb, #ed {
           display: none !important;
         }
+        #grid-mensal {
+          display: block !important;
+          break-inside: avoid !important;
+          page-break-inside: avoid !important;
+          margin-bottom: 16px !important;
+        }
+        .tm-tab {
+          font-size: 7.5pt !important;
+          width: 100% !important;
+        }
+        .tm-tab th, .tm-tab td {
+          padding: 3px 5px !important;
+          white-space: nowrap !important;
+        }
+        .tm-tab th.th-lbl, .tm-tab td.td-lbl,
+        .tm-tab th.th-final, .tm-tab td.td-final {
+          position: static !important;
+          box-shadow: none !important;
+        }
       }
     </style>
     <script>
