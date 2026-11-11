@@ -121,11 +121,30 @@ export const FluxoObrasTab: React.FC = () => {
         gap: 12px 20px !important;
       }
       header .acts, header .filters { justify-content: flex-start !important; }
+      .tm-tab th, .tm-tab td {
+        padding: 5px 6px !important;
+        min-width: 78px !important;
+      }
       .tm-tab th.th-lbl, .tm-tab td.td-lbl {
         background-color: ${theme === 'light' ? '#ffffff' : '#0d182e'} !important;
+        min-width: 195px !important;
+        max-width: 215px !important;
+        width: 205px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+      }
+      .tm-tab th.th-lbl {
+        background-color: ${theme === 'light' ? '#f1f5f9' : '#0a1325'} !important;
       }
       .tm-tab th.th-final, .tm-tab td.td-final {
         background-color: ${theme === 'light' ? '#f8fafc' : '#0d182e'} !important;
+        min-width: 115px !important;
+        max-width: 130px !important;
+        width: 120px !important;
+      }
+      .tm-tab th.th-final {
+        background-color: ${theme === 'light' ? '#f1f5f9' : '#0a1325'} !important;
       }
       @media print {
         @page {
