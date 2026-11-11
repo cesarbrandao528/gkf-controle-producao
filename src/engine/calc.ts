@@ -342,7 +342,8 @@ export function calc(
     remO(c, cfg) +
     fc.filter((x) => x.st !== 'med').reduce((t, x) => t + fechTot(x, cfg, prm), 0);
   const P =
-    (c.P || 0) +
+    (c.P || 0) -
+    remSaida +
     remP(c, cfg) +
     fc.filter((x) => x.st === 'med').reduce((t, x) => t + fechTot(x, cfg, prm), 0);
 
@@ -352,11 +353,23 @@ export function calc(
   };
   const T = r2(L - P > 0 ? L - P : 0);
   const M = r2(T > 0 ? (T - N - O < 0 ? T : N + O) : 0);
-  const baseQ = 'qo' in c && c.qo !== undefined ? c.qo : L - P > 0 ? 0 : P - L;
-  const Q = r2(Math.max(0, baseQ - remSaida));
+  const baseQ =
+    'qo' in c && c.qo !== undefined
+      ? Math.max(0, c.qo - remSaida)
+      : L - P > 0
+      ? 0
+      : P - L;
+  const Q = r2(baseQ);
   const R = r2(T > 0 ? Math.max(L - N - P - O, 0) : 0);
-  const baseS = 'so' in c && c.so !== undefined ? c.so : L - N - O - P > 0 ? 0 : L - N - O - P;
-  const S = r2(baseS < 0 ? Math.min(0, baseS + remSaida) : baseS);
+  const baseS =
+    'so' in c && c.so !== undefined
+      ? c.so < 0
+        ? Math.min(0, c.so + remSaida)
+        : c.so
+      : L - N - O - P > 0
+      ? 0
+      : L - N - O - P;
+  const S = r2(baseS);
   const U = M === 0 ? (N > 0 ? 1 : 0) : N / M;
 
   return { N: r2(N), M, Q, R, S, T, U, O: r2(O), P: r2(P) };

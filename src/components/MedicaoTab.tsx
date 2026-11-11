@@ -254,7 +254,7 @@ export const MedicaoTab: React.FC = () => {
       para: remDestino,
       valor: Math.round(v * 100) / 100,
       data: hoje(),
-      st: 'pend' as const,
+      st: 'med' as const,
       obs: remObs.trim(),
     };
 

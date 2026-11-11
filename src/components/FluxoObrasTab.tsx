@@ -121,6 +121,12 @@ export const FluxoObrasTab: React.FC = () => {
         gap: 12px 20px !important;
       }
       header .acts, header .filters { justify-content: flex-start !important; }
+      .tm-tab th.th-lbl, .tm-tab td.td-lbl {
+        background-color: ${theme === 'light' ? '#ffffff' : '#0d182e'} !important;
+      }
+      .tm-tab th.th-final, .tm-tab td.td-final {
+        background-color: ${theme === 'light' ? '#f8fafc' : '#0d182e'} !important;
+      }
       @media print {
         @page {
           size: A4 landscape;

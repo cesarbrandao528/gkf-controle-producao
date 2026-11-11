@@ -149,6 +149,7 @@ test('Calc: remanejamento deducts from origin Q and relieves S, adds to destinat
   const resOrigem = calc(cfg.contratos[0], cfg, {}, {}, {});
   assert.equal(resOrigem.Q, 0); // 260.57 deducted from retained balance
   assert.equal(resOrigem.S, 0); // -260.57 + 260.57 = 0
+  assert.equal(resOrigem.P, 415000); // 415260.57 - 260.57 = 415000 (deducted from origin P)
 
   const resDestino = calc(cfg.contratos[1], cfg, {}, {}, {});
   assert.equal(resDestino.P, 100260.57); // 260.57 added to accumulated measured
