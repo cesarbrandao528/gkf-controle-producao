@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Motor } from './motor';
-import { calc, fmt, pn, dbr, ordC, stC, filtC, dashRows, buildDash } from './calc';
+import { calc, calcOSE, fmt, pn, dbr, ordC, stC, filtC, dashRows, buildDash } from './calc';
 import { Config, Contrato, PrecoItem } from '../types';
 
 test('Motor: parses and executes arithmetic and cell references', () => {
@@ -153,5 +153,36 @@ test('Calc: remanejamento deducts from origin Q and relieves S, adds to destinat
 
   const resDestino = calc(cfg.contratos[1], cfg, {}, {}, {});
   assert.equal(resDestino.P, 100260.57); // 260.57 added to accumulated measured
+});
+
+test('Calc: calcOSE filters out Meio Fio, Reposicao/Fornecimento, Pedrisco and Bica Corrida from ESC', () => {
+  const dummyCfg: any = { periodo: { ini: '2026-10-01', fim: '2026-10-31' }, frentes: [] };
+  const dummyTpl: any = {
+    ESC: {
+      r0: 1,
+      r1: 1,
+      cells: {},
+      entradas: [],
+      servicos: [
+        { c: '20201', ref: 'A1' },
+        { c: '100109', ref: 'A2' }, // Remoção Meio-Fio
+        { c: '100201', ref: 'A3' }, // Reposição Paralelepípedo
+        { c: '100404', ref: 'A4' }, // Revestimento com Pedrisco
+        { c: '100406', ref: 'A5' }, // Revestimento com Bica Corrida
+      ],
+    },
+  };
+  const dummyOse: any = {
+    id: 'ose1',
+    tipo: 'ESC',
+    nome: 'Trecho 1',
+    rows: [],
+  };
+  const res = calcOSE(dummyOse, 'f1', dummyCfg, {}, dummyTpl);
+  const codes = res.itens.map((x: any) => x.c);
+  assert.ok(!codes.includes('100109'));
+  assert.ok(!codes.includes('100201'));
+  assert.ok(!codes.includes('100404'));
+  assert.ok(!codes.includes('100406'));
 });
 

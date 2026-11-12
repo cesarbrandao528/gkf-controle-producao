@@ -159,9 +159,22 @@ export function calcOSE(
     } else {
       map['40804'] = 0;
     }
-    delete map['60102']; // Retirar item 60102 do Escavado
-    delete map['110101']; // Retirar item 110101 (Tomada de Água) do Escavado
-    delete map['110102']; // Retirar item 110102 (Ramal Predial) do Escavado
+
+    const ESC_EXCLUDED_CODES = new Set([
+      '60102',
+      '100109', // Remoção de Meio-Fio
+      // Todos os itens de Reposição e Fornecimento (lançados na OSE de Reposição de Pavimento):
+      '100201', '100202', '100203', '100204', '100205', '100206',
+      '100209', '100210', '100211', '100212', '100213', '100214',
+      '100215', '100216', '100217',
+      // Reposição de pavimento asfáltico (lançados na OSE de Reposição de Pavimento):
+      '100303', '100308', '100310', '100311', '100312', '100316',
+      // Revestimento com Pedrisco e Revestimento com Bica Corrida, Sem Transporte:
+      '100404', '100406',
+      // Tomada e Ramal predial:
+      '110101', '110102',
+    ]);
+    ESC_EXCLUDED_CODES.forEach((c) => delete map[c]);
   }
 
   // Remove default template items 110101 and 110102 from MND (automatic formula)
@@ -185,13 +198,23 @@ export function calcOSE(
 
   const aj = o.aj || {};
   const ajPct = o.ajPct || {};
+  const ESC_EXCLUDED_SET = new Set([
+    '60102',
+    '100109',
+    '100201', '100202', '100203', '100204', '100205', '100206',
+    '100209', '100210', '100211', '100212', '100213', '100214',
+    '100215', '100216', '100217',
+    '100303', '100308', '100310', '100311', '100312', '100316',
+    '100404', '100406',
+    '110101', '110102',
+  ]);
   const allCodes = Array.from(
     new Set([...Object.keys(map), ...Object.keys(aj), ...Object.keys(ajPct), ...Object.keys(avulsosMap)])
   )
     .filter((c) => {
       // If it was explicitly launched as an avulso or manual adjustment, always keep it
       if (c in avulsosMap || c in aj || c in ajPct) return true;
-      if (o.tipo === 'ESC' && (c === '60102' || c === '110101' || c === '110102')) return false;
+      if (o.tipo === 'ESC' && ESC_EXCLUDED_SET.has(c)) return false;
       if (o.tipo === 'MND' && (c === '110101' || c === '110102')) return false;
       return true;
     })

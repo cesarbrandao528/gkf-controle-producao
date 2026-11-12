@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { useData } from '../context/DataContext';
 import {
@@ -37,6 +37,79 @@ import {
   Building2,
 } from 'lucide-react';
 import { AvulsoItem, Config, Fechamento, FrenteLancamentos, OSE, OSERow, PrecoItem } from '../types';
+
+interface AjusteInputCellProps {
+  value: number | undefined;
+  onChange: (valStr: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  suffix?: string;
+  className?: string;
+}
+
+/**
+ * Input com buffer local para digitação sequencial natural (sem interferência de formatação no meio da digitação)
+ */
+const AjusteInputCell: React.FC<AjusteInputCellProps> = ({
+  value,
+  onChange,
+  placeholder = 'auto',
+  disabled = false,
+  suffix = '',
+  className = '',
+}) => {
+  const [focused, setFocused] = useState(false);
+  const [localText, setLocalText] = useState('');
+
+  useEffect(() => {
+    if (!focused) {
+      if (value === undefined || value === null) {
+        setLocalText('');
+      } else {
+        setLocalText(suffix ? `${value}${suffix}` : fmt(value));
+      }
+    }
+  }, [value, focused, suffix]);
+
+  return (
+    <input
+      type="text"
+      placeholder={placeholder}
+      disabled={disabled}
+      value={
+        focused
+          ? localText
+          : value !== undefined && value !== null
+          ? suffix
+            ? `${value}${suffix}`
+            : fmt(value)
+          : ''
+      }
+      onFocus={() => {
+        setFocused(true);
+        setLocalText(
+          value !== undefined && value !== null
+            ? String(value).replace('.', ',')
+            : ''
+        );
+      }}
+      onChange={(e) => {
+        setLocalText(e.target.value);
+      }}
+      onBlur={() => {
+        setFocused(false);
+        const clean = localText.replace(suffix || '', '').trim();
+        onChange(clean);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          (e.target as HTMLInputElement).blur();
+        }
+      }}
+      className={className}
+    />
+  );
+};
 
 export const TrechosTab: React.FC = () => {
   const {
@@ -1519,13 +1592,12 @@ export const TrechosTab: React.FC = () => {
                         </td>
                         {/* Ajuste em porcentagem (%) */}
                         <td className="text-right">
-                          <input
-                            type="text"
+                          <AjusteInputCell
                             placeholder="0%"
                             disabled={isClosedPeriod}
-                            value={it.ajPct !== undefined ? `${it.ajPct}%` : ''}
-                            onChange={(e) => {
-                              const clean = e.target.value.replace('%', '').trim();
+                            value={it.ajPct}
+                            suffix="%"
+                            onChange={(clean) => {
                               handleUpdateAjustePct(currentOse!, it.c, clean);
                             }}
                             className="text-right text-xs border border-[var(--ln)] rounded px-1.5 py-0.5 bg-black/25 w-16 disabled:opacity-75 disabled:cursor-not-allowed"
@@ -1533,13 +1605,12 @@ export const TrechosTab: React.FC = () => {
                         </td>
                         {/* Ajuste em quantidade manual */}
                         <td className="text-right">
-                          <input
-                            type="text"
+                          <AjusteInputCell
                             placeholder="auto"
                             disabled={isClosedPeriod}
-                            value={it.ajVal !== undefined ? fmt(it.ajVal) : ''}
-                            onChange={(e) =>
-                              handleUpdateAjuste(currentOse!, it.c, e.target.value)
+                            value={it.ajVal}
+                            onChange={(valStr) =>
+                              handleUpdateAjuste(currentOse!, it.c, valStr)
                             }
                             className="text-right text-xs border border-[var(--ln)] rounded px-1.5 py-0.5 bg-black/25 w-20 disabled:opacity-75 disabled:cursor-not-allowed"
                           />

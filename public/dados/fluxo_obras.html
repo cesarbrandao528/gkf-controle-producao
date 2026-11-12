@@ -126,7 +126,7 @@ tr.bx input:not([type=checkbox]){opacity:.55}.cm{color:var(--mu);font-variant-nu
 <div class="side"><div class="acts" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><button type="button" id="btn-toggle-prev" class="btn" onclick="togglePrevisao()" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:700;transition:all .15s ease" title="Desconsiderar / Considerar lançamentos de Previsão de Pagamento da Coluna E (Descrição do Tipo de Documento)"><span id="btn-prev-icon">👁️</span> <span id="btn-prev-text">Previsão de Pgto: Considerada</span></button><label class="btn pr" style="cursor:pointer">⬆ Atualizar planilha<input id="up" type="file" accept=".xlsx,.xlsm" hidden></label></div>
 <div class="filters"><label>Setor (Fluxo Geral)<select id="fs"></select></label><label>Obra (Fluxo)<select id="fo"></select></label><label>Ano<select id="fy"></select></label></div></div></header>
 <div class="grid" id="kp"></div>
-<div class="grid" id="grid-mensal"><div class="card s12" id="card-mensal" style="overflow:hidden"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px"><div><h2 id="titulo-mensal">Fluxo Mensal Consolidado • Receitas, Custos e Resultados (10 Meses)</h2><p class="desc" style="margin-bottom:0">Detalhamento mês a mês com ADM Central, Custos Trabalhistas, Impostos, Entradas, Saídas, Resultado e Margem</p></div><div class="leg" style="margin-bottom:0"><span><i style="background:rgba(239,68,68,0.3);border:1px solid #ef4444"></i>Negativo</span><span><i style="background:rgba(16,185,129,0.3);border:1px solid #10b981"></i>Positivo</span></div></div><div class="tw" id="tabela-mensal"></div></div></div>
+<div class="grid" id="grid-mensal"><div class="card s12" id="card-mensal" style="overflow:hidden"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px"><div><h2 id="titulo-mensal">Fluxo Mensal Consolidado • Receitas, Custos e Resultados (Todos os Meses)</h2><p class="desc" style="margin-bottom:0">Detalhamento mês a mês com ADM Central, Custos Trabalhistas, Impostos, Entradas, Saídas, Resultado e Margem</p></div><div class="leg" style="margin-bottom:0"><span><i style="background:rgba(239,68,68,0.3);border:1px solid #ef4444"></i>Negativo</span><span><i style="background:rgba(16,185,129,0.3);border:1px solid #10b981"></i>Positivo</span></div></div><div class="tw" id="tabela-mensal"></div></div></div>
 <div class="grid" id="ch"></div>
 <div class="grid">
 <div class="card s6" id="card-resultado"><h2>Resultado (padrão da aba FLUXO)</h2><p class="desc">Entradas − saídas − ADM − custos trab − impostos</p><div id="dre"></div></div>
@@ -275,16 +275,14 @@ function renderTabelaMensal(mon, lab, chartData, s, ob) {
     return;
   }
 
-  // Visualização de 10 meses padrão e permanente
-  const is10 = mon.length > 10;
-  const startIdx = is10 ? mon.length - 10 : 0;
-  const vMon = is10 ? mon.slice(startIdx) : mon;
-  const vLab = is10 ? lab.slice(startIdx) : lab;
-  const vChartData = is10 ? chartData.slice(startIdx) : chartData;
+  // Visualização de todos os meses consolidada
+  const vMon = mon;
+  const vLab = lab;
+  const vChartData = chartData;
 
   const titEl = $('titulo-mensal');
   if (titEl) {
-    titEl.textContent = 'Fluxo Mensal Consolidado • Receitas, Custos e Resultados (10 Meses)';
+    titEl.textContent = 'Fluxo Mensal Consolidado • Receitas, Custos e Resultados (Todos os Meses)';
   }
 
   const fReal = n => {
@@ -310,7 +308,7 @@ function renderTabelaMensal(mon, lab, chartData, s, ob) {
   const totSaldo = vChartData.length ? vChartData[vChartData.length - 1].ac : 0;
   const totMargem = totE > 0 ? (totR / totE) : null;
 
-  const finalColTitle = is10 ? 'TOTAL (10 MESES)' : 'TOTAL DO PERÍODO';
+  const finalColTitle = 'TOTAL DO PERÍODO';
 
   const mNamesPT = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
