@@ -217,16 +217,17 @@ test('Calc: ESC discounts rock volume from solo excavation/reaterro, excludes 40
     ],
   };
 
-  const res5 = calcOSE(oseWithRock, 'f1', cfg, {}, tpl);
+  const res5 = calcOSE({ ...oseWithRock, dmtPo: 6.3 }, 'f1', cfg, {}, tpl);
   const byCode = (r: any, code: string) => r.itens.find((x: any) => x.c === code);
 
   assert.equal(byCode(res5, '40402'), undefined); // 40402 excluded from formula
   assert.equal(byCode(res5, '40403')?.q, 45.83);
   assert.equal(byCode(res5, '40201')?.q, 34.52); // 345.15 * 0.1 (volume total escavado * 10%)
   assert.equal(byCode(res5, '40301')?.q, 269.39); // (345.15 - 45.8315) * 0.9
-  assert.equal(byCode(res5, '40602')?.q, 156.39); // Reaterro discounts rock
-  assert.equal(byCode(res5, '40607')?.q, 185.64); // 1x rock + areia + berço
-  assert.equal(byCode(res5, '40801')?.q, 142.93);
+  assert.equal(byCode(res5, '40602')?.q, 202.22); // Reaterro sem descontar rocha
+  assert.equal(byCode(res5, '40607')?.q, 139.81); // Apenas areia (O24) + berço (P24), sem rocha (O32)
+  assert.equal(byCode(res5, '40608')?.q, 880.81); // 139.8112 * 6.3
+  assert.equal(byCode(res5, '40801')?.q, 142.93); // 345.15 - 202.2237
   assert.equal(byCode(res5, '40802')?.q, 45.83);
   assert.equal(byCode(res5, '40804')?.q, 714.63);
   assert.equal(byCode(res5, '40805')?.q, 229.16); // 45.8315 * 5
