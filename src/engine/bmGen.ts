@@ -184,6 +184,14 @@ async function montarOSE(
       x = setCell(x, k, v.slice(1), styleOf(x, m[1] + (tp.r0 + 1)), true);
     }
   }
+  if (tp.sheetNum === 12) {
+    for (const ref of ['E192', 'E193', 'E194', 'E195', 'E196', 'E197', 'E198']) {
+      const v = tp.cells[ref];
+      if (typeof v === 'string' && v[0] === '=') {
+        x = setCell(x, ref, v.slice(1), styleOf(x, ref), true);
+      }
+    }
+  }
 
   os.rows.forEach((r: any, i: number) => {
     const row = tp.r0 + i;

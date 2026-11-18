@@ -247,4 +247,65 @@ test('Calc: ESC discounts rock volume from solo excavation/reaterro, excludes 40
   assert.equal(byCode(resNoRock, '40805'), undefined);
 });
 
+test('Calc: MND Travessia maps missing pipe diameters to next larger diameter (e.g. DN 250 -> MND280)', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const tplPath = path.resolve(process.cwd(), 'public/dados/templates.json');
+  const tpl = JSON.parse(fs.readFileSync(tplPath, 'utf8'));
+
+  const cfg: any = {
+    periodo: { ini: '2026-10-21', fim: '2026-11-20' },
+    k: 0.0155,
+    precos: [],
+    contratos: [],
+    frentes: [],
+    equipes: [],
+    rem: [],
+  };
+
+  const oseSalomao: any = {
+    id: 'ose_mnd_250',
+    tipo: 'MND',
+    nome: 'R. Salomão Carneiro',
+    rows: [
+      { d: '2026-11-10', v: { A: '1', B: '250', C: '100' } },
+      { d: '2026-11-11', v: { A: '2', B: '250', C: '60' } },
+      { d: '2026-11-12', v: { A: '3', B: '250', C: '91' } },
+      { d: '2026-11-13', v: { A: '4', B: '250', C: '90' } },
+      { d: '2026-11-14', v: { A: '5', B: '250', C: '93' } },
+      { d: '2026-11-16', v: { A: '6', B: '250', C: '42' } },
+    ],
+  };
+
+  const res250 = calcOSE(oseSalomao, 'f1', cfg, {}, tpl);
+  const byCode = (r: any, code: string) => r.itens.find((x: any) => x.c === code);
+  assert.equal(byCode(res250, 'MND280')?.q, 476); // DN 250 -> MND280
+  assert.equal(byCode(res250, 'MND225'), undefined);
+
+  const oseMixed: any = {
+    id: 'ose_mnd_mix',
+    tipo: 'MND',
+    nome: 'Misto',
+    rows: [
+      { d: '2026-11-10', v: { A: '1', B: '50', C: '10' } },  // -> MND63
+      { d: '2026-11-10', v: { A: '2', B: '75', C: '20' } },  // -> MND90
+      { d: '2026-11-10', v: { A: '3', B: '100', C: '30' } }, // -> MND110
+      { d: '2026-11-10', v: { A: '4', B: '150', C: '40' } }, // -> MND160
+      { d: '2026-11-10', v: { A: '5', B: '200', C: '50' } }, // -> MND225
+      { d: '2026-11-10', v: { A: '6', B: '250', C: '60' } }, // -> MND280
+      { d: '2026-11-10', v: { A: '7', B: '280', C: '15' } }, // -> MND280
+      { d: '2026-11-10', v: { A: '8', B: '300', C: '70' } }, // -> MND315
+    ],
+  };
+
+  const resMix = calcOSE(oseMixed, 'f1', cfg, {}, tpl);
+  assert.equal(byCode(resMix, 'MND63')?.q, 10);
+  assert.equal(byCode(resMix, 'MND90')?.q, 20);
+  assert.equal(byCode(resMix, 'MND110')?.q, 30);
+  assert.equal(byCode(resMix, 'MND160')?.q, 40);
+  assert.equal(byCode(resMix, 'MND225')?.q, 50);
+  assert.equal(byCode(resMix, 'MND280')?.q, 75);
+  assert.equal(byCode(resMix, 'MND315')?.q, 70);
+});
+
 
