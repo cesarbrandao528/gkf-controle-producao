@@ -222,7 +222,7 @@ test('Calc: ESC discounts rock volume from solo excavation/reaterro, excludes 40
 
   assert.equal(byCode(res5, '40402'), undefined); // 40402 excluded from formula
   assert.equal(byCode(res5, '40403')?.q, 45.83);
-  assert.equal(byCode(res5, '40201')?.q, 29.93); // (345.15 - 45.8315) * 0.1
+  assert.equal(byCode(res5, '40201')?.q, 34.52); // 345.15 * 0.1 (volume total escavado * 10%)
   assert.equal(byCode(res5, '40301')?.q, 269.39); // (345.15 - 45.8315) * 0.9
   assert.equal(byCode(res5, '40602')?.q, 156.39); // Reaterro discounts rock
   assert.equal(byCode(res5, '40607')?.q, 185.64); // 1x rock + areia + berço

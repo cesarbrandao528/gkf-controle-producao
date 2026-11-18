@@ -144,11 +144,10 @@ export function calcOSE(
     const dmtPo = o.dmtPo !== undefined && !isNaN(o.dmtPo) ? o.dmtPo : 5;
     const dmtSolo = o.dmtSolo !== undefined && !isNaN(o.dmtSolo) ? o.dmtSolo : 5;
 
-    // Fórmula solicitada: Item 40801 = (volume total de solo escavado - 40602)
-    const escManual = map['40201'] || 0;
-    const escMecanizada = (map['40301'] || 0) + (map['40302'] || 0);
+    // Fórmula solicitada: Item 40801 = (volume de solo não rochoso escavado - 40602)
+    const soloEscavado = ((map['40301'] || 0) + (map['40302'] || 0)) / 0.9;
     const reaterro = map['40602'] || 0;
-    const volumeBotaFora = Math.max(0, (escManual + escMecanizada) - reaterro);
+    const volumeBotaFora = Math.max(0, soloEscavado - reaterro);
     map['40801'] = volumeBotaFora;
 
     if (map['40607']) {
