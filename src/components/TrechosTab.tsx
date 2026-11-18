@@ -1548,7 +1548,7 @@ export const TrechosTab: React.FC = () => {
                       onChange={(e) => handleUpdateDmt(currentOse, 'dmtSolo', e.target.value)}
                       className="w-16 px-2 py-0.5 rounded border border-[var(--ln)] bg-black/30 text-right font-bold text-[var(--cy)] disabled:opacity-75 disabled:cursor-not-allowed"
                     />
-                    <span className="text-[11px] text-[var(--mu)]">(multiplica item 40801)</span>
+                    <span className="text-[11px] text-[var(--mu)]">(multiplica itens 40801 e 40802)</span>
                   </label>
                 </div>
               )}

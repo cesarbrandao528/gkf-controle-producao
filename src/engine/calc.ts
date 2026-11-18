@@ -144,9 +144,9 @@ export function calcOSE(
     const dmtPo = o.dmtPo !== undefined && !isNaN(o.dmtPo) ? o.dmtPo : 5;
     const dmtSolo = o.dmtSolo !== undefined && !isNaN(o.dmtSolo) ? o.dmtSolo : 5;
 
-    // Fórmula solicitada: Item 40801 = (40201 + 40301 ou seja o volume total escavado - 40602)
+    // Fórmula solicitada: Item 40801 = (volume total de solo escavado - 40602)
     const escManual = map['40201'] || 0;
-    const escMecanizada = map['40301'] || 0;
+    const escMecanizada = (map['40301'] || 0) + (map['40302'] || 0);
     const reaterro = map['40602'] || 0;
     const volumeBotaFora = Math.max(0, (escManual + escMecanizada) - reaterro);
     map['40801'] = volumeBotaFora;
@@ -159,8 +159,14 @@ export function calcOSE(
     } else {
       map['40804'] = 0;
     }
+    if (map['40802']) {
+      map['40805'] = map['40802'] * dmtSolo;
+    } else {
+      delete map['40805'];
+    }
 
     const ESC_EXCLUDED_CODES = new Set([
+      '40402', // Escavação de Rocha Compacta a Frio desconsiderada da fórmula
       '60102',
       '100109', // Remoção de Meio-Fio
       // Todos os itens de Reposição e Fornecimento (lançados na OSE de Reposição de Pavimento):
@@ -199,6 +205,7 @@ export function calcOSE(
   const aj = o.aj || {};
   const ajPct = o.ajPct || {};
   const ESC_EXCLUDED_SET = new Set([
+    '40402',
     '60102',
     '100109',
     '100201', '100202', '100203', '100204', '100205', '100206',

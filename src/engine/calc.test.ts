@@ -186,3 +186,64 @@ test('Calc: calcOSE filters out Meio Fio, Reposicao/Fornecimento, Pedrisco and B
   assert.ok(!codes.includes('100406'));
 });
 
+test('Calc: ESC discounts rock volume from solo excavation/reaterro, excludes 40402, and 40805 uses dmtSolo', async () => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const tplPath = path.resolve(process.cwd(), 'public/dados/templates.json');
+  const tpl = JSON.parse(fs.readFileSync(tplPath, 'utf8'));
+
+  const cfg: any = {
+    periodo: { ini: '2026-10-21', fim: '2026-11-20' },
+    k: 0.015,
+    precos: [],
+    contratos: [],
+    frentes: [],
+    equipes: [],
+    rem: [],
+  };
+
+  const oseWithRock: any = {
+    id: 'ose_rock',
+    tipo: 'ESC',
+    nome: 'R. Indaial',
+    dmtPo: 5,
+    dmtSolo: 5,
+    rows: [
+      { d: '2026-11-09', v: { A: '1', B: '100', C: '60', D: '0.1', F: '0.4', G: '0.6', H: '0.65', S: '0' } },
+      { d: '2026-11-10', v: { A: '2', B: '50', C: '48', D: '0.1', F: '0.4', G: '0.55', H: '0.65', S: '0' } },
+      { d: '2026-11-11', v: { A: '3', B: '50', C: '400', D: '0.1', F: '0.4', G: '0.55', H: '0.65', S: '0' } },
+      { d: '2026-11-12', v: { A: '4', B: '50', C: '300', D: '0.1', F: '0.4', G: '0.55', H: '0.65', S: '0.25' } },
+      { d: '2026-11-13', v: { A: '5', B: '50', C: '152', D: '0.1', F: '0.4', G: '0.55', H: '0.65', S: '0.35' } },
+    ],
+  };
+
+  const res5 = calcOSE(oseWithRock, 'f1', cfg, {}, tpl);
+  const byCode = (r: any, code: string) => r.itens.find((x: any) => x.c === code);
+
+  assert.equal(byCode(res5, '40402'), undefined); // 40402 excluded from formula
+  assert.equal(byCode(res5, '40403')?.q, 45.83);
+  assert.equal(byCode(res5, '40201')?.q, 29.93); // (345.15 - 45.8315) * 0.1
+  assert.equal(byCode(res5, '40301')?.q, 269.39); // (345.15 - 45.8315) * 0.9
+  assert.equal(byCode(res5, '40602')?.q, 156.39); // Reaterro discounts rock
+  assert.equal(byCode(res5, '40607')?.q, 185.64); // 1x rock + areia + berço
+  assert.equal(byCode(res5, '40801')?.q, 142.93);
+  assert.equal(byCode(res5, '40802')?.q, 45.83);
+  assert.equal(byCode(res5, '40804')?.q, 714.63);
+  assert.equal(byCode(res5, '40805')?.q, 229.16); // 45.8315 * 5
+
+  // Changing dmtSolo updates both 40804 and 40805
+  const res10 = calcOSE({ ...oseWithRock, dmtSolo: 10 }, 'f1', cfg, {}, tpl);
+  assert.equal(byCode(res10, '40804')?.q, 1429.26);
+  assert.equal(byCode(res10, '40805')?.q, 458.32);
+
+  // Without rock, 40802 and 40805 do not appear
+  const oseNoRock: any = {
+    ...oseWithRock,
+    rows: [{ d: '2026-11-09', v: { A: '1', B: '100', C: '60', D: '0.1', F: '0.4', G: '0.6', H: '0.65', S: '0' } }],
+  };
+  const resNoRock = calcOSE(oseNoRock, 'f1', cfg, {}, tpl);
+  assert.equal(byCode(resNoRock, '40802'), undefined);
+  assert.equal(byCode(resNoRock, '40805'), undefined);
+});
+
+
